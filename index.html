@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="An offline numerical reasoning trainer for graduate aptitude tests. All progress stays in your browser.">
+<title>Numerical Reasoning Trainer</title>
+<style>
+:root{
+  --bg:#f6f6f3;
+  --panel:#ffffff;
+  --panel-2:#fbfbf9;
+  --ink:#23262b;
+  --ink-soft:#3c424b;
+  --muted:#626b76;
+  --line:#e4e4de;
+  --line-strong:#d2d2ca;
+  --accent:#2f6f66;
+  --accent-soft:#e6f0ee;
+  --accent-ink:#ffffff;
+  --ok:#2d6a4b;
+  --ok-bg:#eaf5ee;
+  --ok-line:#bcdcc7;
+  --bad:#9d3b3b;
+  --bad-bg:#fbecea;
+  --bad-line:#eec7c2;
+  --warn:#7a5510;
+  --warn-bg:#fcf3e3;
+  --warn-line:#e8d5ad;
+  --chip:#eceee9;
+  --focus:#1f6feb;
+  --shadow:0 1px 2px rgba(20,22,26,.06), 0 6px 18px rgba(20,22,26,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13151a;
+    --panel:#1b1e24;
+    --panel-2:#20242b;
+    --ink:#e9ebee;
+    --ink-soft:#d3d7dd;
+    --muted:#a3abb7;
+    --line:#2b3039;
+    --line-strong:#3a414c;
+    --accent:#77b8ae;
+    --accent-soft:#1f2f2d;
+    --accent-ink:#10201e;
+    --ok:#7fc79c;
+    --ok-bg:#182a20;
+    --ok-line:#2f513c;
+    --bad:#e79a93;
+    --bad-bg:#2c1c1b;
+    --bad-line:#5a3430;
+    --warn:#e0bd78;
+    --warn-bg:#2a2317;
+    --warn-line:#4d422a;
+    --chip:#252a32;
+    --focus:#79a9ff;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13151a;
+  --panel:#1b1e24;
+  --panel-2:#20242b;
+  --ink:#e9ebee;
+  --ink-soft:#d3d7dd;
+  --muted:#a3abb7;
+  --line:#2b3039;
+  --line-strong:#3a414c;
+  --accent:#77b8ae;
+  --accent-soft:#1f2f2d;
+  --accent-ink:#10201e;
+  --ok:#7fc79c;
+  --ok-bg:#182a20;
+  --ok-line:#2f513c;
+  --bad:#e79a93;
+  --bad-bg:#2c1c1b;
+  --bad-line:#5a3430;
+  --warn:#e0bd78;
+  --warn-bg:#2a2317;
+  --warn-line:#4d422a;
+  --chip:#252a32;
+  --focus:#79a9ff;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.6;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+h1,h2,h3,h4{line-height:1.3;margin:0 0 .4em}
+h1{font-size:1.05rem;font-weight:650;letter-spacing:.01em}
+h2{font-size:1.25rem;font-weight:650}
+h3{font-size:1.05rem;font-weight:650}
+p{margin:0 0 .85em}
+ul,ol{margin:0 0 .9em;padding-left:1.35em}
+li{margin:.3em 0}
+a{color:var(--accent)}
+b,strong{font-weight:650}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 64px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.tiny{font-size:.82rem}
+.center{text-align:center}
+.hidden{display:none !important}
+
+/* ---------- header ---------- */
+header.top{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(8px);
+  border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top);
+}
+.topbar{
+  max-width:860px;margin:0 auto;padding:10px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.brand{display:flex;flex-direction:column;min-width:0;flex:1}
+.brand .sub{font-size:.76rem;color:var(--muted);line-height:1.2}
+.t-short{display:none}
+.streak{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--chip);border:1px solid var(--line);
+  border-radius:999px;padding:5px 11px;font-size:.84rem;font-weight:600;
+  white-space:nowrap;
+}
+.streak svg{width:14px;height:14px;flex:none}
+.streak.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.streak .best{font-weight:500;color:var(--muted)}
+.iconbtn{
+  background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;width:38px;height:38px;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.iconbtn:hover{border-color:var(--line-strong)}
+.iconbtn svg{width:18px;height:18px}
+
+/* ---------- tabs ---------- */
+nav.tabs{
+  position:sticky;top:0;z-index:15;
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.tabsinner{
+  max-width:860px;margin:0 auto;padding:8px 10px;
+  display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.tabsinner::-webkit-scrollbar{display:none}
+.tab{
+  appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);
+  font:inherit;font-size:.95rem;font-weight:600;
+  padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* ---------- cards & controls ---------- */
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:16px 0;box-shadow:var(--shadow);
+}
+.card.plain{box-shadow:none}
+.card h2:first-child,.card h3:first-child{margin-top:0}
+.btn{
+  appearance:none;font:inherit;font-weight:600;cursor:pointer;
+  background:var(--panel);color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:11px;
+  padding:11px 16px;min-height:44px;
+}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;border-color:var(--line)}
+.btn.danger{border-color:var(--bad-line);color:var(--bad)}
+.btn.block{display:block;width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row.tight{gap:8px}
+:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:6px}
+
+label.field{display:block;font-size:.86rem;font-weight:600;color:var(--muted);margin:0 0 5px}
+select,input[type="text"]{
+  font:inherit;font-size:16px;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line-strong);border-radius:11px;padding:11px 12px;width:100%;min-height:46px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+.segmented{display:flex;gap:6px;background:var(--chip);border-radius:12px;padding:5px;border:1px solid var(--line)}
+.segmented button{
+  flex:1;appearance:none;border:0;background:transparent;color:var(--muted);
+  font:inherit;font-weight:600;font-size:.92rem;padding:9px 8px;border-radius:9px;cursor:pointer;min-height:40px;
+}
+.segmented button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+
+.chip{
+  display:inline-block;background:var(--chip);border:1px solid var(--line);
+  border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;color:var(--muted);
+}
+
+/* ---------- practice ---------- */
+.qhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.qhead .spacer{flex:1}
+.progressline{height:5px;background:var(--chip);border-radius:999px;overflow:hidden;margin:2px 0 16px}
+.progressline i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .25s ease}
+.timer{font-variant-numeric:tabular-nums;font-weight:650;font-size:.88rem;color:var(--muted)}
+.qstem{font-size:1.14rem;line-height:1.55;margin:0 0 4px}
+.qstem b{font-weight:650}
+.figure{margin:14px 0;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel-2);overflow-x:auto}
+.figure .figtitle{font-weight:650;font-size:.95rem;margin:0 0 2px}
+.figure .figunits{font-size:.84rem;color:var(--muted);margin:0 0 10px}
+table.data{border-collapse:collapse;width:100%;font-size:.95rem;font-variant-numeric:tabular-nums}
+table.data th,table.data td{border:1px solid var(--line-strong);padding:8px 10px;text-align:right}
+table.data th:first-child,table.data td:first-child{text-align:left}
+table.data thead th{background:var(--chip);font-weight:650}
+svg.chart{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+
+.choices{display:grid;gap:9px;margin:16px 0 0}
+.choice{
+  display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  background:var(--panel);border:1px solid var(--line-strong);border-radius:12px;
+  padding:13px 14px;font:inherit;font-size:1.02rem;cursor:pointer;min-height:52px;color:var(--ink);
+}
+.choice:hover:not(:disabled){border-color:var(--accent);background:var(--panel-2)}
+.choice .letter{
+  flex:none;width:26px;height:26px;border-radius:7px;background:var(--chip);
+  display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--muted);
+}
+.choice.picked{border-color:var(--ink-soft)}
+.choice.right{background:var(--ok-bg);border-color:var(--ok-line)}
+.choice.right .letter{background:var(--ok);color:#fff}
+.choice.wrong{background:var(--bad-bg);border-color:var(--bad-line)}
+.choice.wrong .letter{background:var(--bad);color:#fff}
+.choice:disabled{cursor:default;opacity:1}
+
+.answerbox{display:flex;gap:10px;align-items:stretch;margin-top:16px;flex-wrap:wrap}
+.inputwrap{flex:1 1 180px;display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:11px;background:var(--panel);overflow:hidden}
+.inputwrap:focus-within{border-color:var(--accent)}
+.inputwrap .affix{padding:0 11px;color:var(--muted);font-weight:650;background:var(--panel-2);align-self:stretch;display:flex;align-items:center}
+.inputwrap input{border:0;border-radius:0;background:transparent;font-size:17px;font-variant-numeric:tabular-nums}
+.inputwrap input:focus{outline:none}
+.hintline{font-size:.86rem;color:var(--muted);margin-top:8px}
+
+.verdict{border-radius:12px;padding:12px 14px;margin:18px 0 0;border:1px solid;font-weight:600}
+.verdict.ok{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok)}
+.verdict.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.verdict .vsub{display:block;font-weight:450;color:var(--ink-soft);margin-top:4px;font-size:.94rem}
+
+.solution{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.solution h4{margin:0 0 10px;font-size:1rem}
+.steps{list-style:none;padding:0;margin:0;counter-reset:st}
+.steps li{
+  counter-increment:st;position:relative;padding:0 0 14px 38px;margin:0;
+  border-left:2px solid var(--line);margin-left:12px;padding-left:26px;
+}
+.steps li:last-child{border-left-color:transparent;padding-bottom:4px}
+.steps li::before{
+  content:counter(st);position:absolute;left:-13px;top:0;
+  width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  border:1px solid var(--accent);font-size:.78rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.steps .st{display:block;font-weight:650;margin-bottom:2px}
+.steps .sb{display:block;color:var(--ink-soft)}
+.eq{
+  display:block;margin:8px 0;padding:9px 12px;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:9px;
+  font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);
+  overflow-x:auto;white-space:nowrap;
+}
+.note{border-radius:11px;padding:11px 13px;margin:12px 0 0;border:1px solid;font-size:.95rem}
+.note .nlab{display:block;font-weight:700;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.note.check{background:var(--ok-bg);border-color:var(--ok-line)}
+.note.check .nlab{color:var(--ok)}
+.note.trap{background:var(--warn-bg);border-color:var(--warn-line)}
+.note.trap .nlab{color:var(--warn)}
+.note.info{background:var(--accent-soft);border-color:var(--accent)}
+.note.info .nlab{color:var(--accent)}
+
+/* ---------- calculator ---------- */
+.calcwrap{margin-top:18px}
+.calc{
+  border:1px solid var(--line-strong);border-radius:14px;padding:12px;background:var(--panel-2);margin-top:10px;
+  max-width:340px;
+}
+.calcscreen{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;text-align:right;font-size:1.5rem;font-weight:650;
+  font-variant-numeric:tabular-nums;overflow-x:auto;white-space:nowrap;min-height:50px;
+  display:flex;align-items:center;justify-content:flex-end;
+}
+.calckeys{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
+.calckeys button{
+  appearance:none;font:inherit;font-size:1.05rem;font-weight:600;cursor:pointer;
+  background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;
+  min-height:46px;color:var(--ink);
+}
+.calckeys button:hover{border-color:var(--accent)}
+.calckeys button.op{background:var(--chip)}
+.calckeys button.eqk{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.calckeys button.wide{grid-column:span 2}
+
+/* ---------- learn / tips ---------- */
+details.topic{
+  border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  margin:12px 0;box-shadow:var(--shadow);overflow:hidden;
+}
+details.topic>summary{
+  list-style:none;cursor:pointer;padding:15px 16px;font-weight:650;font-size:1.05rem;
+  display:flex;align-items:center;gap:12px;
+}
+details.topic>summary::-webkit-details-marker{display:none}
+details.topic>summary:hover{background:var(--panel-2)}
+.sumnum{
+  flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;
+}
+.sumtext{flex:1;min-width:0}
+.sumtext .sumsub{display:block;font-weight:450;font-size:.84rem;color:var(--muted);line-height:1.3}
+.chev{flex:none;width:16px;height:16px;color:var(--muted);transition:transform .2s ease}
+details.topic[open]>summary .chev{transform:rotate(180deg)}
+.topicbody{padding:0 16px 18px;border-top:1px solid var(--line)}
+.topicbody>h4{
+  margin:18px 0 6px;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);
+}
+.topicbody>h4:first-child{margin-top:16px}
+.qref{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-top:6px}
+.qref ul{margin:0;padding-left:1.2em}
+.qref li{margin:.35em 0}
+.worked{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel-2);margin:6px 0 0}
+.worked .wq{font-weight:650;margin-bottom:10px}
+kbd.k{
+  font:inherit;font-size:.92rem;font-weight:650;background:var(--chip);border:1px solid var(--line-strong);
+  border-radius:6px;padding:1px 6px;
+}
+table.mini{border-collapse:collapse;font-size:.95rem;margin:4px 0 10px;width:100%;max-width:420px;font-variant-numeric:tabular-nums}
+table.mini th,table.mini td{border:1px solid var(--line-strong);padding:6px 10px;text-align:left}
+table.mini thead th{background:var(--chip);font-weight:650}
+
+/* ---------- progress ---------- */
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.statgrid{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat .v{font-size:1.5rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.8rem;color:var(--muted);line-height:1.3}
+.chartbars{display:flex;align-items:flex-end;gap:6px;height:150px;margin:14px 0 4px;overflow-x:auto;padding-bottom:2px}
+.chartbars .cb{flex:1 1 20px;min-width:18px;display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:5px}
+.chartbars .cb i{display:block;flex:none;background:var(--accent);border-radius:5px 5px 2px 2px;min-height:4px}
+.chartbars .cb span{flex:none;font-size:.68rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.axis{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);border-top:1px solid var(--line);padding-top:6px}
+.trow{display:grid;grid-template-columns:1fr 62px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.trow:last-child{border-bottom:0}
+.trow .tn{font-size:.95rem;font-weight:600}
+.trow .tbar{height:7px;background:var(--chip);border-radius:999px;overflow:hidden;margin-top:5px}
+.trow .tbar i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.trow .tv{text-align:right;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted)}
+/* ---------- small screens ---------- */
+@media (max-width:560px){
+  body{font-size:16px}
+  .wrap{padding:0 14px 56px}
+  .card{padding:15px;border-radius:13px}
+  #startBtn{width:100%}
+  .qstem{font-size:1.08rem}
+  .steps li{padding-left:22px;margin-left:11px}
+  .calc{max-width:100%}
+}
+@media (max-width:480px){
+  .topbar{padding:8px 14px;gap:8px}
+  .brand .sub{display:none}
+  .t-full{display:none}
+  .t-short{display:inline}
+  h1{font-size:.97rem;line-height:1.25}
+  .streak{font-size:.78rem;padding:4px 9px;gap:5px}
+  .iconbtn{width:34px;height:34px}
+  .tabsinner{padding:7px 8px}
+  .tab{padding:7px 12px;font-size:.92rem}
+  .statgrid{gap:8px}
+  .stat{padding:10px}
+  .stat .v{font-size:1.3rem}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <div class="brand">
+      <h1><span class="t-full">Numerical Reasoning Trainer</span><span class="t-short">Numerical Reasoning</span></h1>
+      <span class="sub">Cappfinity &amp; Sova style &middot; works offline</span>
+    </div>
+    <div id="streakChip" class="streak" title="Days practised in a row">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.2 2.1c.3 3-1.1 4.3-2.4 5.5-1.4 1.3-2.8 2.6-2.8 5.2 0 .9.2 1.7.6 2.4-1-.6-1.7-1.6-2-2.8-1.1 1.3-1.7 3-1.7 4.7 0 3.8 3.2 6.9 7.1 6.9s7.1-3.1 7.1-6.9c0-4.6-2.9-6.6-4.3-9.1-.8-1.4-1.2-3.2-1.6-5.9z"/></svg>
+      <span id="streakText">0 days</span>
+    </div>
+    <button id="themeBtn" class="iconbtn" type="button" aria-label="Switch between light and dark" title="Light / dark">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="tabsinner" role="tablist">
+    <button class="tab" role="tab" id="tab-practice" aria-controls="panel-practice" aria-selected="true" type="button">Practice</button>
+    <button class="tab" role="tab" id="tab-learn" aria-controls="panel-learn" aria-selected="false" type="button">Learn</button>
+    <button class="tab" role="tab" id="tab-tips" aria-controls="panel-tips" aria-selected="false" type="button">Tips</button>
+    <button class="tab" role="tab" id="tab-progress" aria-controls="panel-progress" aria-selected="false" type="button">Progress</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ================= PRACTICE ================= -->
+<section id="panel-practice" role="tabpanel" aria-labelledby="tab-practice">
+
+  <!-- setup -->
+  <div id="setup" class="card">
+    <h2>Start a practice session</h2>
+    <p class="muted small">Every question is generated fresh, so you can never learn the answers by heart &mdash; only the method.</p>
+
+    <div style="margin-top:18px">
+      <label class="field" for="modeSeg">How do you want to practise?</label>
+      <div class="segmented" id="modeSeg">
+        <button type="button" data-mode="learn" aria-pressed="true">Untimed (learn)</button>
+        <button type="button" data-mode="timed" aria-pressed="false">Timed</button>
+      </div>
+      <p id="modeNote" class="hintline"></p>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div>
+        <label class="field" for="lenSel">How many questions?</label>
+        <select id="lenSel">
+          <option value="5">5 &mdash; a quick go</option>
+          <option value="10" selected>10 &mdash; a normal session</option>
+          <option value="15">15 &mdash; a longer stretch</option>
+        </select>
+      </div>
+      <div>
+        <label class="field" for="topicSel">Which topics?</label>
+        <select id="topicSel"><option value="all">All topics mixed</option></select>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:18px">
+      <button id="startBtn" class="btn primary" type="button">Start</button>
+    </div>
+    <p class="hintline" id="weakHint"></p>
+  </div>
+
+  <!-- question -->
+  <div id="quiz" class="card hidden">
+    <div class="qhead">
+      <span class="chip" id="qTopic">Topic</span>
+      <span class="spacer"></span>
+      <span class="timer" id="qTimer"></span>
+      <span class="small muted" id="qCount">Question 1 of 10</span>
+    </div>
+    <div class="progressline"><i id="qProgress" style="width:0%"></i></div>
+
+    <p class="qstem" id="qStem"></p>
+    <div id="qFigure"></div>
+
+    <div id="qChoices" class="choices"></div>
+
+    <div id="qFree" class="hidden">
+      <div class="answerbox">
+        <div class="inputwrap">
+          <span class="affix hidden" id="qPrefix"></span>
+          <input type="text" id="qInput" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="Your answer">
+          <span class="affix hidden" id="qSuffix"></span>
+        </div>
+        <button id="submitBtn" class="btn primary" type="button">Check</button>
+      </div>
+      <p class="hintline" id="qHint"></p>
+    </div>
+
+    <div class="row tight" style="margin-top:14px">
+      <button id="unsureBtn" class="btn ghost small" type="button">Not sure &mdash; show me the method</button>
+    </div>
+
+    <div id="qResult"></div>
+
+    <div class="calcwrap">
+      <button id="calcToggle" class="btn ghost" type="button" aria-expanded="false" aria-controls="calcPanel">Calculator</button>
+      <div id="calcPanel" class="calc hidden">
+        <div class="calcscreen" id="calcScreen" aria-live="polite">0</div>
+        <div class="calckeys">
+          <button type="button" class="op" data-k="clear">C</button>
+          <button type="button" class="op" data-k="back" aria-label="Delete last digit">&#9003;</button>
+          <button type="button" class="op" data-k="pct" title="Turns the number on screen into a decimal: 15 becomes 0.15">%</button>
+          <button type="button" class="op" data-k="/">&divide;</button>
+          <button type="button" data-k="7">7</button>
+          <button type="button" data-k="8">8</button>
+          <button type="button" data-k="9">9</button>
+          <button type="button" class="op" data-k="*">&times;</button>
+          <button type="button" data-k="4">4</button>
+          <button type="button" data-k="5">5</button>
+          <button type="button" data-k="6">6</button>
+          <button type="button" class="op" data-k="-">&minus;</button>
+          <button type="button" data-k="1">1</button>
+          <button type="button" data-k="2">2</button>
+          <button type="button" data-k="3">3</button>
+          <button type="button" class="op" data-k="+">+</button>
+          <button type="button" class="wide" data-k="0">0</button>
+          <button type="button" data-k=".">.</button>
+          <button type="button" class="eqk" data-k="=">=</button>
+        </div>
+        <p class="tiny muted" style="margin:9px 0 0">The <b>%</b> key turns what is on screen into its decimal form (15 &rarr; 0.15), which is how you build multipliers.</p>
+        <button id="useAnswerBtn" class="btn ghost block hidden" type="button" style="margin-top:8px">Put this in the answer box</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button id="quitBtn" class="btn ghost small" type="button">End session</button>
+    </div>
+  </div>
+
+  <!-- summary -->
+  <div id="summary" class="card hidden"></div>
+</section>
+
+<!-- ================= LEARN ================= -->
+<section id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" class="hidden">
+
+  <div class="card plain">
+    <h2>Learn</h2>
+    <p class="muted">Nine short chapters. Each one starts with an everyday comparison, then explains the idea, then the method, then one example worked through slowly with nothing skipped.</p>
+    <p class="muted small">You don't need to read them in order, but if you're not sure where to start, start at chapter 1. Nothing here assumes you remember anything from school.</p>
+  </div>
+
+  <!-- 1 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">1</span>
+      <span class="sumtext">Percentages &mdash; the foundation
+        <span class="sumsub">What "%" actually means, and how to find a percentage of something</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>Imagine a test with exactly 100 marks. You get 37 marks. Everyone would say you scored <b>37 per cent</b>.</p>
+      <p>That's all a percentage is: <b>a score out of 100</b>. Nothing more clever than that.</p>
+      <p>The word helps too. <i>Per cent</i> means <i>per hundred</i>. It's the same "cent" as in <b>cent</b>ury (100 years) and <b>cent</b>imetre (100 of them make a metre). So "37%" is just a shorter way of writing "37 out of every 100".</p>
+
+      <h4>What it is</h4>
+      <p>Real life doesn't come in neat hundreds. A class might have 25 people. A salary might be &pound;28,400. A percentage takes whatever size the thing is and re-describes it <i>as if</i> it were out of 100.</p>
+      <p>That's the whole point of percentages: they put different-sized things on the same scale so you can compare them fairly. 18 out of 25 and 68 out of 100 are hard to compare as they are. As percentages &mdash; 72% and 68% &mdash; it's obvious in a second.</p>
+      <p>Two words worth pinning down now, because every question uses them:</p>
+      <ul>
+        <li><b>The whole</b> &mdash; the full amount, the thing being cut up. The total class, the full price, the entire budget.</li>
+        <li><b>The part</b> &mdash; the bit of it you're talking about.</li>
+      </ul>
+
+      <h4>The method &mdash; finding a percentage of a number</h4>
+      <p>There are two ways. Learn the first one for understanding, use the second one for speed.</p>
+      <p><b>Way 1 &mdash; the 1% brick.</b> If 1% means "one hundredth", then:</p>
+      <span class="eq">1% of a number = the number &divide; 100</span>
+      <p>Once you know what 1% is worth, you can build any percentage you like by multiplying. Want 15%? That's 15 of those bricks.</p>
+      <p><b>Way 2 &mdash; the decimal.</b> 15% is 15 hundredths, which is 0.15. So "15% of 240" is just "0.15 &times; 240". One button-press on a calculator. (Chapter 2 explains where 0.15 comes from.)</p>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">What is 15% of 240?</p>
+        <p><b>Step 1 &mdash; find 1%.</b> Divide by 100. Dividing by 100 moves the decimal point two places to the left, so 240 becomes 2.4.</p>
+        <span class="eq">240 &divide; 100 = 2.4 &nbsp; (so 1% of 240 is 2.4)</span>
+        <p><b>Step 2 &mdash; build up to 15%.</b> We have one brick, and we need fifteen of them.</p>
+        <span class="eq">2.4 &times; 15 = 36</span>
+        <p><b>Step 3 &mdash; answer the question that was asked.</b> 15% of 240 is <b>36</b>.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Let's get there a completely different way. 10% of 240 is 24 (just divide by 10). 5% is half of 10%, so 12. Add them: 24 + 12 = 36. Same answer, so it's right. It's also comfortably smaller than 240, which it has to be &mdash; 15% is only a small slice.</div>
+      </div>
+
+      <h4>The method &mdash; "what percentage is X out of Y?"</h4>
+      <p>This is the other question you'll be asked. The recipe:</p>
+      <span class="eq">part &divide; whole &times; 100</span>
+      <p>Divide first, then multiply by 100 to turn it into a percentage.</p>
+      <div class="worked">
+        <p class="wq">39 out of 60 applicants passed. What percentage passed?</p>
+        <p><b>Step 1 &mdash; decide which number is the whole.</b> 60 is everybody, so 60 is the whole. 39 is the part. The whole goes on the bottom of the division.</p>
+        <p><b>Step 2 &mdash; divide the part by the whole.</b></p>
+        <span class="eq">39 &divide; 60 = 0.65</span>
+        <p>That 0.65 is the answer already &mdash; just in decimal form, out of 1 rather than out of 100.</p>
+        <p><b>Step 3 &mdash; turn it into a percentage.</b> Multiply by 100.</p>
+        <span class="eq">0.65 &times; 100 = 65%</span>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          39 is a bit less than 40, and 40 out of 60 is two thirds, which is about 67%. Our answer, 65%, sits just under that. Good. And because the part is smaller than the whole, the answer had to be under 100% &mdash; it is.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out</span>
+        The single most common slip is dividing the wrong way round: 60 &divide; 39 instead of 39 &divide; 60. That gives 1.538, which would be 153.8% &mdash; more than everybody. Before you press the button, ask yourself: <i>which number is the whole?</i> The whole always goes on the bottom. And if the part is smaller than the whole, your answer <i>must</i> be under 100%.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li><b>1%</b> = divide by 100</li>
+          <li><b>10%</b> = divide by 10</li>
+          <li><b>50%</b> = halve it</li>
+          <li><b>25%</b> = halve it, halve it again</li>
+          <li><b>20%</b> = divide by 5 (or double 10%)</li>
+          <li><b>5%</b> = half of 10%</li>
+          <li>Any percentage can be built from 10% + 5% + 1% pieces. 35% = 10 + 10 + 10 + 5.</li>
+          <li>"What % is X out of Y" &rarr; <b>X &divide; Y &times; 100</b></li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 2 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">2</span>
+      <span class="sumtext">Fractions, decimals and percentages
+        <span class="sumsub">Three ways of saying exactly the same thing</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>Think about money for a second. You can say "fifty pence", or "&pound;0.50", or "half a pound". Three different ways of writing it. Nobody is confused, and nobody thinks they're different amounts.</p>
+      <p>Fractions, decimals and percentages work exactly like that. <b>&frac12; and 0.5 and 50% are the same amount wearing different clothes.</b></p>
+
+      <h4>What it is</h4>
+      <p>Here's the one idea that makes all of this click:</p>
+      <ul>
+        <li>A <b>fraction</b> is a division waiting to happen. &frac34; literally means "3 divided by 4".</li>
+        <li>A <b>decimal</b> is that division already done. 3 &divide; 4 = 0.75.</li>
+        <li>A <b>percentage</b> is that same decimal, scaled up so it's out of 100 instead of out of 1. 0.75 &rarr; 75%.</li>
+      </ul>
+      <p>So they are three stops on the same road. You can walk in either direction.</p>
+      <p>Why does a test care? Because questions deliberately mix them. "Two fifths of staff" and "40% of staff" mean the same thing, and the question that mentions both is testing whether you noticed.</p>
+
+      <h4>The method</h4>
+      <p>Four small moves. That's genuinely all of it.</p>
+      <table class="mini">
+        <thead><tr><th>Going from&hellip;</th><th>to&hellip;</th><th>Do this</th></tr></thead>
+        <tbody>
+          <tr><td>Fraction</td><td>Decimal</td><td>Divide the top by the bottom</td></tr>
+          <tr><td>Decimal</td><td>Percentage</td><td>Multiply by 100</td></tr>
+          <tr><td>Percentage</td><td>Decimal</td><td>Divide by 100</td></tr>
+          <tr><td>Percentage</td><td>Fraction</td><td>Put it over 100, then simplify</td></tr>
+        </tbody>
+      </table>
+      <p>"Multiply by 100" and "divide by 100" both just move the decimal point two places &mdash; right when multiplying, left when dividing. 0.375 &rarr; 37.5. And 37.5 &rarr; 0.375.</p>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">3 out of 8 trains were late. Write that as a percentage.</p>
+        <p><b>Step 1 &mdash; write it as a fraction.</b> 3 out of 8 is <sup>3</sup>&frasl;<sub>8</sub>. The whole (8) goes on the bottom.</p>
+        <p><b>Step 2 &mdash; turn the fraction into a decimal.</b> The fraction line means "divide".</p>
+        <span class="eq">3 &divide; 8 = 0.375</span>
+        <p><b>Step 3 &mdash; turn the decimal into a percentage.</b> Multiply by 100, which slides the point two places right.</p>
+        <span class="eq">0.375 &times; 100 = 37.5%</span>
+        <p>So <b>37.5%</b> of the trains were late.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          3 out of 8 is a bit less than 4 out of 8, and 4 out of 8 is a half &mdash; 50%. So the answer should be a bit under 50%. 37.5% is. If you'd got 3.75% or 375%, the decimal point slipped.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out</span>
+        Seeing 0.4 and thinking "4%". It isn't &mdash; it's <b>40%</b>. Here's why: 0.4 means four <i>tenths</i>, and four tenths is forty <i>hundredths</i>. Percentages are hundredths, so 0.4 = 40%. The rule that saves you: <b>the point always moves two places</b>, not one. 0.4 &rarr; 40%. 0.04 &rarr; 4%.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <p style="margin:0 0 8px"><b>Worth knowing by heart &mdash; they come up constantly:</b></p>
+        <table class="mini" style="margin-bottom:0">
+          <thead><tr><th>Fraction</th><th>Decimal</th><th>Percentage</th></tr></thead>
+          <tbody>
+            <tr><td>1/2</td><td>0.5</td><td>50%</td></tr>
+            <tr><td>1/3</td><td>0.333&hellip;</td><td>33.3%</td></tr>
+            <tr><td>1/4</td><td>0.25</td><td>25%</td></tr>
+            <tr><td>3/4</td><td>0.75</td><td>75%</td></tr>
+            <tr><td>1/5</td><td>0.2</td><td>20%</td></tr>
+            <tr><td>2/5</td><td>0.4</td><td>40%</td></tr>
+            <tr><td>1/8</td><td>0.125</td><td>12.5%</td></tr>
+            <tr><td>1/10</td><td>0.1</td><td>10%</td></tr>
+            <tr><td>1/20</td><td>0.05</td><td>5%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+  <!-- 3 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">3</span>
+      <span class="sumtext">Percentage change
+        <span class="sumsub">How much something went up or down, in fair terms</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>A jumper is reduced by &pound;10. A sofa is reduced by &pound;10. Same money off &mdash; but one of those feels like a real bargain and the other barely registers.</p>
+      <p>Why? Because &pound;10 off a &pound;40 jumper is a quarter of the price, while &pound;10 off a &pound;800 sofa is almost nothing. <b>The size of a change only means something next to what you started with.</b></p>
+      <p>Percentage change is the tool that does that comparison for you.</p>
+
+      <h4>What it is</h4>
+      <p>Percentage change answers: "compared to where it started, how big was the move?"</p>
+      <p>One word matters more than any other here: <b>the original</b>. That's the value you started from &mdash; the older one, the "before" one, the one that came first in time. Everything gets measured against it.</p>
+
+      <h4>The method</h4>
+      <ol>
+        <li><b>Find the change.</b> Bigger number minus smaller number. Note whether it went up or down.</li>
+        <li><b>Divide the change by the original.</b> Not by the new one. By the one you started with.</li>
+        <li><b>Multiply by 100</b> to turn it into a percentage.</li>
+      </ol>
+      <span class="eq">percentage change = (change &divide; original) &times; 100</span>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">A shop sold 250 units last year and 310 units this year. What was the percentage increase?</p>
+        <p><b>Step 1 &mdash; which one is the original?</b> Last year came first, so 250 is the original. This is the step people rush. Don't.</p>
+        <p><b>Step 2 &mdash; find the change.</b></p>
+        <span class="eq">310 &minus; 250 = 60</span>
+        <p>Sales went up by 60 units.</p>
+        <p><b>Step 3 &mdash; compare that change to the original.</b> Divide by 250, not by 310.</p>
+        <span class="eq">60 &divide; 250 = 0.24</span>
+        <p><b>Step 4 &mdash; make it a percentage.</b></p>
+        <span class="eq">0.24 &times; 100 = 24%</span>
+        <p>So sales rose by <b>24%</b>.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Work it forwards. 10% of 250 is 25, so 20% is 50, and 4% is 10. Together, 24% of 250 = 60 &mdash; exactly the change we found. It fits, so the answer is right.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 1</span>
+        Dividing by the <i>new</i> number. Using 310 above gives 19.4%, which is one of the wrong options you'll be offered. Say it out loud before you divide: "compared to what it <i>was</i>".</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 2</span>
+        <b>Percentage points are not percentages.</b> If an interest rate goes from 2% to 3%, that's a rise of <b>1 percentage point</b> &mdash; but it's a <b>50% increase</b> (the change, 1, divided by the original, 2). Both are correct; they answer different questions. Read which one is being asked.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 3</span>
+        Up 50% then down 50% does <i>not</i> bring you back. &pound;100 up 50% is &pound;150; &pound;150 down 50% is &pound;75. The second percentage was taken from a bigger number, so it took more away.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li><b>change &divide; original &times; 100</b> &mdash; the original is the "before" number</li>
+          <li>Went up &rarr; say "increase". Went down &rarr; say "decrease". Don't report a negative percentage unless asked.</li>
+          <li>A change bigger than the original means over 100% &mdash; that's allowed and often correct (doubling = a 100% increase).</li>
+          <li>From 2% to 3% = 1 percentage point = a 50% increase.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 4 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">4</span>
+      <span class="sumtext">Multipliers
+        <span class="sumsub">The one-step shortcut for adding or taking off a percentage</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>Think of an old photocopier with a zoom dial. Set it to 110% and everything comes out 10% bigger. Set it to 85% and everything comes out 15% smaller. You don't work out the extra and glue it on &mdash; the dial does it in <b>one pass</b>.</p>
+      <p>A multiplier is that dial, written as a number.</p>
+
+      <h4>What it is</h4>
+      <p>A multiplier is a single number you multiply by to apply a percentage change in one move.</p>
+      <p>The thinking behind it: the thing you start with is <b>100%</b> of itself. Always. So&hellip;</p>
+      <ul>
+        <li>Add 20% and you now have 100% + 20% = <b>120%</b> of the original, and 120% as a decimal is <b>1.2</b>.</li>
+        <li>Take off 15% and you're left with 100% &minus; 15% = <b>85%</b>, which as a decimal is <b>0.85</b>.</li>
+      </ul>
+      <p>That's the whole trick. Work out what percentage you're <i>left holding</i>, then turn it into a decimal by dividing by 100.</p>
+      <p>Why bother, when you could find the amount and add it on? Two reasons. It's one calculator step instead of three, so there's less to get wrong. And it's the only sane way to handle chapter 5 (working backwards).</p>
+
+      <h4>The method</h4>
+      <ol>
+        <li><b>Increase by p%</b> &rarr; multiplier is <b>(100 + p) &divide; 100</b>. Up 8% &rarr; 108 &divide; 100 &rarr; &times;1.08</li>
+        <li><b>Decrease by p%</b> &rarr; multiplier is <b>(100 &minus; p) &divide; 100</b>. Down 8% &rarr; 92 &divide; 100 &rarr; &times;0.92</li>
+        <li>Multiply the starting amount by it. Done.</li>
+      </ol>
+      <p>Notice the shape of them: an increase always gives a multiplier <b>above 1</b>, and a decrease always gives one <b>below 1</b>. That's a free check every single time.</p>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">A laptop costs &pound;480. In a sale it is reduced by 15%. What is the sale price?</p>
+        <p><b>Step 1 &mdash; what are we left holding?</b> We start at 100% and lose 15%.</p>
+        <span class="eq">100% &minus; 15% = 85%</span>
+        <p><b>Step 2 &mdash; turn 85% into a decimal.</b> Divide by 100 (point moves two places left).</p>
+        <span class="eq">85 &divide; 100 = 0.85 &nbsp; (this is our multiplier)</span>
+        <p>Sense-check the multiplier before using it: it's below 1, and the price is going down. Correct shape.</p>
+        <p><b>Step 3 &mdash; one multiplication.</b></p>
+        <span class="eq">&pound;480 &times; 0.85 = &pound;408</span>
+        <p>The sale price is <b>&pound;408</b>.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          The slow way: 10% of 480 is 48, and 5% is 24, so 15% off is 48 + 24 = &pound;72 off. 480 &minus; 72 = &pound;408. Same answer. And &pound;408 is a bit below &pound;480, which is exactly what a 15% discount should look like &mdash; a small bite, not half the price.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 1</span>
+        Multiplying by <b>0.15</b> instead of 0.85. That gives &pound;72, which is the <i>discount</i>, not the <i>price</i>. Both numbers will be sitting there in the multiple-choice options. Ask yourself what the question wanted: the money off, or the money you pay?</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 2</span>
+        Writing 5% as <b>1.5</b>. It's <b>1.05</b>. Five per cent is 0.05, not 0.5. If it helps, always write the percentage as a three-digit thing first: 105% &rarr; 1.05.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 3</span>
+        Two changes in a row: multiply the multipliers, don't add the percentages. Up 10% then up 10% is &times;1.1 &times;1.1 = &times;1.21 &mdash; a 21% rise overall, not 20%.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li>+5% &rarr; &times;1.05 &nbsp;&middot;&nbsp; +10% &rarr; &times;1.1 &nbsp;&middot;&nbsp; +20% (VAT) &rarr; &times;1.2 &nbsp;&middot;&nbsp; +2.5% &rarr; &times;1.025</li>
+          <li>&minus;5% &rarr; &times;0.95 &nbsp;&middot;&nbsp; &minus;10% &rarr; &times;0.9 &nbsp;&middot;&nbsp; &minus;25% &rarr; &times;0.75 &nbsp;&middot;&nbsp; &minus;33% &rarr; &times;0.67</li>
+          <li>Increase &rarr; multiplier above 1. Decrease &rarr; multiplier below 1. No exceptions.</li>
+          <li>Doubling is &times;2, which is a 100% increase. Halving is &times;0.5, a 50% decrease.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 5 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">5</span>
+      <span class="sumtext">Reverse percentages
+        <span class="sumsub">You know the price after the change &mdash; what was it before?</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>A jumper goes in a hot wash and comes out 20% smaller. You're holding the shrunken jumper. What size was it before?</p>
+      <p>Your instinct says "add 20% back on". But that's wrong, and it's worth seeing exactly why. The 20% that was lost was 20% <b>of the original, bigger jumper</b> &mdash; not 20% of the sad little one in your hands. Adding 20% of the small one back on doesn't return the same amount that was taken away.</p>
+      <p>So you can't nudge forwards. You have to properly <b>undo</b> the change.</p>
+
+      <h4>What it is</h4>
+      <p>These questions give you the value <b>after</b> something happened and ask for the value <b>before</b>.</p>
+      <p>You can spot them by their language. Look for: "<i>a price <b>including</b> VAT</i>", "<i><b>after</b> a 12% pay rise</i>", "<i>the <b>sale</b> price is</i>", "<i>what was it <b>originally</b>?</i>", "<i>what was the price <b>before</b>&hellip;</i>". The number you're given is the finished one; the missing number is the starting one.</p>
+      <p>This is the topic that catches the most people out in real tests &mdash; not because it's hard, but because the wrong method feels so natural. Once you have the rule below, it becomes one of the easiest marks available.</p>
+
+      <h4>The method</h4>
+      <p>Remember from chapter 4: applying a percentage change means multiplying.</p>
+      <span class="eq">original &times; multiplier = final amount</span>
+      <p>Here you have the final amount and want the original. Multiplication undoes with <b>division</b>. So:</p>
+      <span class="eq">original = final amount &divide; multiplier</span>
+      <ol>
+        <li><b>Work out the multiplier</b> exactly as before. (VAT at 20% added &rarr; 1.2. A 30% discount &rarr; 0.7.)</li>
+        <li><b>Check the direction.</b> Going forwards you multiply; coming backwards you <b>divide</b>.</li>
+        <li><b>Divide</b> the amount you were given by the multiplier.</li>
+        <li><b>Check by going forwards again</b> &mdash; multiply your answer by the multiplier and see if you land on the number in the question.</li>
+      </ol>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">A coat costs &pound;96 including VAT at 20%. What was the price before VAT was added?</p>
+        <p><b>Step 1 &mdash; which number am I holding?</b> &pound;96 is the price <i>with</i> VAT already on it. The word "including" tells me it's the finished number. So this is a backwards question.</p>
+        <p><b>Step 2 &mdash; find the multiplier.</b> VAT adds 20%, so the price went from 100% to 120% of itself.</p>
+        <span class="eq">120 &divide; 100 = 1.2</span>
+        <p><b>Step 3 &mdash; divide, don't multiply.</b> The &pound;96 is the "after". To get back, undo the multiplication.</p>
+        <span class="eq">96 &divide; 1.2 = 80</span>
+        <p>The price before VAT was <b>&pound;80</b>.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Run it forwards: &pound;80 &times; 1.2 = &pound;96. That's exactly the number in the question, so &pound;80 must be right. This forwards check takes five seconds and catches every mistake in this topic &mdash; always do it.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out</span>
+        Taking 20% off the &pound;96. That gives &pound;76.80, and it will absolutely be one of the options. It's wrong because the VAT was worked out on &pound;80, not on &pound;96 &mdash; the VAT added was &pound;16, not &pound;19.20. The give-away: if you then add 20% back to &pound;76.80 you get &pound;92.16, not the &pound;96 you started with. It doesn't come back, so it wasn't right.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li><b>Forwards</b> (before &rarr; after): <b>multiply</b> by the multiplier.</li>
+          <li><b>Backwards</b> (after &rarr; before): <b>divide</b> by the multiplier.</li>
+          <li>Signal words for backwards: <i>including, after, originally, before the increase, the sale price is</i>.</li>
+          <li>Undoing a rise gives a <b>smaller</b> answer. Undoing a discount gives a <b>bigger</b> one. Check that before you move on.</li>
+          <li>Always verify by multiplying your answer forwards.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 6 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">6</span>
+      <span class="sumtext">Ratios
+        <span class="sumsub">Sharing things out in proportion</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>Making orange squash. The bottle says "one part squash to four parts water".</p>
+      <p>It doesn't tell you to use cups, or litres, or bucketloads &mdash; and it doesn't need to. It's telling you the <b>recipe</b>: however much squash you pour, use four times as much water. One cup and four cups. Or two cups and eight cups. The drink tastes identical either way, because the <i>proportion</i> is the same.</p>
+      <p>That recipe, written as <b>1 : 4</b>, is a ratio. That's it. That's the whole concept.</p>
+
+      <h4>What it is</h4>
+      <p>A ratio tells you how a total is split between two or more people, or things, without telling you the actual amounts.</p>
+      <p>The two dots mean "to". So 3 : 5 is read out loud as "three to five", and it means "for every 3 of the first thing, there are 5 of the second".</p>
+      <p>Here's the idea that unlocks nearly every ratio question: <b>think in parts</b>. A ratio of 4 : 5 means the pile is cut into 4 + 5 = <b>9 equal parts</b>. One person gets 4 of them, the other gets 5. Once you know what one part is worth in real money, you can build anything.</p>
+
+      <h4>The method</h4>
+      <p>For "share &pound;X in the ratio a : b":</p>
+      <ol>
+        <li><b>Add the numbers</b> in the ratio. That's the total number of parts.</li>
+        <li><b>Divide the total amount by the number of parts.</b> That gives the value of <b>one part</b>. This is the step that does the real work.</li>
+        <li><b>Multiply</b> the value of one part by each side of the ratio.</li>
+        <li><b>Add your answers back up</b> and check they come to the total you started with.</li>
+      </ol>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">&pound;360 is shared between Amy and Ben in the ratio 4 : 5. How much does each get?</p>
+        <p><b>Step 1 &mdash; how many parts altogether?</b></p>
+        <span class="eq">4 + 5 = 9 parts</span>
+        <p>So think of the &pound;360 as being cut into 9 equal piles.</p>
+        <p><b>Step 2 &mdash; what is one part worth?</b> Divide the money by the number of parts.</p>
+        <span class="eq">&pound;360 &divide; 9 = &pound;40 per part</span>
+        <p><b>Step 3 &mdash; give everyone their parts.</b> Amy has 4 parts, Ben has 5.</p>
+        <span class="eq">Amy: 4 &times; &pound;40 = &pound;160</span>
+        <span class="eq">Ben: 5 &times; &pound;40 = &pound;200</span>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Add the two shares back together: &pound;160 + &pound;200 = &pound;360. That's exactly the amount we started with, so nothing has been lost or invented. Also, Ben's number is bigger than Amy's &mdash; which it should be, because 5 is bigger than 4. Two checks, both pass.</div>
+      </div>
+
+      <h4>A second shape of question</h4>
+      <div class="worked">
+        <p class="wq">Staff and managers are in the ratio 7 : 2. There are 56 staff. How many managers?</p>
+        <p><b>Step 1 &mdash; match the number to its side.</b> The 56 lines up with the 7, because both refer to staff.</p>
+        <p><b>Step 2 &mdash; find one part.</b> If 7 parts are worth 56 people:</p>
+        <span class="eq">56 &divide; 7 = 8 people per part</span>
+        <p><b>Step 3 &mdash; build the other side.</b> Managers are 2 parts.</p>
+        <span class="eq">2 &times; 8 = 16 managers</span>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Is 56 : 16 really the same recipe as 7 : 2? Divide both by 8: yes, 7 : 2. And there are far fewer managers than staff, which matches a ratio of 7 to 2.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 1</span>
+        Dividing by one of the ratio numbers instead of by the <b>total parts</b>. &pound;360 &divide; 4 = &pound;90 is a tempting but meaningless number. Always add the sides together first.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 2</span>
+        <b>A ratio is not a fraction.</b> Squash mixed 1 : 4 is <i>one fifth</i> squash, not one quarter. The 4 is "parts of water", not "the whole drink". When a question switches to fraction language, rebuild it from parts: 1 part out of 5 total parts.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 3</span>
+        Answering the wrong half. If the question asks "how much <b>more</b> does Ben get?", the answer is &pound;200 &minus; &pound;160 = &pound;40, not &pound;200. Re-read the final sentence before you commit.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li><b>Total parts</b> = add the sides. <b>One part</b> = total amount &divide; total parts.</li>
+          <li>Simplify a ratio by dividing both sides by the same number: 20 : 30 &rarr; 2 : 3.</li>
+          <li>2 : 3 and 4 : 6 and 10 : 15 are all the same ratio.</li>
+          <li>Ratio a : b means the first thing is <b>a/(a+b)</b> of the whole.</li>
+          <li>The shares must always add back up to the total. If they don't, something slipped.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 7 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">7</span>
+      <span class="sumtext">Rates &mdash; speed and price per unit
+        <span class="sumsub">Anything with the word "per" in it</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>You're in a supermarket holding two bags of rice. One is 2&nbsp;kg for &pound;3.00, the other is 5&nbsp;kg for &pound;7.00. Which is better value?</p>
+      <p>You can't compare them as they are &mdash; different prices <i>and</i> different sizes. So you do what everyone does instinctively: work out what <b>one kilo</b> costs in each. &pound;1.50 a kilo versus &pound;1.40 a kilo. Now it's obvious.</p>
+      <p>That "cost of exactly one" is a rate. You already use them every day.</p>
+
+      <h4>What it is</h4>
+      <p>A rate is how much of one thing you get for <b>one</b> of another thing. The word <b>per</b> always means "for each one".</p>
+      <ul>
+        <li>60 miles <b>per</b> hour = 60 miles for each one hour</li>
+        <li>&pound;1.40 <b>per</b> kilo = &pound;1.40 for each one kilo</li>
+        <li>18 <b>per</b> cent = 18 for each one hundred (yes &mdash; percentages are rates too)</li>
+      </ul>
+      <p>And the way you find any rate is always the same: <b>divide by however many units you had</b>. &pound;7.00 for 5 kg &rarr; 7 &divide; 5 = &pound;1.40 for 1 kg.</p>
+
+      <h4>The method</h4>
+      <p><b>To find a rate:</b> divide the total by the number of units. "&pound;7 for 5 kg" &rarr; 7 &divide; 5.</p>
+      <p><b>To compare value:</b> put both options into the same "per one" and then compare. Cheaper per unit = better value.</p>
+      <p><b>For speed, distance and time,</b> there are three versions of one relationship:</p>
+      <span class="eq">speed = distance &divide; time</span>
+      <span class="eq">distance = speed &times; time</span>
+      <span class="eq">time = distance &divide; speed</span>
+      <p>If you only remember one, remember <b>distance = speed &times; time</b> &mdash; the other two are that same sentence rearranged. Or reason it out from the units: miles per hour is "miles divided by hours", which tells you the formula without memorising anything.</p>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">A train travels 150 miles in 2 hours 30 minutes. What is its average speed in miles per hour?</p>
+        <p><b>Step 1 &mdash; sort the time out first.</b> This is where the marks are lost. "2 hours 30 minutes" is <b>not</b> 2.30 hours. Minutes have to be turned into a fraction of an hour by dividing by 60.</p>
+        <span class="eq">30 &divide; 60 = 0.5, so the time is 2.5 hours</span>
+        <p><b>Step 2 &mdash; pick the right version of the formula.</b> We want miles <i>per hour</i> &mdash; miles for each one hour &mdash; so we divide the miles by the hours.</p>
+        <span class="eq">150 &divide; 2.5 = 60</span>
+        <p><b>Step 3 &mdash; write it with the units.</b> The average speed is <b>60 miles per hour</b>. A number without its unit is only half an answer.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Run it forwards. At 60 mph, in 2 hours you'd cover 120 miles, and in the extra half hour another 30. 120 + 30 = 150 miles. That's the distance in the question, so 60 mph is right. And 60 mph is a believable train-ish speed &mdash; if you'd got 6 or 600, something went wrong.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 1</span>
+        <b>Typing 2 hours 30 as 2.30.</b> It's 2.5. Minutes divided by 60, always. 2h 15m = 2.25 h. 1h 45m = 1.75 h. 40 minutes = 0.667 h.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 2</span>
+        Dividing upside down. 2.5 &divide; 150 gives 0.0167, which is hours per mile &mdash; a real thing, but not what was asked. Let the unit name guide you: "miles per hour" literally says miles &divide; hours.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 3</span>
+        With value-for-money questions, the <b>cheaper</b> per unit wins &mdash; but check whether the question asks which is better value or how much you'd <i>save</i>. They want different numbers.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li><b>Minutes into hours:</b> 15 min = 0.25 &middot; 20 min = 0.333 &middot; 30 min = 0.5 &middot; 40 min = 0.667 &middot; 45 min = 0.75 &middot; 90 min = 1.5</li>
+          <li><b>distance = speed &times; time</b> &mdash; rearrange for the other two</li>
+          <li>Price per unit = total price &divide; number of units</li>
+          <li>"Per" = "for each one" = divide by the number of them</li>
+          <li>Always write the unit next to your answer: mph, &pound;/kg, per hour. It stops half the mistakes.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 8 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">8</span>
+      <span class="sumtext">Currency conversion
+        <span class="sumsub">Swapping one money for another</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>A bureau de change board says <b>&pound;1 = &euro;1.17</b>. Read that as a price tag: "one pound buys you one euro and seventeen cents".</p>
+      <p>It's shopping, really. If one pound buys 1.17 euros, then ten pounds buys ten lots of that, and a hundred pounds buys a hundred lots of it.</p>
+
+      <h4>What it is</h4>
+      <p>An exchange rate is just a swap deal written as a sentence about <b>one</b> unit. It's a rate, exactly like chapter 7 &mdash; euros per pound.</p>
+      <p>Everything becomes easy once you write the rate down as a full sentence with the "1" in it:</p>
+      <span class="eq">&pound;1 = &euro;1.17</span>
+      <p>Now you can see which way round things go, instead of guessing.</p>
+
+      <h4>The method</h4>
+      <ol>
+        <li><b>Write the rate as a sentence</b> starting with the single unit: "&pound;1 = &euro;1.17".</li>
+        <li><b>Decide the direction.</b> Going <i>from</i> the currency on the "1" side (pounds) <i>to</i> the other one &rarr; <b>multiply</b>. Coming back the other way &rarr; <b>divide</b>.</li>
+        <li><b>Do the one calculation.</b></li>
+        <li><b>Sense-check the size</b> using the rate. Since one pound is worth more than one euro here, an amount in euros should always be a <i>bigger number</i> than the same amount in pounds.</li>
+      </ol>
+      <p>That last step is the one that saves you, and it works without you having to remember any rule at all. Ask: "should this number get bigger or smaller?" If your answer went the wrong way, you multiplied when you should have divided.</p>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">The rate is &pound;1 = &euro;1.17. How many euros do you get for &pound;240?</p>
+        <p><b>Step 1 &mdash; the rate as a sentence.</b> One pound gets me 1.17 euros.</p>
+        <p><b>Step 2 &mdash; direction.</b> I'm starting with pounds, and pounds are the "1" side, so I have 240 lots of "1.17 euros". That's a multiplication.</p>
+        <span class="eq">240 &times; 1.17 = 280.80</span>
+        <p><b>Step 3 &mdash; write it as money.</b> <b>&euro;280.80</b>. Two decimal places, because it's money.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Euros are worth a bit less than pounds here, so I should end up with a bit <i>more</i> euros than the 240 pounds I put in. 280.80 is a bit more than 240. It fits. (If I'd divided by mistake I'd have got about &euro;205 &mdash; fewer euros than pounds, which would be the wrong shape.)</div>
+      </div>
+
+      <div class="worked" style="margin-top:12px">
+        <p class="wq">Now backwards: the rate is &pound;1 = &euro;1.15. You have &euro;287.50. How many pounds is that?</p>
+        <p><b>Step 1 &mdash; direction.</b> I'm coming <i>back</i> to the "1" side, so this is a division.</p>
+        <span class="eq">287.50 &divide; 1.15 = 250</span>
+        <p>That's <b>&pound;250</b>.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          Go forwards to test it: 250 &times; 1.15 = 287.50. Lands exactly on the number in the question. And pounds are worth more, so the pounds number should be smaller than the euros number &mdash; 250 is smaller than 287.50.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 1</span>
+        Multiplying when you should divide. Both answers look plausible on their own, which is why the size check matters so much. Decide <i>before</i> you calculate whether the number should grow or shrink.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 2</span>
+        <b>Fees and commission.</b> If there's a &pound;5 fee taken before the exchange, take it off <i>first</i>, then convert what's left. Read carefully which currency the fee is in and whether it comes off before or after.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 3</span>
+        Rounding early. Keep the full number on your calculator until the end, then round to 2 decimal places for money.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li>Always rewrite the rate as "<b>1 of this = that much of the other</b>".</li>
+          <li>From the "1" currency &rarr; <b>multiply</b>. Back to it &rarr; <b>divide</b>.</li>
+          <li>Check by going forwards: your answer &times; rate should return the number in the question.</li>
+          <li>Money answers get <b>2 decimal places</b>.</li>
+          <li>Weaker currency = bigger number. If &pound;1 buys &euro;1.17, the euro figure is always the larger one.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 9 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">9</span>
+      <span class="sumtext">Reading tables and charts
+        <span class="sumsub">Finding the right number before you do any maths</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here: a comparison</h4>
+      <p>A table is a seating plan. Every number is sitting in a seat, and the seat is described by two labels: the row it's in and the column it's in.</p>
+      <p>Nobody finds seat 14F by scanning the whole plane. You find row 14, then you go along to F. Tables work the same way, and doing it in that order &mdash; deliberately, with your finger or your eye &mdash; removes almost all the errors in this topic.</p>
+      <p>Because here's the thing most people don't realise: in a real test, <b>data questions are rarely hard maths</b>. The maths is usually a percentage or a subtraction. The difficulty is entirely in picking up the right number in the first place.</p>
+
+      <h4>What it is</h4>
+      <p>Data interpretation gives you a table or a chart and asks a question that needs one or two numbers out of it. The test is measuring whether you can locate, read and use information accurately under time pressure.</p>
+      <p>Two things carry hidden meaning and are the source of most lost marks:</p>
+      <ul>
+        <li><b>The units line.</b> A heading like "Revenue (&pound;000s)" means every number in that table is in <i>thousands of pounds</i>. A 48 in the table is <b>&pound;48,000</b>. You'll also see (&pound;m), (millions), (%), (per 1,000 people).</li>
+        <li><b>The scale on a chart.</b> The gridlines tell you what the bars are worth. If labelled lines go 0, 20, 40, 60, then each line is 20 &mdash; and a bar halfway between 40 and 60 is 50.</li>
+      </ul>
+
+      <h4>The method</h4>
+      <ol>
+        <li><b>Read the title.</b> Five seconds. What is this actually about?</li>
+        <li><b>Read the units.</b> Out loud in your head: "these are thousands of pounds". Write "&times;1000" in the margin if it helps.</li>
+        <li><b>Read the question and find the exact numbers you need.</b> Row first, then column. Say the label to yourself as you land on it.</li>
+        <li><b>Write those numbers down</b> before calculating. On paper, away from the table. This is what stops you drifting into the next row.</li>
+        <li><b>Do the maths</b> &mdash; usually a percentage, a difference, a total or a ratio.</li>
+        <li><b>Re-read the question</b> and check you answered <i>that</i>, in the units it asked for.</li>
+      </ol>
+
+      <h4>Worked example &mdash; slowly</h4>
+      <div class="worked">
+        <p class="wq">Using the table below: what percentage of the total Q1 revenue came from the North branch?</p>
+        <table class="data" style="max-width:420px;margin-bottom:10px">
+          <caption style="caption-side:top;text-align:left;font-weight:650;font-size:.95rem;padding-bottom:2px">Revenue by branch (&pound;000s)</caption>
+          <thead><tr><th>Branch</th><th>Q1</th><th>Q2</th></tr></thead>
+          <tbody>
+            <tr><td>North</td><td>120</td><td>138</td></tr>
+            <tr><td>South</td><td>180</td><td>171</td></tr>
+            <tr><td>East</td><td>95</td><td>110</td></tr>
+            <tr><td>West</td><td>105</td><td>121</td></tr>
+          </tbody>
+        </table>
+        <p><b>Step 1 &mdash; units.</b> The title says &pound;000s. So North's Q1 isn't &pound;120, it's &pound;120,000. Here's the useful bit though: because <i>every</i> number is in the same units, a percentage question cancels them out. I can work in the table's own numbers and the percentage is unaffected. (If the question asked for an amount in pounds, I <i>would</i> need to multiply by 1,000.)</p>
+        <p><b>Step 2 &mdash; find the numbers.</b> I need the whole Q1 column. Going down: 120, 180, 95, 105.</p>
+        <p><b>Step 3 &mdash; find the total.</b> Add them, in small steps so nothing slips.</p>
+        <span class="eq">120 + 180 = 300, &nbsp; 300 + 95 = 395, &nbsp; 395 + 105 = 500</span>
+        <p><b>Step 4 &mdash; the percentage.</b> This is "what percentage is the part out of the whole" from chapter 1. The part is North's 120; the whole is the total, 500.</p>
+        <span class="eq">120 &divide; 500 = 0.24</span>
+        <span class="eq">0.24 &times; 100 = 24%</span>
+        <p><b>Step 5 &mdash; re-read the question.</b> It asked for a percentage of Q1 total. That's what I have: <b>24%</b>.</p>
+        <div class="note check"><span class="nlab">Check it makes sense</span>
+          There are four branches. If they were all equal, each would be 25%. North is very slightly below average for the group, so a touch under 25% is exactly the right neighbourhood. If I'd got 63% or 4%, I'd know to go back and look again.</div>
+      </div>
+
+      <h4>The trap</h4>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 1</span>
+        <b>Ignoring the units line.</b> If that question had asked "how much revenue did North take in Q1?", the answer is &pound;120,000 &mdash; not &pound;120. The &pound;000s heading is small, easy to skim past, and deliberately placed.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 2</span>
+        <b>Reading the neighbouring row or column.</b> Especially on a phone or a small screen. Q1 and Q2 sit right next to each other for a reason. Find the row, then track across carefully.</div>
+      <div class="note trap"><span class="nlab">Watch out &mdash; trap 3</span>
+        <b>Confusing "percentage of the total" with "percentage change".</b> "What share did North have?" divides by the <i>total</i>. "How much did North grow?" divides by North's <i>own earlier figure</i>. Two different wholes. Read the question twice.</div>
+
+      <h4>Quick reference</h4>
+      <div class="qref">
+        <ul>
+          <li>&pound;000s &rarr; the real figure has <b>three more zeros</b>. &pound;m &rarr; six more.</li>
+          <li>Percentages of a total are unaffected by the units &mdash; but amounts are.</li>
+          <li>Chart scale: find two labelled gridlines, subtract, and you know what each gap is worth.</li>
+          <li>"Share of total" &rarr; divide by the total. "Growth" &rarr; divide by the earlier figure.</li>
+          <li>Write the numbers down before calculating. Every time.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <div class="card">
+    <h3>One last thing</h3>
+    <p class="small">If a chapter didn't land the first time, that isn't a verdict on you &mdash; it usually means one earlier idea hadn't settled yet. Chapters 1 and 2 hold up everything else, so they're the ones worth re-reading.</p>
+    <p class="small muted" style="margin-bottom:0">Understanding comes from doing it a few times, not from reading it perfectly the first time. Nobody gets this from one pass.</p>
+  </div>
+</section>
+
+<!-- ================= TIPS ================= -->
+<section id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" class="hidden">
+
+  <div class="card plain">
+    <h2>Tips</h2>
+    <p class="muted">Exam technique, which is a different skill from maths &mdash; and a much quicker one to fix.</p>
+  </div>
+
+  <div class="card">
+    <h3>1. Nearly all your wrong answers will be slips, not gaps</h3>
+    <p>When people review their practice honestly, the pattern is almost always the same: they knew the method, and they mistyped a number, used the wrong one of two figures, or answered a slightly different question from the one asked.</p>
+    <p>That matters because slips and gaps need opposite fixes. A gap needs study. A slip needs <b>slowing down and writing the steps out</b>. If you're getting questions wrong but nodding along to the worked solution, you don't have a knowledge problem &mdash; you have a speed-and-layout problem, and that's very fixable.</p>
+    <p class="small muted" style="margin-bottom:0">Practical version: keep a pen and paper next to you, even for the easy ones. One line per step. Never hold two steps in your head at once.</p>
+  </div>
+
+  <div class="card">
+    <h3>2. Sanity-check the size of every answer</h3>
+    <p>Before you move on, spend three seconds asking: <b>is this number roughly the right size?</b></p>
+    <ul>
+      <li>A discount should make the price <b>smaller</b>. A rise should make it <b>bigger</b>.</li>
+      <li>A part of a whole must be <b>under 100%</b>.</li>
+      <li>A share from a ratio must be <b>less than the total</b>, and the shares must add back up to it.</li>
+      <li>An average must land <b>between</b> the smallest and biggest values.</li>
+      <li>If 10% of something is 24, then 15% has to be around 36 &mdash; not 3.6, not 360.</li>
+    </ul>
+    <p style="margin-bottom:0">Most wrong answers aren't slightly wrong, they're <i>ten times</i> wrong or upside down. A size check catches those instantly, and it costs you almost no time.</p>
+  </div>
+
+  <div class="card">
+    <h3>3. Read the units and the scale before you read the question</h3>
+    <p>Tables and charts hide their most important information in the smallest text: <b>&pound;000s</b>, <b>millions</b>, <b>%</b>, <b>per 1,000 people</b>, <b>excluding VAT</b>, <b>Q1 only</b>.</p>
+    <p>Make it a habit: title, then units, then question. A "48" under a &pound;000s heading is &pound;48,000, and the option "&pound;48" will be sitting there waiting for you.</p>
+    <p style="margin-bottom:0">Then check the units your <i>answer</i> needs. Pounds or thousands of pounds? Miles or kilometres? Per week or per year? The maths can be perfect and the answer still marked wrong.</p>
+  </div>
+
+  <div class="card">
+    <h3>4. Don't round until the very last step</h3>
+    <p>If a calculation gives 23.6842105, keep it. Use it in the next step. Only round when you write the final answer.</p>
+    <p>Rounding early is how you end up with an answer that's <i>nearly</i> one of the options but not quite &mdash; and then lose a minute wondering which one to pick.</p>
+    <p style="margin-bottom:0">Unless told otherwise: money to <b>2 decimal places</b>, percentages to <b>1</b>, and match whatever precision the answer options are using.</p>
+  </div>
+
+  <div class="card">
+    <h3>5. Calculator for the arithmetic, your head for the set-up</h3>
+    <p>Cappfinity assessments let you use a calculator, and you should. But be clear about the division of labour:</p>
+    <ul>
+      <li><b>Your job:</b> decide <i>what</i> to calculate. Which number is the whole? Is this forwards or backwards? Do I divide by the total parts or by one side?</li>
+      <li><b>The calculator's job:</b> the actual multiplying and dividing.</li>
+    </ul>
+    <p>A calculator will happily give you a beautifully precise wrong answer. It cannot tell you that you divided by the new figure instead of the original.</p>
+    <p style="margin-bottom:0">So: work out the plan first, say it to yourself in words ("change divided by the original, times a hundred"), <i>then</i> pick up the calculator.</p>
+  </div>
+
+  <div class="card">
+    <h3>6. Pacing &mdash; Cappfinity scores speed <i>and</i> accuracy</h3>
+    <p>This sounds stressful, but read what it actually means: <b>rushing is not rewarded</b>. A fast wrong answer scores nothing. A steady right answer scores fully. Speed only helps you once accuracy is there.</p>
+    <p>So the target isn't "be fast". It's <b>be steady, and don't stall</b>. A calm, consistent rhythm of around a minute to a minute and a half per question beats a pattern of sprinting, panicking and re-doing.</p>
+    <ul>
+      <li>Give each question one clean attempt at full attention.</li>
+      <li>If you're 20 seconds in and you don't know where to start, that's information &mdash; make your best decision and move on rather than freezing. One lost question is cheap; five minutes lost on it is not.</li>
+      <li>Don't re-check work you've already checked once. Second-guessing costs more marks than it saves.</li>
+      <li>Timed practice is for building the rhythm. Untimed practice is for building the method. You need both, and method comes first.</li>
+    </ul>
+    <p style="margin-bottom:0" class="small muted">Sova assessments are often adaptive &mdash; they adjust the difficulty as you go, and some sections are timed per question. The habits are identical: read the units, set the calculation up properly, check the size.</p>
+  </div>
+
+  <div class="card">
+    <h3>7. Multiple choice: work it out <i>before</i> you look at the options</h3>
+    <p>The wrong options aren't random. They are deliberately built from the classic mistakes &mdash; the discount instead of the price, the division done upside down, the figure with 20% taken off instead of divided by 1.2.</p>
+    <p>That means a plausible-looking option is no evidence you're right. Get your own answer first, <i>then</i> go looking for it in the list.</p>
+    <p style="margin-bottom:0">If your answer isn't there, don't grab the nearest one. Go back and check the set-up &mdash; usually you've divided by the wrong number, or missed a units line.</p>
+  </div>
+
+  <div class="card">
+    <h3>8. If your mind goes blank</h3>
+    <p>It happens, and it isn't a sign of anything. Blankness is nearly always the body reacting to pressure, not the brain failing to know something.</p>
+    <p>A reset that works: breathe out slowly, then do the smallest possible concrete thing &mdash; write down the two numbers in the question. Not the method, just the numbers. Almost always, the next step reappears once something is on the paper.</p>
+    <p style="margin-bottom:0">And remember what an aptitude test actually is: a few percentage and ratio questions in unfamiliar clothes. You have met every idea in it before.</p>
+  </div>
+
+  <div class="card">
+    <h3>9. What to do between now and the test</h3>
+    <ul>
+      <li><b>Short and daily beats long and occasional.</b> Ten minutes a day will move you further than two hours on a Sunday.</li>
+      <li>Start untimed until a topic feels automatic, then switch that topic to timed.</li>
+      <li>Use the Progress tab to find your weakest topic and drill that one on its own.</li>
+      <li>When you get one wrong, don't just read the answer &mdash; find the <b>exact step</b> where your version and the worked version came apart. That single step is the thing to learn.</li>
+      <li>On the day: paper and pen, calculator within reach, read the units first. Same as practice.</li>
+    </ul>
+    <p class="small muted" style="margin-bottom:0">Being out of practice and being bad at something are not the same thing, and they don't feel different from the inside. Only one of them is true here.</p>
+  </div>
+</section>
+
+<!-- ================= PROGRESS ================= -->
+<section id="panel-progress" role="tabpanel" aria-labelledby="tab-progress" class="hidden">
+  <div class="card plain">
+    <h2>Progress</h2>
+    <p class="muted">Everything here is stored only in this browser, on this device. Nothing is sent anywhere.</p>
+  </div>
+
+  <div class="card">
+    <h3>Your streak</h3>
+    <div class="statgrid" id="streakStats"></div>
+    <p class="hintline" id="streakNote"></p>
+  </div>
+
+  <div class="card">
+    <h3>Totals</h3>
+    <div class="statgrid" id="totalStats"></div>
+  </div>
+
+  <div class="card">
+    <h3>Recent sessions</h3>
+    <div id="sessionChart"></div>
+  </div>
+
+  <div class="card">
+    <h3>Accuracy by topic</h3>
+    <p class="small muted">Where to put your next ten minutes.</p>
+    <div id="topicBreakdown"></div>
+  </div>
+
+  <div class="card">
+    <h3>Reset</h3>
+    <p class="small muted">Clears your streak, sessions and topic history from this browser. It can't be undone.</p>
+    <button id="resetBtn" class="btn danger" type="button">Reset all progress</button>
+  </div>
+
+  <p class="tiny muted center" id="storageNote" style="margin:20px 0 0"></p>
+</section>
+
+</main>
+
+<script>
+/* ============================================================
+   Numerical Reasoning Trainer
+   Everything runs locally. No network, no libraries, no tracking.
+   ============================================================ */
+(function(){
+"use strict";
+
+/* ---------- PURE SECTION START (question generators) ---------- */
+
+var R = {
+  int: function(a,b){ return a + Math.floor(Math.random()*(b-a+1)); },
+  pick: function(a){ return a[Math.floor(Math.random()*a.length)]; },
+  chance: function(p){ return Math.random() < p; },
+  shuffle: function(a){
+    var b = a.slice();
+    for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; }
+    return b;
+  }
+};
+
+function round(n,dp){
+  if(dp===undefined) dp = 2;
+  var f = Math.pow(10,dp);
+  return Math.round(Number((n*f).toFixed(4)))/f;
+}
+function commas(s){
+  var p = s.split('.');
+  p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return p.join('.');
+}
+/* plain number, up to dp decimals, trailing zeros removed */
+function nf(n,dp){
+  if(dp===undefined) dp = 2;
+  var r = round(n,dp);
+  var s = r.toFixed(dp);
+  if(s.indexOf('.') >= 0) s = s.replace(/0+$/,'').replace(/\.$/,'');
+  return commas(s);
+}
+/* money: pence shown only when there are pence */
+function cash(n,sym){
+  sym = sym || '£';
+  var r = round(n,2);
+  var neg = r < 0; r = Math.abs(r);
+  var s = (r % 1 === 0) ? r.toFixed(0) : r.toFixed(2);
+  return (neg?'-':'') + sym + commas(s);
+}
+function pc(n,dp){ return nf(n, dp===undefined?2:dp) + '%'; }
+function rateS(r){ return Number(r).toFixed(2); }  /* an exchange rate always shows 2dp */
+function S(t,b){ return {t:t,b:b}; }
+function eq(s){ return '<span class="eq">'+s+'</span>'; }
+var TIMES = ' × ', DIV = ' ÷ ', MINUS = ' − ', GBP = '£', ARROW = '→';
+
+/* ---------- figures ---------- */
+function tableFig(title, units, head, rows){
+  var h = '<div class="figure"><p class="figtitle">'+title+'</p>';
+  if(units) h += '<p class="figunits">'+units+'</p>';
+  h += '<table class="data"><thead><tr>';
+  for(var i=0;i<head.length;i++) h += '<th>'+head[i]+'</th>';
+  h += '</tr></thead><tbody>';
+  for(var r=0;r<rows.length;r++){
+    h += '<tr>';
+    for(var c=0;c<rows[r].length;c++) h += '<td>'+rows[r][c]+'</td>';
+    h += '</tr>';
+  }
+  return h + '</tbody></table></div>';
+}
+function chartFig(title, units, cats, vals, step){
+  var maxV = Math.max.apply(null, vals);
+  var lines = Math.ceil(maxV/step);
+  if(maxV % step === 0) lines += 1;
+  while(lines > 6){ step *= 2; lines = Math.ceil(maxV/step); if(maxV % step === 0) lines += 1; }
+  var top = lines*step;
+  var x0=46, x1=392, y0=18, y1=196;
+  var s = '<div class="figure"><p class="figtitle">'+title+'</p>';
+  if(units) s += '<p class="figunits">'+units+'</p>';
+  s += '<svg class="chart" viewBox="0 0 400 232" role="img" aria-label="'+title+'">';
+  for(var i=0;i<=lines;i++){
+    var y = round(y1 - (i/lines)*(y1-y0), 1);
+    s += '<line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
+    s += '<text x="'+(x0-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="var(--muted)">'+nf(top*i/lines,0)+'</text>';
+  }
+  var n = cats.length, slot = (x1-x0)/n, bw = slot*0.54;
+  for(var k=0;k<n;k++){
+    var h = round((vals[k]/top)*(y1-y0), 1);
+    var x = round(x0 + slot*k + (slot-bw)/2, 1);
+    s += '<rect x="'+x+'" y="'+round(y1-h,1)+'" width="'+round(bw,1)+'" height="'+h+'" rx="3" fill="var(--accent)"/>';
+    s += '<text x="'+round(x+bw/2,1)+'" y="'+(y1+17)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+cats[k]+'</text>';
+  }
+  s += '<line x1="'+x0+'" y1="'+y1+'" x2="'+x1+'" y2="'+y1+'" stroke="var(--line-strong)" stroke-width="1.5"/>';
+  return s + '</svg></div>';
+}
+
+/* ---------- answer plumbing ---------- */
+function makeChoices(value, fmtFn, cands){
+  var correct = fmtFn(value);
+  var out = [correct], seen = {};
+  seen[correct] = 1;
+  for(var i=0;i<cands.length && out.length<4;i++){
+    var c = cands[i];
+    if(typeof c !== 'number' || !isFinite(c) || c <= 0) continue;
+    if(Math.abs(c - value) < 1e-9) continue;
+    var d = fmtFn(c);
+    if(seen[d]) continue;
+    seen[d] = 1; out.push(d);
+  }
+  var bump = 1;
+  while(out.length < 4 && bump < 40){
+    var alt = round(value * (1 + 0.08*bump) * (bump%2 ? 1 : 0.85), 2);
+    var da = fmtFn(alt);
+    if(!seen[da] && alt > 0){ seen[da]=1; out.push(da); }
+    bump++;
+  }
+  /* last resort, so a question can never show fewer than four options */
+  var step = Math.max(1, Math.abs(round(value*0.1,0)));
+  for(var k=1; out.length < 4 && k < 40; k++){
+    var fb = fmtFn(value + step*k);
+    if(!seen[fb]){ seen[fb]=1; out.push(fb); }
+  }
+  return R.shuffle(out);
+}
+/* turn a part-built question into a finished one */
+function numQ(q, value, fmtFn, cands, forceType){
+  q.answer = value;
+  q.display = fmtFn(value);
+  q.type = forceType || (R.chance(0.5) ? 'mc' : 'free');
+  if(q.type === 'mc') q.choices = makeChoices(value, fmtFn, cands || []);
+  if(q.tol === undefined) q.tol = 0.011;
+  if(!q.steps) q.steps = [];
+  return q;
+}
+
+/* ============================================================
+   TOPIC 1 - percentage basics
+   ============================================================ */
+function gen_basics(){
+  var mode = Math.random();
+  if(mode < 0.55){
+    /* what percentage is X out of Y */
+    var wholes = [20,25,40,50,60,80,120,150,200,250,400,500,800];
+    var pcts = [15,20,24,25,30,35,40,45,55,60,65,70,75,80,85];
+    var whole, p, part, guard = 0;
+    do {
+      whole = R.pick(wholes); p = R.pick(pcts); part = whole*p/100; guard++;
+    } while(!Number.isInteger(part) && guard < 60);
+    if(!Number.isInteger(part)){ whole = 200; p = 35; part = 70; }
+    var ctx = R.pick([
+      {s:'A graduate scheme had <b>'+nf(whole,0)+'</b> applicants. <b>'+nf(part,0)+'</b> were invited to an assessment centre.', q:'What percentage of applicants were invited?', w:'applicants'},
+      {s:'A team has <b>'+nf(whole,0)+'</b> members. <b>'+nf(part,0)+'</b> of them work part-time.', q:'What percentage of the team work part-time?', w:'team members'},
+      {s:'Of the <b>'+nf(whole,0)+'</b> orders placed last month, <b>'+nf(part,0)+'</b> arrived late.', q:'What percentage of orders arrived late?', w:'orders'},
+      {s:'A survey received <b>'+nf(whole,0)+'</b> responses. <b>'+nf(part,0)+'</b> of them answered "yes".', q:'What percentage answered "yes"?', w:'responses'}
+    ]);
+    var dec = part/whole;
+    var q = {
+      topic:'basics',
+      stem: ctx.s + ' ' + ctx.q,
+      suffix:'%',
+      hint:'Type just the number — the % is already there.',
+      steps:[
+        S('Decide which number is the whole',
+          'The whole is everything being counted — here that is the <b>'+nf(whole,0)+' '+ctx.w+'</b>. The part is the <b>'+nf(part,0)+'</b> we are asked about. The whole always goes on the bottom of the division.'),
+        S('Divide the part by the whole',
+          eq(nf(part,0)+DIV+nf(whole,0)+' = '+nf(dec,4)) + 'That is already the answer, just written as a decimal (out of 1 instead of out of 100).'),
+        S('Turn the decimal into a percentage',
+          'Multiply by 100, which slides the decimal point two places to the right.' + eq(nf(dec,4)+TIMES+'100 = '+pc(p)))
+      ],
+      check:'Test it the other way round. 1% of '+nf(whole,0)+' is '+nf(whole/100)+', and '+nf(p,0)+TIMES+nf(whole/100)+' = '+nf(part,0)+' — the number in the question. It also has to be under 100%, because '+nf(part,0)+' is smaller than '+nf(whole,0)+'.',
+      trap:'Dividing the wrong way round. '+nf(whole,0)+DIV+nf(part,0)+' gives '+nf(whole/part,2)+', which would be '+pc(round(whole/part*100,1))+' — more than everybody. If the part is smaller than the whole, the answer must be under 100%.'
+    };
+    return numQ(q, p, function(v){ return pc(v,1); },
+      [round(whole/part*100,1), 100-p, round(p/10,1), round(part-whole/2,0)]);
+  }
+  if(mode < 0.85){
+    /* fraction to percentage */
+    var fr = R.pick([
+      {n:3,d:8},{n:5,d:8},{n:7,d:8},{n:1,d:8},{n:3,d:5},{n:2,d:5},{n:4,d:5},
+      {n:3,d:4},{n:1,d:4},{n:7,d:20},{n:9,d:20},{n:13,d:20},{n:3,d:10},{n:7,d:10},{n:9,d:10},{n:11,d:20}
+    ]);
+    var v = fr.n/fr.d*100;
+    var ctxs = R.pick([
+      'Out of every <b>'+fr.d+'</b> trains, <b>'+fr.n+'</b> arrived late. What percentage of trains were late?',
+      '<b>'+fr.n+'</b> out of <b>'+fr.d+'</b> candidates passed the first stage. What percentage passed?',
+      'A charity spends <b>'+fr.n+'</b> of every <b>'+fr.d+'</b> pounds on staff costs. What percentage is that?'
+    ]);
+    var q2 = {
+      topic:'basics',
+      stem: ctxs,
+      suffix:'%',
+      hint:'Give your answer as a percentage. Decimals are fine.',
+      steps:[
+        S('Write it as a fraction',
+          '"'+fr.n+' out of '+fr.d+'" is the fraction '+fr.n+'/'+fr.d+'. The whole, '+fr.d+', goes on the bottom.'),
+        S('Turn the fraction into a decimal',
+          'A fraction line just means "divide".' + eq(fr.n+DIV+fr.d+' = '+nf(fr.n/fr.d,4))),
+        S('Turn the decimal into a percentage',
+          'Multiply by 100 — the point moves two places right.' + eq(nf(fr.n/fr.d,4)+TIMES+'100 = '+pc(v,1)))
+      ],
+      check:'Compare it to a half. '+fr.n+' out of '+fr.d+' is '+(fr.n/fr.d>0.5?'more':'less')+' than half of '+fr.d+', so the answer should be '+(fr.n/fr.d>0.5?'above':'below')+' 50%. '+pc(v,1)+' is. If you had got '+pc(v/10,2)+' or '+pc(v*10,1)+', the decimal point had slipped.',
+      trap:'Moving the decimal point one place instead of two. '+nf(fr.n/fr.d,3)+' is <b>'+pc(v,1)+'</b>, not '+pc(round(fr.n/fr.d,3),1)+'. Percentages are hundredths, so it is always two places.'
+    };
+    return numQ(q2, v, function(x){ return pc(x,1); },
+      [round(v/10,2), round(100-v,1), round(fr.d/fr.n*100,1), round(v/2,1)]);
+  }
+  /* decimal to percentage */
+  var d0 = R.pick([0.04,0.07,0.4,0.45,0.08,0.8,0.125,0.62,0.075,0.9,0.36,0.055]);
+  var val = d0*100;
+  var q3 = {
+    topic:'basics',
+    stem:'A report says that <b>'+nf(d0,3)+'</b> of customers cancelled within a year. Written as a percentage, what is that?',
+    suffix:'%',
+    hint:'Type just the number.',
+    steps:[
+      S('Remember what a percentage is',
+        'A percentage is hundredths. A decimal is out of 1. To go from one to the other, multiply by 100.'),
+      S('Multiply by 100',
+        'The decimal point moves <b>two</b> places to the right.' + eq(nf(d0,3)+TIMES+'100 = '+pc(val,2)))
+    ],
+    check:'Sense-check against a landmark: 0.5 would be 50%, and 0.1 would be 10%. '+nf(d0,3)+' is '+(d0<0.1?'smaller than 0.1, so the answer must be under 10%':'between those, so a percentage in the tens is right')+'. '+pc(val,2)+' fits.',
+    trap:'Reading 0.4 as 4%. It is <b>40%</b> — four tenths is forty hundredths. Two places, always.'
+  };
+  return numQ(q3, val, function(x){ return pc(x,2); },
+    [round(d0,3), round(val*10,1), round(val/10,2), round(100-val,1)]);
+}
+
+/* ============================================================
+   TOPIC 2 - percentage of a number
+   ============================================================ */
+function gen_pct_of(){
+  var p = R.pick([5,10,12,15,20,25,30,35,40,45,60,65,70,75,80,90]);
+  var base, ans, guard = 0, people = R.chance(0.3);
+  do {
+    base = people ? R.pick([40,60,80,120,140,160,180,200,240,300,400,500]) : R.int(4,49)*20;
+    ans = base*p/100; guard++;
+  } while(people && !Number.isInteger(ans) && guard < 60);
+  if(people && !Number.isInteger(ans)){ base = 200; ans = base*p/100; }
+
+  var money = !people && R.chance(0.6);
+  var stem, fmtFn, unitWord;
+  if(people){
+    stem = 'A company employs <b>'+nf(base,0)+'</b> people. <b>'+pc(p,0)+'</b> of them work remotely. How many people work remotely?';
+    fmtFn = function(v){ return nf(v,0); }; unitWord = 'people';
+  } else if(money){
+    stem = R.pick([
+      'A '+R.pick(['laptop','sofa','bicycle','course','camera'])+' costs <b>'+cash(base)+'</b>. A deposit of <b>'+pc(p,0)+'</b> is required. How much is the deposit?',
+      'A contract is worth <b>'+cash(base)+'</b>. The agency fee is <b>'+pc(p,0)+'</b> of that. How much is the fee?',
+      'A monthly budget is <b>'+cash(base)+'</b>. <b>'+pc(p,0)+'</b> of it goes on rent. How much is the rent?'
+    ]);
+    fmtFn = function(v){ return cash(v); }; unitWord = '';
+  } else {
+    stem = 'What is <b>'+pc(p,0)+'</b> of <b>'+nf(base,0)+'</b>?';
+    fmtFn = function(v){ return nf(v,2); }; unitWord = '';
+  }
+
+  var one = base/100, ten = base/10, k = p/10;
+  var q = {
+    topic:'pct_of',
+    stem: stem,
+    prefix: money ? GBP : '',
+    hint: money ? 'Type the amount, e.g. 42.50' : '',
+    steps:[
+      S('Find 1% first',
+        'Per cent means "per hundred", so 1% of anything is that thing divided by 100. Dividing by 100 moves the decimal point two places left.' + eq(nf(base,0)+DIV+'100 = '+nf(one,4)+'  (1% of '+nf(base,0)+')')),
+      S('Build up to '+pc(p,0),
+        'If one brick is worth '+nf(one,4)+', then '+nf(p,0)+' of them are worth:' + eq(nf(one,4)+TIMES+nf(p,0)+' = '+fmtFn(ans))),
+      S('Or do it in one step',
+        pc(p,0)+' as a decimal is '+nf(p/100,4)+' (divide by 100). So the whole thing is one button press:' + eq(nf(base,0)+TIMES+nf(p/100,4)+' = '+fmtFn(ans)) + 'Same answer. Use whichever you trust more — the 1% route is easier to check, the decimal route is faster.'),
+      S('Answer', '<b>'+fmtFn(ans)+'</b>'+(unitWord?' '+unitWord:'')+'.')
+    ],
+    check:'A second route to the same place: 10% of '+nf(base,0)+' is '+nf(ten,2)+'. '+pc(p,0)+' is '+nf(k,2)+' lots of 10%, and '+nf(ten,2)+TIMES+nf(k,2)+' = '+fmtFn(ans)+'. Same answer, so it is right. It is also smaller than '+fmtFn(base)+', which it has to be because '+pc(p,0)+' is less than the whole thing.',
+    trap:'Slipping a decimal place when dividing by 100. 1% of '+nf(base,0)+' is '+nf(one,4)+', not '+nf(one*10,3)+'. If your answer looks ten times too big or too small, that is where it happened.'
+  };
+  return numQ(q, ans, fmtFn,
+    [round(base/p,2), round(ans*10,2), round(ans/10,2), round(base-ans,2)]);
+}
+
+/* ============================================================
+   TOPIC 3 - percentage change
+   ============================================================ */
+function gen_pct_change(){
+  var up = R.chance(0.55);
+  var p = R.pick([4,5,8,10,12,15,16,20,24,25,30,32,40,50]);
+  var old, nw, guard = 0;
+  do {
+    old = R.pick([25,40,50,60,75,80,120,150,200,240,250,300,400,500,600,750,800]);
+    nw = up ? old*(1+p/100) : old*(1-p/100);
+    guard++;
+  } while(!Number.isInteger(nw) && guard < 60);
+  if(!Number.isInteger(nw)){ old = 200; p = 20; nw = up ? 240 : 160; }
+
+  var money = R.chance(0.45);
+  var f = money ? function(v){ return cash(v); } : function(v){ return nf(v,0); };
+  var ctx = money ? R.pick([
+      {s:'A season ticket cost <b>'+cash(old)+'</b> in 2024 and <b>'+cash(nw)+'</b> in 2025.', t:'the price'},
+      {s:'A monthly energy bill was <b>'+cash(old)+'</b> and is now <b>'+cash(nw)+'</b>.', t:'the bill'},
+      {s:'A weekly food shop cost <b>'+cash(old)+'</b> last year and <b>'+cash(nw)+'</b> this year.', t:'the cost'}
+    ]) : R.pick([
+      {s:'A shop sold <b>'+nf(old,0)+'</b> units last month and <b>'+nf(nw,0)+'</b> units this month.', t:'sales'},
+      {s:'A website had <b>'+nf(old,0)+'</b> visitors in May and <b>'+nf(nw,0)+'</b> visitors in June.', t:'visitor numbers'},
+      {s:'A team had <b>'+nf(old,0)+'</b> staff in January and <b>'+nf(nw,0)+'</b> staff in December.', t:'headcount'}
+    ]);
+  var diff = Math.abs(nw - old);
+  var word = up ? 'increase' : 'decrease';
+  var wrong = round(diff/nw*100, 1);
+
+  var q = {
+    topic:'pct_change',
+    stem: ctx.s + ' What was the percentage ' + word + ' in ' + ctx.t + '?',
+    suffix:'%',
+    hint:'Type just the number.',
+    steps:[
+      S('Spot which number is the original',
+        'The original is the one that came <b>first in time</b> — here that is '+f(old)+'. Everything gets compared to it. Getting this right is most of the question.'),
+      S('Find the change',
+        'Subtract the smaller from the bigger.' + eq(f(Math.max(old,nw))+MINUS+f(Math.min(old,nw))+' = '+f(diff)) + 'So it went '+(up?'up':'down')+' by '+f(diff)+'.'),
+      S('Compare the change to the original',
+        'Divide the change by the <b>original</b> — not by the new figure.' + eq(nf(diff,2)+DIV+nf(old,2)+' = '+nf(diff/old,4))),
+      S('Turn it into a percentage',
+        'Multiply by 100.' + eq(nf(diff/old,4)+TIMES+'100 = '+pc(p,1)) + 'So it is a <b>'+pc(p,1)+' '+word+'</b>.')
+    ],
+    check:'Run it forwards. '+pc(p,0)+' of '+f(old)+' is '+f(diff)+', and '+f(old)+(up?' + ':MINUS)+f(diff)+' = '+f(nw)+' — exactly the second number in the question. It fits, so the answer is right.',
+    trap:'Dividing by the new figure instead of the original. '+nf(diff,2)+DIV+nf(nw,2)+' gives '+pc(wrong,1)+', which is a very tempting wrong answer. Say it to yourself before dividing: "compared to what it <b>was</b>".'
+  };
+  return numQ(q, p, function(v){ return pc(v,1); },
+    [wrong, round(diff,1), round(100-p,1), round(nw/old*100,1)]);
+}
+
+/* ============================================================
+   TOPIC 4 - increase / decrease by a percentage
+   ============================================================ */
+function gen_incdec(){
+  var up = R.chance(0.5);
+  var p = up ? R.pick([2.5,3,4,5,8,10,12,15,20,25]) : R.pick([5,10,12,15,20,25,30,33,40]);
+  var base = R.int(6,60)*20;
+  var mult = up ? (100+p)/100 : (100-p)/100;
+  var ans = round(base*mult, 2);
+  var ctx;
+  if(up){
+    ctx = R.pick([
+      {s:'A bill of <b>'+cash(base)+'</b> has VAT added at <b>'+pc(p,1)+'</b>.', q:'What is the total to pay?', n:'total'},
+      {s:'An annual insurance premium of <b>'+cash(base)+'</b> rises by <b>'+pc(p,1)+'</b>.', q:'What is the new premium?', n:'new premium'},
+      {s:'A rent of <b>'+cash(base)+'</b> a month increases by <b>'+pc(p,1)+'</b>.', q:'What is the new monthly rent?', n:'new rent'}
+    ]);
+  } else {
+    ctx = R.pick([
+      {s:'A jacket priced <b>'+cash(base)+'</b> is reduced by <b>'+pc(p,1)+'</b> in a sale.', q:'What is the sale price?', n:'sale price'},
+      {s:'A laptop costing <b>'+cash(base)+'</b> has <b>'+pc(p,1)+'</b> taken off with a staff discount.', q:'What does a member of staff pay?', n:'price paid'},
+      {s:'A budget of <b>'+cash(base)+'</b> is cut by <b>'+pc(p,1)+'</b>.', q:'What is the new budget?', n:'new budget'}
+    ]);
+  }
+  var left = up ? (100+p) : (100-p);
+  var change = round(base*p/100, 2);
+  var q = {
+    topic:'incdec',
+    stem: ctx.s + ' ' + ctx.q,
+    prefix: GBP,
+    hint:'Type the amount, e.g. 408 or 408.50',
+    steps:[
+      S('Start from 100%',
+        'Whatever you begin with is 100% of itself. Here we '+(up?'add':'take off')+' '+pc(p,1)+'.' + eq('100%'+(up?' + ':MINUS)+pc(p,1)+' = '+pc(left,1)) + 'So we end up holding '+pc(left,1)+' of the original amount.')
+      ,
+      S('Turn that into a multiplier',
+        'Divide by 100 to make it a decimal.' + eq(nf(left,1)+DIV+'100 = '+nf(mult,4)) + 'Quick sense-check on the multiplier itself: it is '+(up?'above':'below')+' 1, and the amount is going '+(up?'up':'down')+'. Right shape.'),
+      S('One multiplication',
+        eq(cash(base)+TIMES+nf(mult,4)+' = '+cash(ans))),
+      S('Answer the question asked',
+        'The '+ctx.n+' is <b>'+cash(ans)+'</b>. Note that this is the '+(up?'full amount including the extra':'price after the discount')+', not the '+(up?'extra on its own':'discount on its own')+'.')
+    ],
+    check:'The slow route, as a check: '+pc(p,1)+' of '+cash(base)+' is '+cash(change)+'. Then '+cash(base)+(up?' + ':MINUS)+cash(change)+' = '+cash(ans)+'. Same answer. And '+cash(ans)+' is '+(up?'a bit more':'a bit less')+' than '+cash(base)+', which is exactly what '+(up?'adding':'taking off')+' '+pc(p,1)+' should look like.',
+    trap:'Multiplying by '+nf(p/100,4)+' instead of '+nf(mult,4)+'. That gives '+cash(change)+', which is the '+(up?'extra amount':'discount')+' on its own — not the '+ctx.n+'. Both numbers will be offered to you. Ask what the question actually wanted.'
+  };
+  return numQ(q, ans, function(v){ return cash(v); },
+    [change, round(base*(up?(100-p)/100:(100+p)/100),2), round(base+p,2), round(base-p,2)]);
+}
+
+/* ============================================================
+   TOPIC 5 - reverse percentages
+   ============================================================ */
+function gen_reverse(){
+  var up = R.chance(0.55);
+  var p = up ? R.pick([5,10,12,15,20,25]) : R.pick([10,15,20,25,30,40]);
+  var mult = up ? (100+p)/100 : (100-p)/100;
+  var orig, fin, guard = 0;
+  do {
+    orig = R.int(4,60)*20;
+    fin = round(orig*mult, 2);
+    guard++;
+  } while((fin*100) % 1 !== 0 && guard < 50);
+  var ctx = up ? R.pick([
+      {s:'A coat costs <b>'+cash(fin)+'</b> <b>including</b> VAT at '+pc(p,0)+'.', q:'What was the price before VAT was added?', sig:'including'},
+      {s:'A hotel bill comes to <b>'+cash(fin)+'</b> after a '+pc(p,0)+' service charge is added.', q:'What was the bill before the service charge?', sig:'after'},
+      {s:'A monthly bill is <b>'+cash(fin)+'</b> after a '+pc(p,0)+' increase.', q:'What was the bill before the increase?', sig:'after'}
+    ]) : R.pick([
+      {s:'In a sale, a chair is reduced by '+pc(p,0)+' and now costs <b>'+cash(fin)+'</b>.', q:'What was the original price?', sig:'now costs'},
+      {s:'After a '+pc(p,0)+' discount, a customer pays <b>'+cash(fin)+'</b>.', q:'What was the price before the discount?', sig:'after'},
+      {s:'The value of a stock holding fell by '+pc(p,0)+' and is now worth <b>'+cash(fin)+'</b>.', q:'What was it worth before the fall?', sig:'is now'}
+    ]);
+  var naive = round(up ? fin*(100-p)/100 : fin*(100+p)/100, 2);
+  var backAgain = round(naive*mult, 2);
+
+  var q = {
+    topic:'reverse',
+    stem: ctx.s + ' ' + ctx.q,
+    prefix: GBP,
+    hint:'Type the amount, e.g. 80 or 80.50',
+    steps:[
+      S('Notice which number you have been given',
+        'The '+cash(fin)+' is the <b>finished</b> amount — the value <i>after</i> the '+(up?'increase':'reduction')+' has already happened. The word "<b>'+ctx.sig+'</b>" is the giveaway. So this is a backwards question.'),
+      S('Work out the multiplier as usual',
+        'Going forwards, the original was '+(up?'increased':'reduced')+' by '+pc(p,0)+', so it was multiplied by:' + eq('(100'+(up?' + ':MINUS)+nf(p,0)+')'+DIV+'100 = '+nf(mult,4))),
+      S('Go backwards by dividing',
+        'Forwards you multiply, so backwards you <b>divide</b>. That is the whole trick.' + eq(cash(fin)+DIV+nf(mult,4)+' = '+cash(orig))),
+      S('Answer',
+        'The amount before the '+(up?'increase':'reduction')+' was <b>'+cash(orig)+'</b>.')
+    ],
+    check:'Always finish these by going forwards again: '+cash(orig)+TIMES+nf(mult,4)+' = '+cash(fin)+'. That is exactly the figure in the question, so '+cash(orig)+' must be right. Also, undoing '+(up?'an increase gives a smaller number, and '+cash(orig)+' is smaller than '+cash(fin):'a discount gives a bigger number, and '+cash(orig)+' is bigger than '+cash(fin))+'.',
+    trap:(up?'Taking '+pc(p,0)+' off the '+cash(fin)+'.':'Adding '+pc(p,0)+' onto the '+cash(fin)+'.')+' That gives '+cash(naive)+', and it will be one of the options. It is wrong because the '+pc(p,0)+' was worked out on the <i>original</i> '+cash(orig)+', not on '+cash(fin)+'. You can prove it: '+cash(naive)+TIMES+nf(mult,4)+' = '+cash(backAgain)+', which is not the '+cash(fin)+' we were given.'
+  };
+  return numQ(q, orig, function(v){ return cash(v); },
+    [naive, round(fin*mult,2), round(fin - p,2), round(fin*(up?1.2:0.8),2)]);
+}
+
+/* ============================================================
+   TOPIC 6 - ratios
+   ============================================================ */
+function gen_ratio(){
+  var mode = Math.random();
+
+  if(mode < 0.38){
+    /* share a total between two in a:b */
+    var pair = R.pick([[2,3],[3,4],[4,5],[3,5],[5,7],[2,7],[3,7],[4,7],[5,6],[1,4],[2,5],[3,8]]);
+    var a = pair[0], b = pair[1], parts = a+b;
+    var one = R.pick([15,20,25,30,40,45,50,60,75,80,100,120]);
+    var total = parts*one;
+    var names = R.pick([['Amy','Ben'],['Priya','Tom'],['Sam','Jo'],['Lena','Marco']]);
+    var askFirst = R.chance(0.5);
+    var who = askFirst ? names[0] : names[1];
+    var share = (askFirst ? a : b) * one;
+    var money = R.chance(0.7);
+    var f = money ? function(v){ return cash(v); } : function(v){ return nf(v,0); };
+    var q = {
+      topic:'ratio',
+      stem: (money ? '<b>'+cash(total)+'</b> is shared' : '<b>'+nf(total,0)+'</b> items are shared') +
+            ' between '+names[0]+' and '+names[1]+' in the ratio <b>'+a+' : '+b+'</b>. How much does '+who+' get?',
+      prefix: money ? GBP : '',
+      steps:[
+        S('Count the parts',
+          'The ratio '+a+' : '+b+' means the pile is cut into equal parts — '+a+' for '+names[0]+' and '+b+' for '+names[1]+'. Add them to find how many parts there are altogether.' + eq(a+' + '+b+' = '+parts+' parts')),
+        S('Find what one part is worth',
+          'Share the total out evenly between all '+parts+' parts. This single step does most of the work.' + eq(f(total)+DIV+parts+' = '+f(one)+' per part')),
+        S('Give '+who+' their parts',
+          who+' gets '+(askFirst?a:b)+' of those parts.' + eq((askFirst?a:b)+TIMES+f(one)+' = '+f(share))),
+        S('Answer', who+' gets <b>'+f(share)+'</b>.')
+      ],
+      check:'Work out the other share and add them up: '+names[0]+' has '+f(a*one)+', '+names[1]+' has '+f(b*one)+', and '+f(a*one)+' + '+f(b*one)+' = '+f(total)+' — the total we started with. Nothing lost, nothing invented. Also '+names[b>a?1:0]+' has more, which matches '+(b>a?b+' being bigger than '+a:a+' being bigger than '+b)+'.',
+      trap:'Dividing by one side of the ratio instead of by the total parts. '+f(total)+DIV+(askFirst?a:b)+' = '+f(total/(askFirst?a:b))+' is a meaningless number here. Always add the sides together first.'
+    };
+    return numQ(q, share, f,
+      [ (askFirst?b:a)*one, round(total/(askFirst?a:b),2), round(total/2,2), round(total-share,2) ]);
+  }
+
+  if(mode < 0.62){
+    /* three-way share */
+    var t3 = R.pick([[1,2,3],[2,3,5],[1,3,4],[2,2,3],[3,4,5],[1,2,4],[2,5,3]]);
+    var sum3 = t3[0]+t3[1]+t3[2];
+    var one3 = R.pick([20,25,30,40,50,60,80,100]);
+    var total3 = sum3*one3;
+    var idx = R.int(0,2);
+    var labels = R.pick([['marketing','training','equipment'],['rent','wages','supplies'],['staffing','software','travel']]);
+    var share3 = t3[idx]*one3;
+    var q3 = {
+      topic:'ratio',
+      stem:'A budget of <b>'+cash(total3)+'</b> is split between '+labels[0]+', '+labels[1]+' and '+labels[2]+' in the ratio <b>'+t3.join(' : ')+'</b>. How much goes to '+labels[idx]+'?',
+      prefix: GBP,
+      steps:[
+        S('Add up all the parts',
+          'Three-way ratios work exactly like two-way ones — there are just more parts.' + eq(t3.join(' + ')+' = '+sum3+' parts')),
+        S('Find one part',
+          eq(cash(total3)+DIV+sum3+' = '+cash(one3)+' per part')),
+        S('Multiply by the parts for '+labels[idx],
+          labels[idx]+' takes '+t3[idx]+' parts.' + eq(t3[idx]+TIMES+cash(one3)+' = '+cash(share3))),
+        S('Answer','<b>'+cash(share3)+'</b> goes to '+labels[idx]+'.')
+      ],
+      check:'All three shares are '+cash(t3[0]*one3)+', '+cash(t3[1]*one3)+' and '+cash(t3[2]*one3)+'. Added up: '+cash(total3)+' — the original budget exactly. That is the check that catches nearly every slip in ratio questions.',
+      trap:'Forgetting the third number when adding the parts. If you use '+(t3[0]+t3[1])+' parts instead of '+sum3+', every answer afterwards is wrong. Count them twice.'
+    };
+    return numQ(q3, share3, function(v){ return cash(v); },
+      [round(total3/sum3,2), t3[(idx+1)%3]*one3, round(total3/3,2), round(total3-share3,2)]);
+  }
+
+  if(mode < 0.82){
+    /* scale one side to the other */
+    var pr = R.pick([[7,2],[5,3],[4,3],[9,4],[3,2],[8,5],[5,2],[6,5]]);
+    var a2 = pr[0], b2 = pr[1];
+    var k = R.pick([4,6,7,8,9,11,12,15]);
+    var known = a2*k, want = b2*k;
+    var swap = R.chance(0.5);
+    var kn = swap ? b2*k : a2*k, kp = swap ? b2 : a2, wp = swap ? a2 : b2;
+    var wn = wp*k;
+    var ctx2 = R.pick([
+      {x:'staff', y:'managers'},{x:'cats', y:'dogs'},{x:'students', y:'tutors'},{x:'cars', y:'vans'}
+    ]);
+    var first = swap ? ctx2.y : ctx2.x, second = swap ? ctx2.x : ctx2.y;
+    var q2 = {
+      topic:'ratio',
+      stem:'The ratio of '+ctx2.x+' to '+ctx2.y+' is <b>'+a2+' : '+b2+'</b>. There are <b>'+nf(kn,0)+'</b> '+first+'. How many '+second+' are there?',
+      steps:[
+        S('Line the number up with its side of the ratio',
+          'The '+nf(kn,0)+' '+first+' matches the <b>'+kp+'</b> in the ratio, because both refer to '+first+'.'),
+        S('Find what one part is worth',
+          'If '+kp+' parts are worth '+nf(kn,0)+' '+first+', then one part is:' + eq(nf(kn,0)+DIV+kp+' = '+nf(k,0)+' per part')),
+        S('Build the other side',
+          second+' are '+wp+' parts.' + eq(wp+TIMES+nf(k,0)+' = '+nf(wn,0))),
+        S('Answer','There are <b>'+nf(wn,0)+'</b> '+second+'.')
+      ],
+      check:'Does '+nf(kn,0)+' : '+nf(wn,0)+' simplify back to '+(swap?b2+' : '+a2:a2+' : '+b2)+'? Divide both by '+nf(k,0)+' and you get exactly that. And there are '+(wn<kn?'fewer':'more')+' '+second+' than '+first+', which matches the ratio.',
+      trap:'Multiplying or dividing by the wrong side. Check which number in the ratio belongs to which group before you touch the calculator — the question deliberately puts them in a different order sometimes.'
+    };
+    return numQ(q2, wn, function(v){ return nf(v,0); },
+      [round(kn/wp*kp,0), Math.abs(kn-wn), kn+wn, k]);
+  }
+
+  /* simplify a ratio */
+  var g = R.pick([3,4,5,6,7,8,9,12,15]);
+  var sr = R.pick([[2,3],[3,4],[4,5],[5,6],[2,5],[3,5],[5,8],[4,7],[7,9]]);
+  var A = sr[0]*g, B = sr[1]*g;
+  var qs = {
+    topic:'ratio',
+    type:'mc',
+    stem:'A shop sells <b>'+nf(A,0)+'</b> coffees and <b>'+nf(B,0)+'</b> teas in a day. Write the ratio of coffees to teas in its simplest form.',
+    steps:[
+      S('Write the ratio down as it is',
+        'Coffees first, teas second, because that is the order the question asked for.' + eq(nf(A,0)+' : '+nf(B,0))),
+      S('Find a number that divides into both',
+        'Simplifying means shrinking both sides by the same amount, which keeps the proportion identical — like turning 50:100 into 1:2. Here both '+nf(A,0)+' and '+nf(B,0)+' divide by <b>'+g+'</b>.'),
+      S('Divide both sides',
+        eq(nf(A,0)+DIV+g+' = '+sr[0]+'  and  '+nf(B,0)+DIV+g+' = '+sr[1]) + 'So the ratio is <b>'+sr[0]+' : '+sr[1]+'</b>.'),
+      S('Check it will not go further',
+        'Is there any number that divides into both '+sr[0]+' and '+sr[1]+'? No — so this is as simple as it gets.')
+    ],
+    check:'Scale it back up: '+sr[0]+TIMES+g+' = '+nf(A,0)+' and '+sr[1]+TIMES+g+' = '+nf(B,0)+'. It returns to the original numbers, so the simplified version describes the same thing.',
+    trap:'Dividing the two sides by <i>different</i> numbers. That changes the recipe completely. Whatever you do to one side, do to the other.'
+  };
+  qs.answer = 0;
+  qs.display = sr[0]+' : '+sr[1];
+  qs.choices = R.shuffle([ sr[0]+' : '+sr[1], sr[1]+' : '+sr[0], (sr[0]+1)+' : '+(sr[1]+1), nf(A,0)+' : '+nf(B,0) ]);
+  return qs;
+}
+/* ---------- PURE SECTION MARK 1 ---------- */
+
+/* ============================================================
+   TOPIC 7 - rates: speed and price per unit
+   ============================================================ */
+function gen_rates(){
+  var mode = Math.random();
+
+  if(mode < 0.3){
+    /* speed from distance and time */
+    var speed = R.pick([40,45,48,50,55,60,64,70,72,75,80,90]);
+    var hrs = R.pick([1.5,2,2.5,3,3.5,4,0.5,1.25,2.25]);
+    var dist = round(speed*hrs, 2);
+    var mins = Math.round((hrs % 1)*60);
+    var whole = Math.floor(hrs);
+    var timeText = mins === 0 ? whole+' hours' : (whole === 0 ? mins+' minutes' : whole+' hours '+mins+' minutes');
+    var q = {
+      topic:'rates',
+      stem:'A train travels <b>'+nf(dist,2)+' miles</b> in <b>'+timeText+'</b>. What is its average speed in miles per hour?',
+      suffix:'mph',
+      hint:'Type just the number.',
+      steps:[
+        S('Get the time into hours first',
+          mins === 0
+            ? 'The time is already in whole hours: <b>'+nf(hrs,2)+' hours</b>. Nothing to convert.'
+            : 'This is where marks get lost. '+timeText+' is <b>not</b> '+whole+'.'+mins+' hours. Minutes have to be turned into a fraction of an hour by dividing by 60.' + eq(mins+DIV+'60 = '+nf(mins/60,3)+', so the time is '+nf(hrs,3)+' hours')),
+        S('Let the units tell you what to do',
+          '"Miles per hour" literally means miles divided by hours. So divide the distance by the time.' + eq(nf(dist,2)+DIV+nf(hrs,3)+' = '+nf(speed,2))),
+        S('Write the answer with its unit',
+          'The average speed is <b>'+nf(speed,2)+' mph</b>. A number on its own is only half an answer.')
+      ],
+      check:'Run it forwards: at '+nf(speed,2)+' mph for '+nf(hrs,3)+' hours, you would cover '+nf(speed,2)+TIMES+nf(hrs,3)+' = '+nf(dist,2)+' miles — the distance in the question. And '+nf(speed,2)+' mph is a believable train speed; if you had got '+nf(speed/10,1)+' or '+nf(speed*10,0)+', something slipped.',
+      trap: mins === 0
+        ? 'Dividing upside down. '+nf(hrs,2)+DIV+nf(dist,2)+' gives hours per mile, which is a real thing but not what was asked.'
+        : 'Typing '+whole+'.'+mins+' into the calculator. '+timeText+' is '+nf(hrs,3)+' hours. Minutes ÷ 60, every time.'
+    };
+    return numQ(q, speed, function(v){ return nf(v,2); },
+      [round(dist/(whole + mins/100),1), round(hrs/dist,3), round(dist*hrs,1), round(dist/whole,1)]);
+  }
+
+  if(mode < 0.5){
+    /* distance from speed and time */
+    var sp = R.pick([45,50,55,60,64,70,72,80,90,110]);
+    var h2 = R.pick([1.5,2,2.5,3,3.25,4,4.5]);
+    var d2 = round(sp*h2, 2);
+    var q2 = {
+      topic:'rates',
+      stem:'A van drives at an average speed of <b>'+nf(sp,0)+' mph</b> for <b>'+nf(h2,2)+' hours</b>. How far does it travel?',
+      suffix:'miles',
+      hint:'Type just the number.',
+      steps:[
+        S('What does "miles per hour" actually promise?',
+          'It says you cover '+nf(sp,0)+' miles in <b>each single hour</b>. So for '+nf(h2,2)+' hours you get '+nf(h2,2)+' lots of '+nf(sp,0)+' miles.'),
+        S('Multiply',
+          eq('distance = speed'+TIMES+'time') + eq(nf(sp,0)+TIMES+nf(h2,2)+' = '+nf(d2,2)+' miles')),
+        S('Answer','<b>'+nf(d2,2)+' miles</b>.')
+      ],
+      check: (h2 % 1 === 0)
+        ? 'Build it up the slow way: one hour is '+nf(sp,0)+' miles, so '+nf(h2,0)+' hours is '+nf(sp,0)+TIMES+nf(h2,0)+' = '+nf(d2,2)+' miles. It has to be bigger than '+nf(sp,0)+', because the van drives for more than one hour \u2014 and it is.'
+        : 'Rough it out in your head: '+nf(h2,2)+' hours is roughly '+Math.round(h2)+' hours, and '+Math.round(h2)+TIMES+nf(sp,0)+' is about '+nf(Math.round(h2)*sp,0)+'. Our answer '+nf(d2,2)+' is right next to that, so it is the right size.',
+      trap:'Dividing instead of multiplying. More hours must mean <b>more</b> miles — if your answer came out smaller than the speed, you divided by mistake.'
+    };
+    return numQ(q2, d2, function(v){ return nf(v,2); },
+      [round(sp/h2,2), round(h2/sp,3), round(sp+h2,2), round(d2/2,2)]);
+  }
+
+  if(mode < 0.75){
+    /* price per unit */
+    var n3 = R.pick([2,2.5,4,5,6,8,10,12,1.5,3]);
+    var per = R.pick([0.8,1.2,1.25,1.4,1.5,1.75,2.4,2.5,3.2,0.95]);
+    var cost = round(n3*per, 2);
+    var item = R.pick([
+      {u:'litres', t:'paint', unit:'litre'},
+      {u:'kg', t:'rice', unit:'kilo'},
+      {u:'metres', t:'cable', unit:'metre'},
+      {u:'kg', t:'coffee', unit:'kilo'}
+    ]);
+    var q3 = {
+      topic:'rates',
+      stem:'<b>'+nf(n3,2)+' '+item.u+'</b> of '+item.t+' costs <b>'+cash(cost)+'</b>. What is the price per '+item.unit+'?',
+      prefix: GBP,
+      hint:'Give your answer in pounds, e.g. 1.40',
+      steps:[
+        S('What is being asked?',
+          '"Per '+item.unit+'" means "for <b>one</b> '+item.unit+'". So we need to share the total cost out across the '+nf(n3,2)+' '+item.u+'.'),
+        S('Divide the total by how many units there are',
+          eq(cash(cost)+DIV+nf(n3,2)+' = '+cash(per))),
+        S('Answer','<b>'+cash(per)+'</b> per '+item.unit+'.')
+      ],
+      check:'Go forwards: '+nf(n3,2)+' '+item.u+' at '+cash(per)+' each is '+nf(n3,2)+TIMES+cash(per)+' = '+cash(cost)+'. Back to the price in the question, so it is right. The per-unit price must also be '+(n3>1?'smaller':'bigger')+' than the total, because you are buying '+(n3>1?'more than one unit':'less than a full unit')+'.',
+      trap:'Dividing the wrong way round: '+nf(n3,2)+DIV+nf(cost,2)+' = '+nf(n3/cost,3)+' is '+item.u+' per pound, not pounds per '+item.unit+'. Read the unit you are being asked for.'
+    };
+    return numQ(q3, per, function(v){ return cash(v); },
+      [round(n3/cost,2), round(cost*n3,2), round(cost-n3,2), round(per*2,2)]);
+  }
+
+  /* better value comparison */
+  var unitA = R.pick([0.9,1.1,1.2,1.25,1.4,1.5,1.6,2.0]);
+  var sizeA = R.pick([2,3,4,5,6]);
+  var sizeB = R.pick([8,10,12,15]);
+  var better = R.chance(0.5);
+  var unitB = round(better ? unitA*R.pick([0.8,0.85,0.9]) : unitA*R.pick([1.1,1.15,1.2]), 3);
+  var costA = round(sizeA*unitA, 2), costB = round(sizeB*unitB, 2);
+  var prod = R.pick([
+    {t:'washing powder', u:'kg'},{t:'orange juice', u:'litres'},{t:'printer paper', u:'reams'},{t:'dog food', u:'kg'}
+  ]);
+  var cheaper = unitB < unitA ? 'B' : 'A';
+  var q4 = {
+    topic:'rates',
+    type:'mc',
+    stem:'Two packs of '+prod.t+' are on sale.<br><b>Pack A:</b> '+nf(sizeA,2)+' '+prod.u+' for '+cash(costA)+
+         '<br><b>Pack B:</b> '+nf(sizeB,2)+' '+prod.u+' for '+cash(costB)+'<br>Which is better value, and by how much per '+prod.u.replace(/s$/,'')+'?',
+    steps:[
+      S('You cannot compare them as they are',
+        'Different sizes <i>and</i> different prices. The fix is the one you already use in a supermarket: work out what <b>one</b> '+prod.u.replace(/s$/,'')+' costs in each pack.'),
+      S('Price per unit for Pack A',
+        eq(cash(costA)+DIV+nf(sizeA,2)+' = '+cash(unitA)+' per '+prod.u.replace(/s$/,''))),
+      S('Price per unit for Pack B',
+        eq(cash(costB)+DIV+nf(sizeB,2)+' = '+cash(unitB)+' per '+prod.u.replace(/s$/,''))),
+      S('Compare, then find the gap',
+        'Pack '+cheaper+' costs less for each single '+prod.u.replace(/s$/,'')+', so it is the better value.' +
+        eq(cash(Math.max(unitA,unitB))+MINUS+cash(Math.min(unitA,unitB))+' = '+cash(Math.abs(unitA-unitB))+' cheaper per '+prod.u.replace(/s$/,'')))
+    ],
+    check:'Sanity test: buying '+nf(sizeB,2)+' '+prod.u+' at Pack '+cheaper+"'s rate would cost "+cash(Math.min(unitA,unitB)*sizeB)+', which is '+(Math.min(unitA,unitB)*sizeB < Math.max(unitA,unitB)*sizeB ? 'less' : 'more')+' than the same amount at the other rate ('+cash(Math.max(unitA,unitB)*sizeB)+'). The cheaper-per-unit pack really is cheaper.',
+    trap:'Assuming the bigger pack must be better value — it often is, but not always, and tests know that. Work both out. Also watch whether the question wants which pack, the price per unit, or the difference.'
+  };
+  var gap = round(Math.abs(unitA-unitB), 2);
+  q4.display = 'Pack '+cheaper+', by '+cash(gap)+' per '+prod.u.replace(/s$/,'');
+  q4.answer = 0;
+  q4.choices = R.shuffle([
+    q4.display,
+    'Pack '+(cheaper==='A'?'B':'A')+', by '+cash(gap)+' per '+prod.u.replace(/s$/,''),
+    'Pack '+cheaper+', by '+cash(round(Math.abs(costA-costB),2))+' per '+prod.u.replace(/s$/,''),
+    'Pack '+(cheaper==='A'?'B':'A')+', by '+cash(round(gap*2,2))+' per '+prod.u.replace(/s$/,'')
+  ]);
+  return q4;
+}
+
+/* ============================================================
+   TOPIC 8 - currency conversion
+   ============================================================ */
+function gen_currency(){
+  var cur = R.pick([
+    {sym:'€', name:'euros', rate:R.pick([1.12,1.15,1.17,1.20,1.08])},
+    {sym:'$', name:'US dollars', rate:R.pick([1.24,1.25,1.28,1.32])},
+    {sym:'A$', name:'Australian dollars', rate:R.pick([1.85,1.90,1.95])}
+  ]);
+  var rate = cur.rate;
+  var mode = Math.random();
+
+  if(mode < 0.42){
+    /* pounds to foreign */
+    var gb = R.int(6,80)*20;
+    var out = round(gb*rate, 2);
+    var q = {
+      topic:'currency',
+      stem:'The exchange rate is <b>'+GBP+'1 = '+cur.sym+rateS(rate)+'</b>. How many '+cur.name+' do you get for <b>'+cash(gb)+'</b>?',
+      prefix: cur.sym,
+      hint:'Give your answer to 2 decimal places.',
+      steps:[
+        S('Read the rate as a sentence',
+          'Say it out loud with the "1" in it: <b>one pound buys '+cur.sym+rateS(rate)+'</b>. Now the direction is obvious instead of a guess.'),
+        S('Decide: multiply or divide?',
+          'We are starting with pounds, and pounds are the "1" side. '+cash(gb)+' is '+nf(gb,0)+' lots of "'+cur.sym+rateS(rate)+'", so it is a multiplication.'),
+        S('Do the one calculation',
+          eq(nf(gb,0)+TIMES+rateS(rate)+' = '+nf(out,2))),
+        S('Write it as money',
+          '<b>'+cur.sym+nf(out,2)+'</b> — two decimal places, because it is money.')
+      ],
+      check:'One pound is worth more than one '+cur.name.replace(/s$/,'')+' here, so you should end up holding a <b>bigger number</b> of '+cur.name+' than pounds. '+nf(out,2)+' is bigger than '+nf(gb,0)+'. It fits. (Dividing by mistake would have given about '+cur.sym+nf(gb/rate,2)+' — fewer, which is the wrong shape.)',
+      trap:'Multiplying when you should divide, or the other way round. Decide <i>before</i> you calculate whether the number should get bigger or smaller, then check your answer against that.'
+    };
+    return numQ(q, out, function(v){ return nf(v,2); },
+      [round(gb/rate,2), round(gb+rate,2), round(out*10,2), round(gb*(rate-1),2)]);
+  }
+
+  if(mode < 0.78){
+    /* foreign to pounds */
+    var gb2 = R.int(6,70)*25;
+    var foreign = round(gb2*rate, 2);
+    var q2 = {
+      topic:'currency',
+      stem:'The exchange rate is <b>'+GBP+'1 = '+cur.sym+rateS(rate)+'</b>. You have <b>'+cur.sym+nf(foreign,2)+'</b> left over from a trip. How many pounds is that worth?',
+      prefix: GBP,
+      hint:'Give your answer to 2 decimal places.',
+      steps:[
+        S('Read the rate as a sentence',
+          '<b>One pound buys '+cur.sym+rateS(rate)+'.</b> The pound is the "1" side of this rate.'),
+        S('Decide: multiply or divide?',
+          'This time we are going <i>back</i> to the "1" side. Going out was a multiplication, so coming back is a <b>division</b>.'),
+        S('Do the one calculation',
+          eq(nf(foreign,2)+DIV+rateS(rate)+' = '+nf(gb2,2))),
+        S('Answer','<b>'+cash(gb2)+'</b>.')
+      ],
+      check:'Test it by going forwards: '+nf(gb2,2)+TIMES+rateS(rate)+' = '+nf(foreign,2)+', which is exactly the amount in the question. And pounds are worth more here, so the pounds figure should be the <b>smaller</b> number — '+nf(gb2,2)+' is smaller than '+nf(foreign,2)+'.',
+      trap:'Multiplying again out of habit. That would give '+cur.sym+nf(foreign*rate,2)+', which is more than you started with — impossible when swapping into a stronger currency.'
+    };
+    return numQ(q2, gb2, function(v){ return nf(v,2); },
+      [round(foreign*rate,2), round(foreign-rate,2), round(gb2/rate,2), round(foreign/2,2)]);
+  }
+
+  /* with a fee */
+  var gb3 = R.int(10,60)*25;
+  var fee = R.pick([3,4,5,6,8,10]);
+  var afterFee = gb3 - fee;
+  var out3 = round(afterFee*rate, 2);
+  var q3 = {
+    topic:'currency',
+    stem:'A bureau de change offers <b>'+GBP+'1 = '+cur.sym+rateS(rate)+'</b> and charges a flat fee of <b>'+cash(fee)+'</b>, taken from your pounds <i>before</i> the exchange. You hand over <b>'+cash(gb3)+'</b>. How many '+cur.name+' do you receive?',
+    prefix: cur.sym,
+    hint:'Give your answer to 2 decimal places.',
+    steps:[
+      S('Deal with the fee first',
+        'The question says the fee comes off <b>before</b> the exchange, and it is in pounds. So not all of your '+cash(gb3)+' gets converted.' + eq(cash(gb3)+MINUS+cash(fee)+' = '+cash(afterFee)+' to be exchanged')),
+      S('Now convert what is left',
+        'One pound buys '+cur.sym+rateS(rate)+', and we are going from pounds, so multiply.' + eq(nf(afterFee,2)+TIMES+rateS(rate)+' = '+nf(out3,2))),
+      S('Answer','<b>'+cur.sym+nf(out3,2)+'</b>.')
+    ],
+    check:'Two checks. First, the fee made the amount smaller before converting, so this must be less than converting the full '+cash(gb3)+' (which would give '+cur.sym+nf(gb3*rate,2)+'). It is. Second, we are buying a weaker currency, so the number should still be bigger than '+nf(afterFee,2)+'. It is.',
+    trap:'Converting the full '+cash(gb3)+' and then taking the fee off in '+cur.name+'. That gives a different answer ('+cur.sym+nf(gb3*rate-fee,2)+'), because a '+cash(fee)+' fee is not the same as a '+cur.sym+nf(fee,2)+' fee. Read <i>which currency</i> the fee is in and <i>when</i> it is taken.'
+  };
+  return numQ(q3, out3, function(v){ return nf(v,2); },
+    [round(gb3*rate,2), round(gb3*rate-fee,2), round(afterFee/rate,2), round(out3-fee,2)]);
+}
+
+/* ============================================================
+   TOPIC 9 - data interpretation
+   ============================================================ */
+function gen_data(){
+  if(R.chance(0.55)) return dataTable();
+  return dataChart();
+}
+
+function dataTable(){
+  var set = R.pick([
+    {title:'Revenue by branch', units:'All figures in '+GBP+'000s', rows:['North','South','East','West'], cols:['Q1','Q2'], unitScale:1000, money:true, noun:'revenue'},
+    {title:'Units sold by product', units:'All figures in thousands of units', rows:['Alpha','Beta','Gamma','Delta'], cols:['2024','2025'], unitScale:1000, money:false, noun:'sales'},
+    {title:'Staff by department', units:'Number of employees', rows:['Sales','Support','Finance','Technology'], cols:['Last year','This year'], unitScale:1, money:false, noun:'headcount'}
+  ]);
+  var n = set.rows.length;
+  var wholeOnly = (set.unitScale === 1); /* you cannot have 14.3 employees */
+  var base = [], grow = [], second = [];
+  for(var i=0;i<n;i++){
+    var b = R.int(4,40)*5;
+    var opts = R.shuffle([-20,-10,-5,5,10,15,20,25,-15]);
+    var g = 20, s2 = b*1.2;
+    for(var gi=0; gi<opts.length; gi++){
+      var cand = b*(100+opts[gi])/100;
+      if(wholeOnly ? Number.isInteger(cand) : Number.isInteger(cand*10)){ g = opts[gi]; s2 = cand; break; }
+    }
+    base.push(b); grow.push(g); second.push(round(s2,1));
+  }
+  var rows = [];
+  for(var r=0;r<n;r++) rows.push([set.rows[r], nf(base[r],1), nf(second[r],1)]);
+  var fig = tableFig(set.title, set.units, ['', set.cols[0], set.cols[1]], rows);
+
+  var total1 = 0;
+  for(var t=0;t<n;t++) total1 += base[t];
+  total1 = round(total1,1);
+  var idx = R.int(0,n-1);
+  var kind = R.pick(['share','change','diff','scale','total']);
+
+  if(kind === 'share'){
+    var share = round(base[idx]/total1*100, 1);
+    var q = {
+      topic:'data',
+      stem:'What percentage of total '+set.cols[0]+' '+set.noun+' came from <b>'+set.rows[idx]+'</b>?',
+      figure: fig,
+      suffix:'%',
+      tol:0.06,
+      hint:'Give your answer to 1 decimal place.',
+      steps:[
+        S('Read the units line before anything else',
+          'The table says: <i>'+set.units+'</i>. Because <b>every</b> figure is in the same units, they cancel out in a percentage — so we can work with the numbers exactly as printed. (If the question had asked for an amount, the units would matter enormously.)'),
+        S('Find the numbers you need',
+          'We need the whole '+set.cols[0]+' column. Going down it: '+base.map(function(v){return nf(v,1);}).join(', ')+'. Write them down before calculating — that is what stops you drifting into the next column.'),
+        S('Add them up for the total',
+          'This is the <b>whole</b>, because the question asks for a share of the total.' + eq(base.map(function(v){return nf(v,1);}).join(' + ')+' = '+nf(total1,1))),
+        S('Part divided by whole, times 100',
+          set.rows[idx]+' is the part.' + eq(nf(base[idx],1)+DIV+nf(total1,1)+' = '+nf(base[idx]/total1,4)) + eq(nf(base[idx]/total1,4)+TIMES+'100 = '+pc(share,1))),
+        S('Re-read the question','It asked for a percentage of the '+set.cols[0]+' total. That is what we have: <b>'+pc(share,1)+'</b>.')
+      ],
+      check:'There are '+n+' rows, so if they were all equal each would be '+pc(round(100/n,1),1)+'. '+set.rows[idx]+' is '+(base[idx] > total1/n ? 'above' : 'below')+' average for the group, so an answer '+(base[idx] > total1/n ? 'above' : 'below')+' that is exactly right. '+pc(share,1)+' fits.',
+      trap:'Confusing "percentage of the total" with "percentage change". Share of total divides by the <b>column total</b>. Change divides by that row’s <b>own earlier figure</b>. Two completely different wholes.'
+    };
+    return numQ(q, share, function(v){ return pc(v,1); },
+      [round(base[idx]/second[idx]*100,1), round(total1/base[idx],1), round(base[idx]/total1*10,1), round(100-share,1)]);
+  }
+
+  if(kind === 'change'){
+    var pch = round((second[idx]-base[idx])/base[idx]*100, 1);
+    var dir = pch >= 0 ? 'increase' : 'decrease';
+    var q2 = {
+      topic:'data',
+      stem:'What was the percentage '+dir+' in '+set.rows[idx]+'’s figure from '+set.cols[0]+' to '+set.cols[1]+'?',
+      figure: fig,
+      suffix:'%',
+      tol:0.06,
+      hint:'Give your answer to 1 decimal place, without a minus sign.',
+      steps:[
+        S('Find the right row, then track across',
+          'Row: <b>'+set.rows[idx]+'</b>. Then along to '+set.cols[0]+' = '+nf(base[idx],1)+' and '+set.cols[1]+' = '+nf(second[idx],1)+'. Use your finger on a small screen — neighbouring rows are the classic misread.'),
+        S('Which is the original?',
+          set.cols[0]+' came first, so <b>'+nf(base[idx],1)+'</b> is the original. That is what we compare against.'),
+        S('Find the change',
+          eq(nf(Math.max(base[idx],second[idx]),1)+MINUS+nf(Math.min(base[idx],second[idx]),1)+' = '+nf(Math.abs(second[idx]-base[idx]),1))),
+        S('Change '+DIV.trim()+' original '+TIMES.trim()+' 100',
+          eq(nf(Math.abs(second[idx]-base[idx]),1)+DIV+nf(base[idx],1)+' = '+nf(Math.abs(second[idx]-base[idx])/base[idx],4)) + eq(nf(Math.abs(second[idx]-base[idx])/base[idx],4)+TIMES+'100 = '+pc(Math.abs(pch),1)) + 'So it is a <b>'+pc(Math.abs(pch),1)+' '+dir+'</b>.'),
+        S('Units footnote',
+          'The '+set.units.toLowerCase()+' heading does not affect this answer, because both figures are in the same units and a percentage compares them to each other.')
+      ],
+      check:'Forwards test: '+pc(Math.abs(pch),0)+' of '+nf(base[idx],1)+' is '+nf(Math.abs(second[idx]-base[idx]),1)+', and '+nf(base[idx],1)+(pch>=0?' + ':MINUS)+nf(Math.abs(second[idx]-base[idx]),1)+' = '+nf(second[idx],1)+' — the '+set.cols[1]+' figure in the table. Correct.',
+      trap:'Dividing by the '+set.cols[1]+' figure instead of the '+set.cols[0]+' one. That would give '+pc(round(Math.abs(second[idx]-base[idx])/second[idx]*100,1),1)+' — close enough to look right, wrong enough to lose the mark.'
+    };
+    return numQ(q2, Math.abs(pch), function(v){ return pc(v,1); },
+      [round(Math.abs(second[idx]-base[idx])/second[idx]*100,1), round(Math.abs(second[idx]-base[idx]),1), round(second[idx]/base[idx]*100,1), round(100-Math.abs(pch),1)]);
+  }
+
+  if(kind === 'diff'){
+    /* skip pairs that are nearly identical - "116 minus 115" is not a real question */
+    var j = -1;
+    var order = R.shuffle([1,2,3].slice(0, Math.max(1, n-1)));
+    for(var jj=0; jj<order.length; jj++){
+      var cand = (idx+order[jj]) % n;
+      var gap = Math.abs(base[idx] - second[cand]);
+      if(gap >= 5 && gap >= 0.1*Math.max(base[idx], second[cand])){ j = cand; break; }
+    }
+    if(j < 0) kind = 'total';
+  }
+  if(kind === 'diff'){
+    var d = round(Math.abs(base[idx]-second[j]), 1);
+    var q3 = {
+      topic:'data',
+      stem:'What is the difference between <b>'+set.rows[idx]+'’s '+set.cols[0]+'</b> figure and <b>'+set.rows[j]+'’s '+set.cols[1]+'</b> figure?',
+      figure: fig,
+      tol:0.06,
+      hint:'Answer in the units used by the table.',
+      steps:[
+        S('Slow down and find two separate cells',
+          'This question deliberately sends you to two different rows <i>and</i> two different columns. Do them one at a time.'),
+        S('Cell one',
+          set.rows[idx]+', '+set.cols[0]+' column: <b>'+nf(base[idx],1)+'</b>'),
+        S('Cell two',
+          set.rows[j]+', '+set.cols[1]+' column: <b>'+nf(second[j],1)+'</b>'),
+        S('Subtract the smaller from the bigger',
+          eq(nf(Math.max(base[idx],second[j]),1)+MINUS+nf(Math.min(base[idx],second[j]),1)+' = '+nf(d,1)))
+      ],
+      check:'Add the difference back onto the smaller number: '+nf(Math.min(base[idx],second[j]),1)+' + '+nf(d,1)+' = '+nf(Math.max(base[idx],second[j]),1)+'. That returns the bigger figure, so the subtraction was right.',
+      trap:'Reading the wrong column. '+set.cols[0]+' and '+set.cols[1]+' sit right next to each other for a reason. Find the row first, then track across deliberately.'
+    };
+    return numQ(q3, d, function(v){ return nf(v,1); },
+      [round(base[idx]+second[j],1), round(Math.abs(base[idx]-base[j]),1), round(Math.abs(second[idx]-second[j]),1), round(d*10,1)]);
+  }
+
+  if(kind === 'scale' && set.unitScale > 1){
+    var actual = round(second[idx]*set.unitScale, 0);
+    var q4 = {
+      topic:'data',
+      stem:'What was '+set.rows[idx]+'’s actual '+set.cols[1]+' figure, written out in full'+(set.money?' in pounds':'')+'?',
+      figure: fig,
+      prefix: set.money ? GBP : '',
+      tol:0.6,
+      hint:'Write the full number, e.g. 48000',
+      steps:[
+        S('This question is entirely about the units line',
+          'The heading says: <i>'+set.units+'</i>. That means every number in the table has been shortened. A printed <b>'+nf(second[idx],1)+'</b> is not '+nf(second[idx],1)+' — it stands for '+nf(second[idx],1)+' thousand.'),
+        S('Find the cell',
+          set.rows[idx]+' row, '+set.cols[1]+' column: <b>'+nf(second[idx],1)+'</b>'),
+        S('Scale it back up',
+          'Thousands means multiply by 1,000 — three extra zeros.' + eq(nf(second[idx],1)+TIMES+'1,000 = '+(set.money?cash(actual):nf(actual,0)))),
+        S('Answer','<b>'+(set.money?cash(actual):nf(actual,0))+'</b>.')
+      ],
+      check:'Does the size feel right for '+set.noun+'? '+(set.money?cash(actual):nf(actual,0))+' is a sensible business figure, whereas the printed '+nf(second[idx],1)+' on its own would be implausibly small. That mismatch is your clue that a units line exists.',
+      trap:'Ignoring the '+GBP+'000s heading entirely and answering '+nf(second[idx],1)+'. It is small text, easy to skim past, and put there on purpose. Read the units line before the question.'
+    };
+    return numQ(q4, actual, function(v){ return set.money ? cash(v) : nf(v,0); },
+      [round(second[idx],1), round(second[idx]*100,0), round(second[idx]*1000000,0), round(base[idx]*set.unitScale,0)]);
+  }
+
+  /* total of a column */
+  var colTotal = total1;
+  var q5 = {
+    topic:'data',
+    stem:'What is the combined '+set.cols[0]+' figure for all '+n+' '+(set.title.indexOf('branch')>-1?'branches':(set.title.indexOf('product')>-1?'products':'departments'))+'?',
+    figure: fig,
+    tol:0.06,
+    hint:'Answer in the units used by the table.',
+    steps:[
+      S('Read the units, then the column heading',
+        'The table is in <i>'+set.units.toLowerCase()+'</i>, and we want the <b>'+set.cols[0]+'</b> column — not '+set.cols[1]+'.'),
+      S('List the figures before adding',
+        'Going down the '+set.cols[0]+' column: '+base.map(function(v){return nf(v,1);}).join(', ')+'.'),
+      S('Add them in small steps',
+        'Two at a time, so nothing gets lost.' + eq(base.map(function(v){return nf(v,1);}).join(' + ')+' = '+nf(colTotal,1))),
+      S('Answer','<b>'+nf(colTotal,1)+'</b> (in the table’s units: '+set.units.toLowerCase()+').')
+    ],
+    check:'Rough estimate: the figures average roughly '+nf(round(colTotal/n,0),0)+' each, and '+nf(round(colTotal/n,0),0)+TIMES+n+' is about '+nf(round(colTotal/n,0)*n,0)+'. Our total '+nf(colTotal,1)+' is right there, so no figure has been missed or double-counted.',
+    trap:'Adding the wrong column, or accidentally including one number from '+set.cols[1]+'. Cover the other column with a finger if you can.'
+  };
+  return numQ(q5, colTotal, function(v){ return nf(v,1); },
+    [round(colTotal - base[0],1), round(colTotal/n,1), round(colTotal*2,1), round(colTotal + second[0],1)]);
+}
+
+function dataChart(){
+  var set = R.pick([
+    {title:'Customer enquiries by month', units:'Number of enquiries received', cats:['Jan','Feb','Mar','Apr','May'], step:20},
+    {title:'Weekly sales', units:'Sales in '+GBP+'000s', cats:['Mon','Tue','Wed','Thu','Fri'], step:10},
+    {title:'Applications received', units:'Number of applications', cats:['Week 1','Week 2','Week 3','Week 4'], step:25}
+  ]);
+  var n = set.cats.length, vals = [];
+  for(var i=0;i<n;i++) vals.push(set.step * R.int(1,5));
+  /* make sure two bars differ, for comparison questions */
+  if(Math.max.apply(null,vals) === Math.min.apply(null,vals)) vals[0] = vals[0] + set.step;
+  var fig = chartFig(set.title, set.units + ' · read the value off the gridlines', set.cats, vals, set.step);
+  var total = 0;
+  for(var t=0;t<n;t++) total += vals[t];
+  var i1 = R.int(0,n-1), i2 = (i1+1) % n;
+  /* comparison questions need two bars that actually differ */
+  var pairs = [];
+  for(var a0=0;a0<n;a0++) for(var b0=a0+1;b0<n;b0++) if(vals[a0] !== vals[b0]) pairs.push([a0,b0]);
+  if(pairs.length){ var pr0 = R.pick(pairs); i1 = pr0[0]; i2 = pr0[1]; }
+  var kind = R.pick(['share','change','total','diff']);
+
+  if(kind === 'share'){
+    var share = round(vals[i1]/total*100, 1);
+    var q = {
+      topic:'data',
+      stem:'What percentage of the total for the whole period came from <b>'+set.cats[i1]+'</b>?',
+      figure: fig,
+      suffix:'%',
+      tol:0.06,
+      hint:'Give your answer to 1 decimal place.',
+      steps:[
+        S('Work out what the scale is worth',
+          'Look at the numbers up the left-hand side. Two neighbouring labelled lines differ by <b>'+nf(set.step,0)+'</b>, so every gridline gap is '+nf(set.step,0)+' units. That is how you read a bar exactly instead of guessing.'),
+        S('Read each bar off the scale',
+          set.cats.map(function(c,k){ return c+' = '+nf(vals[k],0); }).join(', ') + '. Write them down.'),
+        S('Add them for the total',
+          'The question says "of the total", so the whole is everything added together.' + eq(vals.map(function(v){return nf(v,0);}).join(' + ')+' = '+nf(total,0))),
+        S('Part divided by whole, times 100',
+          eq(nf(vals[i1],0)+DIV+nf(total,0)+' = '+nf(vals[i1]/total,4)) + eq(nf(vals[i1]/total,4)+TIMES+'100 = '+pc(share,1)))
+      ],
+      check:'With '+n+' bars, an even split would be '+pc(round(100/n,1),1)+' each. '+set.cats[i1]+' looks '+(vals[i1] > total/n ? 'taller' : 'shorter')+' than an average bar, so a figure '+(vals[i1] > total/n ? 'above' : 'below')+' that is right. '+pc(share,1)+' fits what the chart looks like.',
+      trap:'Guessing bar heights instead of reading them off the gridlines. Always work out what one gap is worth first — here, '+nf(set.step,0)+'.'
+    };
+    return numQ(q, share, function(v){ return pc(v,1); },
+      [round(vals[i1]/vals[i2]*100,1), round(100-share,1), round(vals[i1]/total*10,1), round(total/vals[i1],1)]);
+  }
+
+  if(kind === 'change'){
+    var a = Math.min(i1,i2), b = Math.max(i1,i2);
+    var pch = round((vals[b]-vals[a])/vals[a]*100, 1);
+    var dir = pch >= 0 ? 'increase' : 'decrease';
+    var q2 = {
+      topic:'data',
+      stem:'What was the percentage '+dir+' from <b>'+set.cats[a]+'</b> to <b>'+set.cats[b]+'</b>?',
+      figure: fig,
+      suffix:'%',
+      tol:0.06,
+      hint:'Give your answer to 1 decimal place, without a minus sign.',
+      steps:[
+        S('Read the two bars off the scale',
+          'Each gridline gap is worth '+nf(set.step,0)+'. So '+set.cats[a]+' = <b>'+nf(vals[a],0)+'</b> and '+set.cats[b]+' = <b>'+nf(vals[b],0)+'</b>.'),
+        S('Decide which is the original',
+          set.cats[a]+' comes first in time, so <b>'+nf(vals[a],0)+'</b> is the original. Everything is measured against it.'),
+        S('Find the change',
+          eq(nf(Math.max(vals[a],vals[b]),0)+MINUS+nf(Math.min(vals[a],vals[b]),0)+' = '+nf(Math.abs(vals[b]-vals[a]),0))),
+        S('Divide by the original and multiply by 100',
+          eq(nf(Math.abs(vals[b]-vals[a]),0)+DIV+nf(vals[a],0)+' = '+nf(Math.abs(vals[b]-vals[a])/vals[a],4)) + eq(nf(Math.abs(vals[b]-vals[a])/vals[a],4)+TIMES+'100 = '+pc(Math.abs(pch),1)))
+      ],
+      check:'Forwards: '+pc(Math.abs(pch),1)+' of '+nf(vals[a],0)+' is '+nf(Math.abs(vals[b]-vals[a]),0)+', and '+nf(vals[a],0)+(pch>=0?' + ':MINUS)+nf(Math.abs(vals[b]-vals[a]),0)+' = '+nf(vals[b],0)+'. That matches the second bar, so it is right.',
+      trap:'Dividing by the '+set.cats[b]+' bar instead of the '+set.cats[a]+' one — that gives '+pc(round(Math.abs(vals[b]-vals[a])/vals[b]*100,1),1)+'. The original is always the earlier one.'
+    };
+    return numQ(q2, Math.abs(pch), function(v){ return pc(v,1); },
+      [round(Math.abs(vals[b]-vals[a])/vals[b]*100,1), round(Math.abs(vals[b]-vals[a]),0), round(vals[b]/vals[a]*100,1), round(100-Math.abs(pch),1)]);
+  }
+
+  if(kind === 'diff'){
+    var d = Math.abs(vals[i1]-vals[i2]);
+    var q3 = {
+      topic:'data',
+      stem:'How many more '+(set.title.indexOf('Sales')>-1?'sales were there in':'were recorded in')+' <b>'+set.cats[vals[i1]>vals[i2]?i1:i2]+'</b> than in <b>'+set.cats[vals[i1]>vals[i2]?i2:i1]+'</b>?',
+      figure: fig,
+      tol:0.06,
+      hint:'Answer in the units shown on the chart.',
+      steps:[
+        S('Find what one gridline gap is worth',
+          'Neighbouring labels on the left differ by <b>'+nf(set.step,0)+'</b>, so that is the value of each gap.'),
+        S('Read both bars',
+          set.cats[i1]+' = '+nf(vals[i1],0)+' and '+set.cats[i2]+' = '+nf(vals[i2],0)+'.'),
+        S('Subtract',
+          '"How many more" means the gap between them.' + eq(nf(Math.max(vals[i1],vals[i2]),0)+MINUS+nf(Math.min(vals[i1],vals[i2]),0)+' = '+nf(d,0)))
+      ],
+      check:'Look at the chart again: the gap between those two bars is about '+nf(round(d/set.step,1),1)+' gridline gaps, and each gap is '+nf(set.step,0)+'. '+nf(round(d/set.step,1),1)+TIMES+nf(set.step,0)+' = '+nf(d,0)+'. The picture agrees with the arithmetic.',
+      trap:'Answering with the taller bar instead of the difference. "How many more" always means subtract.'
+    };
+    return numQ(q3, d, function(v){ return nf(v,0); },
+      [Math.max(vals[i1],vals[i2]), vals[i1]+vals[i2], round(d/2,0), round(d*2,0)]);
+  }
+
+  var q4 = {
+    topic:'data',
+    stem:'What is the total across all '+n+' '+(set.cats[0].indexOf('Week')>-1?'weeks':(set.cats[0].length===3?'months':'days'))+' shown?',
+    figure: fig,
+    tol:0.06,
+    hint:'Answer in the units shown on the chart.',
+    steps:[
+      S('Work out the scale first',
+        'The labelled gridlines go up in steps of <b>'+nf(set.step,0)+'</b>. Every bar can now be read exactly rather than estimated.'),
+      S('Read each bar and write it down',
+        set.cats.map(function(c,k){ return c+' = '+nf(vals[k],0); }).join(', ')),
+      S('Add them up in small steps',
+        eq(vals.map(function(v){return nf(v,0);}).join(' + ')+' = '+nf(total,0))),
+      S('Answer','<b>'+nf(total,0)+'</b> '+(set.units.indexOf(GBP)>-1?'(in '+GBP+'000s, as the chart states)':'in total')+'.')
+    ],
+    check:'The bars average roughly '+nf(round(total/n,0),0)+' each, and '+nf(round(total/n,0),0)+TIMES+n+' ≈ '+nf(round(total/n,0)*n,0)+'. Our total is '+nf(total,0)+' — the right neighbourhood, so no bar was skipped.',
+    trap:'Missing a bar, or reading one off the wrong gridline. Count that you have used all '+n+' of them before adding.'
+  };
+  return numQ(q4, total, function(v){ return nf(v,0); },
+    [round(total-vals[0],0), round(total/n,0), round(total+set.step,0), round(total*2,0)]);
+}
+
+var GENERATORS = {
+  basics: gen_basics,
+  pct_of: gen_pct_of,
+  pct_change: gen_pct_change,
+  incdec: gen_incdec,
+  reverse: gen_reverse,
+  ratio: gen_ratio,
+  rates: gen_rates,
+  currency: gen_currency,
+  data: gen_data
+};
+var TOPIC_NAMES = {
+  basics:'Percentages (basics)',
+  pct_of:'Percentage of a number',
+  pct_change:'Percentage change',
+  incdec:'Increase / decrease by %',
+  reverse:'Reverse percentages',
+  ratio:'Ratios',
+  rates:'Rates: speed & unit price',
+  currency:'Currency conversion',
+  data:'Data interpretation'
+};
+var TOPIC_ORDER = ['basics','pct_of','pct_change','incdec','reverse','ratio','rates','currency','data'];
+/* which Learn chapter teaches each topic */
+var TOPIC_CHAPTER = {
+  basics:{n:1, t:'Percentages \u2014 the foundation'},
+  pct_of:{n:1, t:'Percentages \u2014 the foundation'},
+  pct_change:{n:3, t:'Percentage change'},
+  incdec:{n:4, t:'Multipliers'},
+  reverse:{n:5, t:'Reverse percentages'},
+  ratio:{n:6, t:'Ratios'},
+  rates:{n:7, t:'Rates \u2014 speed and price per unit'},
+  currency:{n:8, t:'Currency conversion'},
+  data:{n:9, t:'Reading tables and charts'}
+};
+
+/* ---------- PURE SECTION END ---------- */
+
+/* ============================================================
+   STORAGE  (localStorage only; falls back to memory if blocked)
+   ============================================================ */
+var KEY = 'nrt.v1';
+var memoryOnly = false, memData = null;
+
+function blankData(){
+  return { v:1, theme:'auto', streak:{cur:0, best:0, last:''}, sessions:[], topics:{}, totals:{q:0, c:0} };
+}
+function load(){
+  if(memoryOnly) return memData || (memData = blankData());
+  try {
+    var raw = window.localStorage.getItem(KEY);
+    if(!raw) return blankData();
+    var d = JSON.parse(raw);
+    if(!d || typeof d !== 'object') return blankData();
+    var base = blankData();
+    if(d.theme) base.theme = d.theme;
+    if(d.streak) { base.streak.cur = d.streak.cur|0; base.streak.best = d.streak.best|0; base.streak.last = d.streak.last || ''; }
+    if(Array.isArray(d.sessions)) base.sessions = d.sessions;
+    if(d.topics && typeof d.topics === 'object') base.topics = d.topics;
+    if(d.totals) { base.totals.q = d.totals.q|0; base.totals.c = d.totals.c|0; }
+    return base;
+  } catch(e){
+    memoryOnly = true; memData = blankData();
+    return memData;
+  }
+}
+function save(d){
+  if(memoryOnly){ memData = d; return; }
+  try { window.localStorage.setItem(KEY, JSON.stringify(d)); }
+  catch(e){ memoryOnly = true; memData = d; showStorageNote(); }
+}
+function showStorageNote(){
+  var el = document.getElementById('storageNote');
+  if(el) el.textContent = memoryOnly
+    ? 'This browser is not letting the page save data (private browsing can do this), so progress will be lost when you close the tab. Everything else still works.'
+    : 'Saved in this browser only. Nothing is uploaded, and there is no account to sign into.';
+}
+
+/* ---------- dates & streak ---------- */
+function pad2(n){ return n < 10 ? '0'+n : ''+n; }
+function dayKey(d){ d = d || new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function keyToDate(k){ var p = String(k).split('-'); return new Date(+p[0], (+p[1])-1, +p[2]); }
+function daysBetween(a, b){
+  var ms = keyToDate(b).getTime() - keyToDate(a).getTime();
+  return Math.round(ms / 86400000);
+}
+function liveStreak(d){
+  if(!d.streak.last) return 0;
+  var gap = daysBetween(d.streak.last, dayKey());
+  if(gap === 0 || gap === 1) return d.streak.cur;
+  return 0; /* the chain is broken; it restarts at 1 on the next question */
+}
+function markPractisedToday(){
+  var d = load(), today = dayKey();
+  if(d.streak.last === today) return d;
+  if(!d.streak.last) d.streak.cur = 1;
+  else d.streak.cur = (daysBetween(d.streak.last, today) === 1) ? d.streak.cur + 1 : 1;
+  d.streak.last = today;
+  if(d.streak.cur > d.streak.best) d.streak.best = d.streak.cur;
+  save(d);
+  renderStreak();
+  return d;
+}
+function renderStreak(){
+  var d = load(), n = liveStreak(d);
+  var chip = document.getElementById('streakChip');
+  var txt = document.getElementById('streakText');
+  var done = d.streak.last === dayKey();
+  txt.innerHTML = n === 0
+    ? 'Start a streak'
+    : n + (n === 1 ? ' day' : ' days') + (done ? '' : ' · due today');
+  chip.className = 'streak' + (done ? ' on' : '');
+  chip.title = done
+    ? 'Practised today. Current streak ' + n + ', best ' + d.streak.best + '.'
+    : (n === 0 ? 'Answer one question to start a streak.' : 'Answer one question today to keep your ' + n + '-day streak.');
+}
+
+/* ============================================================
+   SHELL: theme + tabs
+   ============================================================ */
+var SUN = '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/>';
+var MOON = '<path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/>';
+function effectiveTheme(){
+  var a = document.documentElement.getAttribute('data-theme');
+  if(a) return a;
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+}
+function applyTheme(mode){
+  if(mode === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', mode);
+  var icon = document.getElementById('themeIcon');
+  icon.innerHTML = effectiveTheme() === 'dark' ? SUN : MOON;
+  document.getElementById('themeBtn').setAttribute('aria-label',
+    effectiveTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+function setupTheme(){
+  var d = load();
+  applyTheme(d.theme || 'auto');
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var next = effectiveTheme() === 'light' ? 'dark' : 'light';
+    var dd = load(); dd.theme = next; save(dd);
+    applyTheme(next);
+  });
+  if(window.matchMedia){
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onChange = function(){ if((load().theme || 'auto') === 'auto') applyTheme('auto'); };
+    if(mq.addEventListener) mq.addEventListener('change', onChange);
+    else if(mq.addListener) mq.addListener(onChange);
+  }
+}
+var TABS = ['practice','learn','tips','progress'];
+function showTab(name){
+  TABS.forEach(function(t){
+    var btn = document.getElementById('tab-'+t), panel = document.getElementById('panel-'+t);
+    var on = (t === name);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    panel.classList.toggle('hidden', !on);
+  });
+  if(name === 'progress') renderProgress();
+  window.scrollTo(0, 0);
+}
+function setupTabs(){
+  TABS.forEach(function(t, i){
+    var btn = document.getElementById('tab-'+t);
+    btn.addEventListener('click', function(){ showTab(t); });
+    btn.addEventListener('keydown', function(e){
+      var dir = e.key === 'ArrowRight' ? 1 : (e.key === 'ArrowLeft' ? -1 : 0);
+      if(!dir) return;
+      e.preventDefault();
+      var next = TABS[(i + dir + TABS.length) % TABS.length];
+      document.getElementById('tab-'+next).focus();
+      showTab(next);
+    });
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+var sess = null, tickHandle = null;
+
+function buildQueue(total, topic){
+  var q = [];
+  if(topic !== 'all'){ for(var i=0;i<total;i++) q.push(topic); return q; }
+  while(q.length < total) q = q.concat(R.shuffle(TOPIC_ORDER));
+  return q.slice(0, total);
+}
+function startSession(){
+  var mode = document.querySelector('#modeSeg button[aria-pressed="true"]').getAttribute('data-mode');
+  var total = parseInt(document.getElementById('lenSel').value, 10);
+  var topic = document.getElementById('topicSel').value;
+  sess = {
+    mode: mode, total: total, topicChoice: topic,
+    queue: buildQueue(total, topic),
+    i: 0, correct: 0, times: [], results: [], answered: false, q: null, startedAt: 0
+  };
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('summary').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  calcReset();
+  nextQuestion();
+}
+function nextQuestion(){
+  if(sess.i >= sess.total){ endSession(); return; }
+  var topic = sess.queue[sess.i];
+  sess.q = GENERATORS[topic]();
+  sess.answered = false;
+  sess.startedAt = Date.now();
+  renderQuestion();
+  startTicker();
+}
+function renderQuestion(){
+  var q = sess.q;
+  document.getElementById('qTopic').textContent = TOPIC_NAMES[q.topic];
+  document.getElementById('qCount').textContent = 'Question ' + (sess.i + 1) + ' of ' + sess.total;
+  document.getElementById('qProgress').style.width = ((sess.i) / sess.total * 100) + '%';
+  document.getElementById('qStem').innerHTML = q.stem;
+  document.getElementById('qFigure').innerHTML = q.figure || '';
+  document.getElementById('qResult').innerHTML = '';
+  document.getElementById('unsureBtn').classList.remove('hidden');
+
+  var choicesEl = document.getElementById('qChoices');
+  var freeEl = document.getElementById('qFree');
+  choicesEl.innerHTML = '';
+  if(q.type === 'mc'){
+    freeEl.classList.add('hidden');
+    choicesEl.classList.remove('hidden');
+    q.choices.forEach(function(c, idx){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'choice';
+      b.innerHTML = '<span class="letter">' + 'ABCD'.charAt(idx) + '</span><span>' + c + '</span>';
+      b.addEventListener('click', function(){ if(!sess.answered) answerMC(idx, b); });
+      choicesEl.appendChild(b);
+    });
+  } else {
+    choicesEl.classList.add('hidden');
+    freeEl.classList.remove('hidden');
+    var input = document.getElementById('qInput');
+    input.value = '';
+    input.disabled = false;
+    var pre = document.getElementById('qPrefix'), suf = document.getElementById('qSuffix');
+    pre.textContent = q.prefix || ''; pre.classList.toggle('hidden', !q.prefix);
+    suf.textContent = q.suffix || ''; suf.classList.toggle('hidden', !q.suffix);
+    document.getElementById('qHint').textContent = q.hint || '';
+    var sub = document.getElementById('submitBtn');
+    sub.textContent = 'Check'; sub.disabled = false;
+    document.getElementById('useAnswerBtn').classList.remove('hidden');
+    if(window.matchMedia && window.matchMedia('(hover: hover)').matches) input.focus();
+  }
+  updateTimerLabel();
+}
+function startTicker(){
+  stopTicker();
+  if(sess.mode !== 'timed'){ document.getElementById('qTimer').textContent = ''; return; }
+  tickHandle = window.setInterval(updateTimerLabel, 1000);
+  updateTimerLabel();
+}
+function stopTicker(){ if(tickHandle){ window.clearInterval(tickHandle); tickHandle = null; } }
+function updateTimerLabel(){
+  var el = document.getElementById('qTimer');
+  if(sess.mode !== 'timed' || sess.answered) return;
+  var secs = Math.floor((Date.now() - sess.startedAt) / 1000);
+  el.textContent = Math.floor(secs / 60) + ':' + pad2(secs % 60);
+}
+function parseTyped(str){
+  if(str === null || str === undefined) return NaN;
+  var s = String(str).replace(/[\s,]/g, '').replace(/[£$€%]/g, '').replace(/[A-Za-z\/]+$/, '');
+  if(!s || !/^-?\d*\.?\d+$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+function answerMC(idx, btn){
+  var q = sess.q;
+  var right = (q.choices[idx] === q.display);
+  document.querySelectorAll('#qChoices .choice').forEach(function(b, i){
+    b.disabled = true;
+    if(q.choices[i] === q.display) b.classList.add('right');
+    else if(i === idx) b.classList.add('wrong');
+  });
+  finishAnswer(right, q.choices[idx]);
+}
+function submitFree(){
+  if(sess.answered) return;
+  var raw = document.getElementById('qInput').value;
+  var v = parseTyped(raw);
+  if(isNaN(v)){
+    document.getElementById('qHint').textContent = 'Type a number first — digits and a decimal point. No need for symbols.';
+    return;
+  }
+  var q = sess.q;
+  var right = Math.abs(v - q.answer) <= (q.tol || 0.011);
+  document.getElementById('qInput').disabled = true;
+  document.getElementById('submitBtn').disabled = true;
+  finishAnswer(right, String(raw).trim());
+}
+function giveUp(){
+  if(sess.answered) return;
+  if(sess.q.type === 'mc'){
+    document.querySelectorAll('#qChoices .choice').forEach(function(b, i){
+      b.disabled = true;
+      if(sess.q.choices[i] === sess.q.display) b.classList.add('right');
+    });
+  } else {
+    document.getElementById('qInput').disabled = true;
+    document.getElementById('submitBtn').disabled = true;
+  }
+  finishAnswer(false, null, true);
+}
+function finishAnswer(right, given, skipped){
+  sess.answered = true;
+  stopTicker();
+  var secs = Math.max(1, Math.round((Date.now() - sess.startedAt) / 1000));
+  sess.times.push(secs);
+  if(right) sess.correct++;
+  sess.results.push({ topic: sess.q.topic, right: right, secs: secs });
+  document.getElementById('unsureBtn').classList.add('hidden');
+  document.getElementById('useAnswerBtn').classList.add('hidden');
+  document.getElementById('qProgress').style.width = ((sess.i + 1) / sess.total * 100) + '%';
+  markPractisedToday();
+  renderResult(right, given, skipped, secs);
+}
+function renderResult(right, given, skipped, secs){
+  var q = sess.q;
+  var html = '';
+  var head, sub;
+  if(skipped){
+    head = 'Marked as not yet';
+    sub = 'The answer was <b>' + q.display + '</b>. This counts as not-yet in your stats — that is what keeps the topic breakdown honest and useful.';
+  } else if(right){
+    head = 'Correct';
+    sub = 'The answer was <b>' + q.display + '</b>.';
+  } else {
+    head = 'Not this time';
+    sub = 'You answered <b>' + (given === null ? '—' : given) + '</b>. The answer was <b>' + q.display + '</b>. Find the step below where your version and this one came apart — that single step is the thing worth learning.';
+  }
+  html += '<div class="verdict ' + (right ? 'ok' : 'bad') + '" role="status">' + head + '<span class="vsub">' + sub + '</span></div>';
+
+  if(sess.mode === 'timed'){
+    var pace = secs <= 45 ? 'Comfortably quick. Only keep that pace if it is not costing you accuracy.'
+      : (secs <= 100 ? 'That is a good steady rhythm — about right for a real test.'
+      : 'Slower than test pace, which is completely fine while you are still learning the method. Speed comes later, on its own.');
+    html += '<p class="hintline" style="margin-top:10px"><b>' + secs + ' seconds.</b> ' + pace + '</p>';
+  }
+
+  var stepsHTML = '<div class="solution"><h4>How it is done, step by step</h4><ol class="steps">';
+  q.steps.forEach(function(s){
+    stepsHTML += '<li><span class="st">' + s.t + '</span><span class="sb">' + s.b + '</span></li>';
+  });
+  stepsHTML += '</ol>';
+  stepsHTML += '<div class="note check"><span class="nlab">Check it makes sense</span>' + q.check + '</div>';
+  stepsHTML += '<div class="note trap"><span class="nlab">The trap here</span>' + q.trap + '</div></div>';
+
+  var collapse = (sess.mode === 'timed' && right);
+  if(collapse){
+    html += '<div class="row" style="margin-top:14px"><button class="btn ghost" type="button" id="showWork">Show the working anyway</button></div>';
+    html += '<div id="workWrap" class="hidden">' + stepsHTML + '</div>';
+  } else {
+    html += stepsHTML;
+  }
+
+  var last = (sess.i + 1 >= sess.total);
+  html += '<div class="row" style="margin-top:18px"><button class="btn primary" type="button" id="nextBtn">' +
+          (last ? 'Finish and see your score' : 'Next question') + '</button></div>';
+
+  var res = document.getElementById('qResult');
+  res.innerHTML = html;
+  if(collapse){
+    document.getElementById('showWork').addEventListener('click', function(){
+      document.getElementById('workWrap').classList.remove('hidden');
+      this.classList.add('hidden');
+    });
+  }
+  var nb = document.getElementById('nextBtn');
+  nb.addEventListener('click', function(){ sess.i++; nextQuestion(); });
+  nb.focus();
+}
+function encouragement(pct, total){
+  if(total === 0) return '';
+  if(pct === 100) return 'Full marks. Every step landed where it should.';
+  if(pct >= 80) return 'Strong session — the method is clearly sticking.';
+  if(pct >= 60) return 'Solid. The ones you missed are the useful ones: go back and find the exact step that went astray.';
+  if(pct >= 40) return 'Middle of the road, which is normal while a method is still settling. The working is where the progress is.';
+  return 'A tough one. That is information, not a verdict — and the worked solutions above show exactly where each step goes.';
+}
+function endSession(){
+  stopTicker();
+  document.getElementById('quiz').classList.add('hidden');
+  var answered = sess.results.length;
+  var sum = document.getElementById('summary');
+  sum.classList.remove('hidden');
+
+  if(answered === 0){
+    sum.innerHTML = '<h2>Session ended</h2><p class="muted">No questions answered, so nothing has been recorded.</p>' +
+      '<div class="row"><button class="btn primary" type="button" id="againBtn">Back to the start</button></div>';
+    document.getElementById('againBtn').addEventListener('click', backToSetup);
+    sess = null;
+    return;
+  }
+
+  var pct = Math.round(sess.correct / answered * 100);
+  var totalSecs = sess.times.reduce(function(a,b){ return a+b; }, 0);
+  var avg = Math.round(totalSecs / answered);
+
+  /* per-topic within this session */
+  var byTopic = {};
+  sess.results.forEach(function(r){
+    if(!byTopic[r.topic]) byTopic[r.topic] = {n:0, c:0};
+    byTopic[r.topic].n++;
+    if(r.right) byTopic[r.topic].c++;
+  });
+
+  /* persist */
+  var d = load();
+  d.sessions.push({ date: dayKey(), mode: sess.mode, n: answered, c: sess.correct, avg: avg });
+  if(d.sessions.length > 60) d.sessions = d.sessions.slice(-60);
+  d.totals.q += answered; d.totals.c += sess.correct;
+  Object.keys(byTopic).forEach(function(t){
+    if(!d.topics[t]) d.topics[t] = {n:0, c:0};
+    d.topics[t].n += byTopic[t].n;
+    d.topics[t].c += byTopic[t].c;
+  });
+  save(d);
+
+  var html = '<h2>' + sess.correct + ' out of ' + answered + '</h2>';
+  html += '<p>' + encouragement(pct, answered) + '</p>';
+  html += '<div class="statgrid" style="margin:16px 0">';
+  html += '<div class="stat"><div class="v">' + pct + '%</div><div class="l">this session</div></div>';
+  html += '<div class="stat"><div class="v">' + avg + 's</div><div class="l">average per question</div></div>';
+  html += '<div class="stat"><div class="v">' + Math.floor(totalSecs/60) + 'm ' + (totalSecs%60) + 's</div><div class="l">time on task</div></div>';
+  html += '<div class="stat"><div class="v">' + liveStreak(d) + '</div><div class="l">day streak</div></div>';
+  html += '</div>';
+
+  if(sess.mode === 'timed'){
+    html += '<div class="note info"><span class="nlab">On pace</span>' +
+      'You averaged <b>' + avg + ' seconds</b> a question. Around 60–90 seconds is a realistic test rhythm. Speed is worth having, but only once the method is automatic — a fast wrong answer scores nothing.</div>';
+  }
+
+  html += '<h3 style="margin-top:22px">How each topic went</h3><div>';
+  Object.keys(byTopic).sort(function(a,b){
+    return (byTopic[a].c/byTopic[a].n) - (byTopic[b].c/byTopic[b].n);
+  }).forEach(function(t){
+    var o = byTopic[t], p = Math.round(o.c/o.n*100);
+    html += '<div class="trow"><div><div class="tn">' + TOPIC_NAMES[t] + '</div>' +
+            '<div class="tbar"><i style="width:' + p + '%"></i></div></div>' +
+            '<div class="tv">' + o.c + '/' + o.n + '</div></div>';
+  });
+  html += '</div>';
+
+  var weak = weakestTopic(d);
+  if(weak) html += '<p class="hintline">Across everything you have done, <b>' + TOPIC_NAMES[weak.topic] +
+    '</b> is the one to drill next (' + Math.round(weak.rate*100) + '% so far). Learn chapter ' + TOPIC_CHAPTER[weak.topic].n +
+    ' explains it from scratch, and you can choose that topic on its own from the list on the next screen.</p>';
+
+  html += '<div class="row" style="margin-top:20px">' +
+          '<button class="btn primary" type="button" id="againBtn">Practise again</button>' +
+          '<button class="btn ghost" type="button" id="toProgress">See progress</button></div>';
+  sum.innerHTML = html;
+  document.getElementById('againBtn').addEventListener('click', backToSetup);
+  document.getElementById('toProgress').addEventListener('click', function(){ showTab('progress'); });
+  renderStreak();
+  sess = null;
+}
+function backToSetup(){
+  document.getElementById('summary').classList.add('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('setup').classList.remove('hidden');
+  renderWeakHint();
+  window.scrollTo(0, 0);
+}
+function weakestTopic(d){
+  var best = null;
+  TOPIC_ORDER.forEach(function(t){
+    var o = d.topics[t];
+    if(!o || o.n < 4) return;
+    var rate = o.c / o.n;
+    if(!best || rate < best.rate) best = { topic:t, rate:rate, n:o.n };
+  });
+  return best;
+}
+function renderWeakHint(){
+  var d = load(), el = document.getElementById('weakHint');
+  var w = weakestTopic(d);
+  if(w && w.rate < 0.75) el.innerHTML = 'Suggestion: your weakest topic so far is <b>' + TOPIC_NAMES[w.topic] + '</b> (' + Math.round(w.rate*100) + '% over ' + w.n + ' questions). A focused session on it would be time well spent.';
+  else if(d.totals.q === 0) el.innerHTML = 'First time here? Start untimed, with all topics mixed. Every question comes with a full worked solution.';
+  else el.innerHTML = '';
+}
+
+/* ---------- calculator ---------- */
+var cDisp = '0', cPrev = null, cOp = null, cFresh = true;
+function calcReset(){ cDisp = '0'; cPrev = null; cOp = null; cFresh = true; calcPaint(); }
+function calcPaint(){ var s = document.getElementById('calcScreen'); if(s) s.textContent = cDisp; }
+function calcFmt(n){
+  if(!isFinite(n)) return 'Error';
+  var r = Math.round(n * 1e10) / 1e10;
+  var s = String(r);
+  if(s.length > 14 && Math.abs(r) > 1) s = String(Math.round(r * 1e4) / 1e4);
+  return s;
+}
+function calcApply(a, b, op){
+  if(op === '+') return a + b;
+  if(op === '-') return a - b;
+  if(op === '*') return a * b;
+  if(op === '/') return b === 0 ? NaN : a / b;
+  return b;
+}
+function calcKey(k){
+  if(/^[0-9]$/.test(k)){
+    if(cDisp === 'Error') calcReset();
+    if(cFresh){ cDisp = k; cFresh = false; }
+    else if(cDisp.replace(/[^0-9]/g,'').length < 13) cDisp = (cDisp === '0') ? k : cDisp + k;
+  } else if(k === '.'){
+    if(cDisp === 'Error') calcReset();
+    if(cFresh){ cDisp = '0.'; cFresh = false; }
+    else if(cDisp.indexOf('.') < 0) cDisp += '.';
+  } else if(k === 'clear'){
+    calcReset(); return;
+  } else if(k === 'back'){
+    if(!cFresh && cDisp !== 'Error'){
+      cDisp = cDisp.length > 1 ? cDisp.slice(0, -1) : '0';
+      if(cDisp === '-' || cDisp === '') cDisp = '0';
+    }
+  } else if(k === 'pct'){
+    var v = parseFloat(cDisp);
+    if(isFinite(v)){ cDisp = calcFmt(v / 100); cFresh = true; }
+  } else if(k === '=' ){
+    if(cOp !== null && cPrev !== null){
+      cDisp = calcFmt(calcApply(cPrev, parseFloat(cDisp) || 0, cOp));
+      cPrev = null; cOp = null; cFresh = true;
+    }
+  } else { /* an operator */
+    var cur = parseFloat(cDisp);
+    if(!isFinite(cur)) cur = 0;
+    if(cOp !== null && cPrev !== null && !cFresh){
+      cDisp = calcFmt(calcApply(cPrev, cur, cOp));
+      cPrev = parseFloat(cDisp);
+    } else {
+      cPrev = cur;
+    }
+    cOp = k; cFresh = true;
+  }
+  calcPaint();
+}
+function setupCalc(){
+  var panel = document.getElementById('calcPanel');
+  var toggle = document.getElementById('calcToggle');
+  toggle.addEventListener('click', function(){
+    var open = panel.classList.toggle('hidden') === false;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.querySelectorAll('#calcPanel .calckeys button').forEach(function(b){
+    b.addEventListener('click', function(){ calcKey(b.getAttribute('data-k')); });
+  });
+  document.getElementById('useAnswerBtn').addEventListener('click', function(){
+    var input = document.getElementById('qInput');
+    if(!input || input.disabled) return;
+    input.value = (cDisp === 'Error') ? '' : cDisp;
+    input.focus();
+  });
+  calcPaint();
+}
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+function renderProgress(){
+  var d = load();
+  var live = liveStreak(d);
+
+  document.getElementById('streakStats').innerHTML =
+    '<div class="stat"><div class="v">' + live + '</div><div class="l">current streak (days)</div></div>' +
+    '<div class="stat"><div class="v">' + d.streak.best + '</div><div class="l">best streak</div></div>' +
+    '<div class="stat"><div class="v">' + (d.streak.last === dayKey() ? 'Yes' : 'Not yet') + '</div><div class="l">practised today</div></div>' +
+    '<div class="stat"><div class="v">' + d.sessions.length + '</div><div class="l">sessions</div></div>';
+
+  var note = document.getElementById('streakNote');
+  if(!d.streak.last) note.textContent = 'A day counts as soon as you answer one question — you do not have to finish a whole session for it to count.';
+  else if(d.streak.last === dayKey()) note.textContent = 'Today is logged. Come back tomorrow to keep it going.';
+  else if(live > 0) note.textContent = 'Your ' + live + '-day streak is still alive. One question today keeps it.';
+  else note.textContent = 'The streak reset after a missed day. Not a problem — one question today starts a new one, and your best (' + d.streak.best + ') is still on record.';
+
+  var rate = d.totals.q ? Math.round(d.totals.c / d.totals.q * 100) : 0;
+  var allSecs = d.sessions.reduce(function(a,s){ return a + (s.avg||0) * (s.n||0); }, 0);
+  var allQ = d.sessions.reduce(function(a,s){ return a + (s.n||0); }, 0);
+  document.getElementById('totalStats').innerHTML =
+    '<div class="stat"><div class="v">' + d.totals.q + '</div><div class="l">questions answered</div></div>' +
+    '<div class="stat"><div class="v">' + d.totals.c + '</div><div class="l">correct</div></div>' +
+    '<div class="stat"><div class="v">' + rate + '%</div><div class="l">average score</div></div>' +
+    '<div class="stat"><div class="v">' + (allQ ? Math.round(allSecs/allQ) + 's' : '—') + '</div><div class="l">average per question</div></div>';
+
+  /* recent sessions bar chart */
+  var chart = document.getElementById('sessionChart');
+  var recent = d.sessions.slice(-12);
+  if(!recent.length){
+    chart.innerHTML = '<p class="muted small" style="margin:0">Your session scores will appear here as a bar chart once you have finished one.</p>';
+  } else {
+    var bars = '<div class="chartbars">';
+    recent.forEach(function(s, i){
+      var p = s.n ? Math.round(s.c / s.n * 100) : 0;
+      bars += '<div class="cb" title="' + s.date + ': ' + s.c + '/' + s.n + '">' +
+              '<i style="height:' + Math.max(4, Math.round(p/100*126)) + 'px" aria-hidden="true"></i>' +
+              '<span>' + p + '</span></div>';
+    });
+    bars += '</div><div class="axis"><span>oldest</span><span>score %, last ' + recent.length + ' session' + (recent.length===1?'':'s') + '</span><span>latest</span></div>';
+    chart.innerHTML = bars;
+  }
+
+  /* per-topic */
+  var tb = document.getElementById('topicBreakdown');
+  var any = TOPIC_ORDER.some(function(t){ return d.topics[t] && d.topics[t].n; });
+  if(!any){
+    tb.innerHTML = '<p class="muted small" style="margin:0">Nothing here yet. After a session or two this shows which topics are solid and which need another look.</p>';
+  } else {
+    var rows = '';
+    TOPIC_ORDER.forEach(function(t){
+      var o = d.topics[t];
+      if(!o || !o.n){
+        rows += '<div class="trow"><div><div class="tn">' + TOPIC_NAMES[t] + '</div>' +
+                '<div class="tbar"><i style="width:0%"></i></div></div><div class="tv">—</div></div>';
+        return;
+      }
+      var p = Math.round(o.c / o.n * 100);
+      rows += '<div class="trow"><div><div class="tn">' + TOPIC_NAMES[t] + '</div>' +
+              '<div class="tbar"><i style="width:' + p + '%"></i></div></div>' +
+              '<div class="tv">' + p + '%<br><span class="tiny">' + o.c + '/' + o.n + '</span></div></div>';
+    });
+    tb.innerHTML = rows;
+    var w = weakestTopic(d);
+    if(w){
+      var ch = TOPIC_CHAPTER[w.topic];
+      tb.innerHTML += '<p class="hintline"><b>' + TOPIC_NAMES[w.topic] + '</b> is your lowest so far. Chapter ' + ch.n +
+        ' of the Learn tab (<i>' + ch.t + '</i>) covers it from scratch — read it once, then run a session on that topic on its own.</p>';
+    }
+  }
+  showStorageNote();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function fillTopicSelect(){
+  var sel = document.getElementById('topicSel');
+  TOPIC_ORDER.forEach(function(t){
+    var o = document.createElement('option');
+    o.value = t; o.textContent = TOPIC_NAMES[t];
+    sel.appendChild(o);
+  });
+}
+function setupModeSeg(){
+  var note = document.getElementById('modeNote');
+  function paint(){
+    var mode = document.querySelector('#modeSeg button[aria-pressed="true"]').getAttribute('data-mode');
+    note.innerHTML = (mode === 'timed')
+      ? 'Times each question and shows how long you took. Cappfinity scores <b>speed and accuracy</b> together, which sounds stressful but really means one thing: rushing is not rewarded. Aim for a steady 60–90 seconds, not a sprint.'
+      : 'No clock. Every question is followed by a full worked solution, written out step by step. This is the mode to use while a method is still new.';
+  }
+  document.querySelectorAll('#modeSeg button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#modeSeg button').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      paint();
+    });
+  });
+  paint();
+}
+function init(){
+  setupTheme();
+  setupTabs();
+  fillTopicSelect();
+  setupModeSeg();
+  setupCalc();
+  renderStreak();
+  renderWeakHint();
+  showStorageNote();
+
+  document.getElementById('startBtn').addEventListener('click', startSession);
+  document.getElementById('submitBtn').addEventListener('click', submitFree);
+  document.getElementById('unsureBtn').addEventListener('click', giveUp);
+  document.getElementById('qInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); submitFree(); }
+  });
+  document.getElementById('quitBtn').addEventListener('click', function(){
+    if(sess && sess.results.length && !window.confirm('End the session here? Your answers so far will still be recorded.')) return;
+    if(sess) endSession();
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if(!window.confirm('Delete all saved progress from this browser? This cannot be undone.')) return;
+    var theme = load().theme;
+    var fresh = blankData();
+    fresh.theme = theme;
+    if(!memoryOnly){ try { window.localStorage.removeItem(KEY); } catch(e){} }
+    memData = fresh;
+    save(fresh);
+    renderStreak(); renderProgress(); renderWeakHint();
+  });
+  showTab('practice');
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+})();
+</script>
+</body>
+</html>
