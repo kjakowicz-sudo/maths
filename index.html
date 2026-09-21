@@ -6,6 +6,14 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="An offline numerical reasoning trainer for graduate aptitude tests. All progress stays in your browser.">
 <title>Numerical Reasoning Trainer</title>
+<meta name="theme-color" id="themeColor" content="#f6f6f3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Numeracy">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6f66'/%3E%3Ctext x='32' y='46' font-family='Helvetica,Arial,sans-serif' font-size='40' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%25%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f6f6f3;
@@ -455,6 +463,10 @@ table.mini thead th{background:var(--chip);font-weight:650}
       <button id="startBtn" class="btn primary" type="button">Start</button>
     </div>
     <p class="hintline" id="weakHint"></p>
+    <div id="installRow" class="hidden" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+      <p class="hintline" id="installText" style="margin:0 0 9px"></p>
+      <button id="installBtn" class="btn ghost hidden" type="button">Add to home screen</button>
+    </div>
   </div>
 
   <!-- question -->
@@ -2517,6 +2529,8 @@ function applyTheme(mode){
   else document.documentElement.setAttribute('data-theme', mode);
   var icon = document.getElementById('themeIcon');
   icon.innerHTML = effectiveTheme() === 'dark' ? SUN : MOON;
+  var tc = document.getElementById('themeColor');
+  if(tc) tc.setAttribute('content', effectiveTheme() === 'dark' ? '#13151a' : '#f6f6f3');
   document.getElementById('themeBtn').setAttribute('aria-label',
     effectiveTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 }
@@ -3049,6 +3063,58 @@ function setupModeSeg(){
   });
   paint();
 }
+/* ============================================================
+   INSTALLING AS AN APP
+   The page works perfectly well without any of this - it only adds
+   the home-screen install and the offline cache when it is served
+   over https. Opened straight from a file, it is skipped entirely.
+   ============================================================ */
+function isInstalled(){
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+         window.navigator.standalone === true;
+}
+function setupInstall(){
+  var row = document.getElementById('installRow');
+  var text = document.getElementById('installText');
+  var btn = document.getElementById('installBtn');
+  var deferred = null;
+
+  if(isInstalled() || location.protocol === 'file:') return;
+
+  /* Android and desktop Chrome: a real install prompt */
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferred = e;
+    text.innerHTML = 'You can install this as an app: it gets its own icon, opens without the browser bars, and still works with no connection.';
+    btn.classList.remove('hidden');
+    row.classList.remove('hidden');
+  });
+  btn.addEventListener('click', function(){
+    if(!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function(){ deferred = null; row.classList.add('hidden'); });
+  });
+  window.addEventListener('appinstalled', function(){ row.classList.add('hidden'); });
+
+  /* iPhone and iPad: Safari has no prompt, so say where the button is */
+  var ua = navigator.userAgent || '';
+  var iOS = /iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1);
+  if(iOS && !/CriOS|FxiOS|EdgiOS/.test(ua)){
+    text.innerHTML = 'To keep this on your home screen like an app: tap the <b>Share</b> button in Safari, then <b>Add to Home Screen</b>. It will open without the browser bars and still work with no connection.';
+    row.classList.remove('hidden');
+  }
+}
+function setupServiceWorker(){
+  if(!('serviceWorker' in navigator)) return;
+  var host = location.hostname;
+  if(location.protocol !== 'https:' && host !== 'localhost' && host !== '127.0.0.1') return;
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){
+      /* nothing to do: without it the app simply needs a connection on first open */
+    });
+  });
+}
+
 function init(){
   setupTheme();
   setupTabs();
@@ -3069,6 +3135,8 @@ function init(){
     if(sess && sess.results.length && !window.confirm('End the session here? Your answers so far will still be recorded.')) return;
     if(sess) endSession();
   });
+  setupInstall();
+  setupServiceWorker();
   document.getElementById('resetBtn').addEventListener('click', function(){
     if(!window.confirm('Delete all saved progress from this browser? This cannot be undone.')) return;
     var theme = load().theme;
