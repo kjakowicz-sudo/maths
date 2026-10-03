@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="An offline trainer for Aon gapChallenge style deductive reasoning: a grid where no symbol repeats in a row or column, and you work out what belongs in the missing square.">
+<title>Deductive Reasoning Trainer</title>
+<meta name="theme-color" id="themeColor" content="#f6f6f3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Deduction">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238a5a1e'/%3E%3Cg stroke='%23ffffff' stroke-width='2.5' fill='none' opacity='.55'%3E%3Crect x='12' y='12' width='40' height='40'/%3E%3Cpath d='M32 12v40M12 32h40'/%3E%3C/g%3E%3Ctext x='42' y='48' font-family='Helvetica,Arial,sans-serif' font-size='22' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%3F%3C/text%3E%3Ccircle cx='22' cy='22' r='5' fill='%23ffffff'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f6f6f3;
+  --panel:#ffffff;
+  --panel-2:#fbfbf9;
+  --ink:#23262b;
+  --ink-soft:#3c424b;
+  --muted:#626b76;
+  --line:#e4e4de;
+  --line-strong:#d2d2ca;
+  --accent:#8a5a1e;
+  --accent-soft:#f6efe3;
+  --accent-ink:#ffffff;
+  --ok:#2d6a4b;
+  --ok-bg:#eaf5ee;
+  --ok-line:#bcdcc7;
+  --bad:#9d3b3b;
+  --bad-bg:#fbecea;
+  --bad-line:#eec7c2;
+  --warn:#7a5510;
+  --warn-bg:#fcf3e3;
+  --warn-line:#e8d5ad;
+  --chip:#eceee9;
+  --focus:#1f6feb;
+  --shadow:0 1px 2px rgba(20,22,26,.06), 0 6px 18px rgba(20,22,26,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13151a;
+    --panel:#1b1e24;
+    --panel-2:#20242b;
+    --ink:#e9ebee;
+    --ink-soft:#d3d7dd;
+    --muted:#a3abb7;
+    --line:#2b3039;
+    --line-strong:#3a414c;
+    --accent:#e0b06a;
+    --accent-soft:#2e2619;
+    --accent-ink:#2a1f10;
+    --ok:#7fc79c;
+    --ok-bg:#182a20;
+    --ok-line:#2f513c;
+    --bad:#e79a93;
+    --bad-bg:#2c1c1b;
+    --bad-line:#5a3430;
+    --warn:#e0bd78;
+    --warn-bg:#2a2317;
+    --warn-line:#4d422a;
+    --chip:#252a32;
+    --focus:#79a9ff;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13151a;
+  --panel:#1b1e24;
+  --panel-2:#20242b;
+  --ink:#e9ebee;
+  --ink-soft:#d3d7dd;
+  --muted:#a3abb7;
+  --line:#2b3039;
+  --line-strong:#3a414c;
+  --accent:#e0b06a;
+  --accent-soft:#2e2619;
+  --accent-ink:#2a1f10;
+  --ok:#7fc79c;
+  --ok-bg:#182a20;
+  --ok-line:#2f513c;
+  --bad:#e79a93;
+  --bad-bg:#2c1c1b;
+  --bad-line:#5a3430;
+  --warn:#e0bd78;
+  --warn-bg:#2a2317;
+  --warn-line:#4d422a;
+  --chip:#252a32;
+  --focus:#79a9ff;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.6;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+h1,h2,h3,h4{line-height:1.3;margin:0 0 .4em}
+h1{font-size:1.05rem;font-weight:650;letter-spacing:.01em}
+h2{font-size:1.25rem;font-weight:650}
+h3{font-size:1.05rem;font-weight:650}
+p{margin:0 0 .85em}
+ul,ol{margin:0 0 .9em;padding-left:1.35em}
+li{margin:.3em 0}
+a{color:var(--accent)}
+b,strong{font-weight:650}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 64px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.tiny{font-size:.82rem}
+.center{text-align:center}
+.hidden{display:none !important}
+
+/* ---------- header ---------- */
+header.top{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(8px);
+  border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top);
+}
+.topbar{
+  max-width:860px;margin:0 auto;padding:10px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.brand{display:flex;flex-direction:column;min-width:0;flex:1}
+.brand .sub{font-size:.76rem;color:var(--muted);line-height:1.2}
+.t-short{display:none}
+.streak{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--chip);border:1px solid var(--line);
+  border-radius:999px;padding:5px 11px;font-size:.84rem;font-weight:600;
+  white-space:nowrap;
+}
+.streak svg{width:14px;height:14px;flex:none}
+.streak.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.streak .best{font-weight:500;color:var(--muted)}
+.iconbtn{
+  background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;width:38px;height:38px;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.iconbtn:hover{border-color:var(--line-strong)}
+.iconbtn svg{width:18px;height:18px}
+
+/* ---------- tabs ---------- */
+nav.tabs{
+  position:sticky;top:0;z-index:15;
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.tabsinner{
+  max-width:860px;margin:0 auto;padding:8px 10px;
+  display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.tabsinner::-webkit-scrollbar{display:none}
+.tab{
+  appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);
+  font:inherit;font-size:.95rem;font-weight:600;
+  padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* ---------- cards & controls ---------- */
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:16px 0;box-shadow:var(--shadow);
+}
+.card.plain{box-shadow:none}
+.card h2:first-child,.card h3:first-child{margin-top:0}
+.btn{
+  appearance:none;font:inherit;font-weight:600;cursor:pointer;
+  background:var(--panel);color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:11px;
+  padding:11px 16px;min-height:44px;
+}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;border-color:var(--line)}
+.btn.danger{border-color:var(--bad-line);color:var(--bad)}
+.btn.block{display:block;width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row.tight{gap:8px}
+:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:6px}
+
+label.field{display:block;font-size:.86rem;font-weight:600;color:var(--muted);margin:0 0 5px}
+select,input[type="text"]{
+  font:inherit;font-size:16px;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line-strong);border-radius:11px;padding:11px 12px;width:100%;min-height:46px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+.segmented{display:flex;gap:6px;background:var(--chip);border-radius:12px;padding:5px;border:1px solid var(--line)}
+.segmented button{
+  flex:1;appearance:none;border:0;background:transparent;color:var(--muted);
+  font:inherit;font-weight:600;font-size:.92rem;padding:9px 8px;border-radius:9px;cursor:pointer;min-height:40px;
+}
+.segmented button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+
+.chip{
+  display:inline-block;background:var(--chip);border:1px solid var(--line);
+  border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;color:var(--muted);
+}
+
+/* ---------- practice ---------- */
+.qhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.qhead .spacer{flex:1}
+.progressline{height:5px;background:var(--chip);border-radius:999px;overflow:hidden;margin:2px 0 16px}
+.progressline i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .25s ease}
+.timer{font-variant-numeric:tabular-nums;font-weight:650;font-size:.88rem;color:var(--muted)}
+.qstem{font-size:1.14rem;line-height:1.55;margin:0 0 4px}
+.qstem b{font-weight:650}
+.figure{margin:14px 0;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel-2);overflow-x:auto}
+.figure .figtitle{font-weight:650;font-size:.95rem;margin:0 0 2px}
+.figure .figunits{font-size:.84rem;color:var(--muted);margin:0 0 10px}
+table.data{border-collapse:collapse;width:100%;font-size:.95rem;font-variant-numeric:tabular-nums}
+table.data th,table.data td{border:1px solid var(--line-strong);padding:8px 10px;text-align:right}
+table.data th:first-child,table.data td:first-child{text-align:left}
+table.data thead th{background:var(--chip);font-weight:650}
+svg.chart{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+
+.choices{display:grid;gap:9px;margin:16px 0 0}
+.choice{
+  display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  background:var(--panel);border:1px solid var(--line-strong);border-radius:12px;
+  padding:13px 14px;font:inherit;font-size:1.02rem;cursor:pointer;min-height:52px;color:var(--ink);
+}
+.choice:hover:not(:disabled){border-color:var(--accent);background:var(--panel-2)}
+.choice .letter{
+  flex:none;width:26px;height:26px;border-radius:7px;background:var(--chip);
+  display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--muted);
+}
+.choice.picked{border-color:var(--ink-soft)}
+.choice.right{background:var(--ok-bg);border-color:var(--ok-line)}
+.choice.right .letter{background:var(--ok);color:#fff}
+.choice.wrong{background:var(--bad-bg);border-color:var(--bad-line)}
+.choice.wrong .letter{background:var(--bad);color:#fff}
+.choice:disabled{cursor:default;opacity:1}
+
+.answerbox{display:flex;gap:10px;align-items:stretch;margin-top:16px;flex-wrap:wrap}
+.inputwrap{flex:1 1 180px;display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:11px;background:var(--panel);overflow:hidden}
+.inputwrap:focus-within{border-color:var(--accent)}
+.inputwrap .affix{padding:0 11px;color:var(--muted);font-weight:650;background:var(--panel-2);align-self:stretch;display:flex;align-items:center}
+.inputwrap input{border:0;border-radius:0;background:transparent;font-size:17px;font-variant-numeric:tabular-nums}
+.inputwrap input:focus{outline:none}
+.hintline{font-size:.86rem;color:var(--muted);margin-top:8px}
+
+.verdict{border-radius:12px;padding:12px 14px;margin:18px 0 0;border:1px solid;font-weight:600}
+.verdict.ok{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok)}
+.verdict.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.verdict .vsub{display:block;font-weight:450;color:var(--ink-soft);margin-top:4px;font-size:.94rem}
+
+.solution{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.solution h4{margin:0 0 10px;font-size:1rem}
+.steps{list-style:none;padding:0;margin:0;counter-reset:st}
+.steps li{
+  counter-increment:st;position:relative;padding:0 0 14px 38px;margin:0;
+  border-left:2px solid var(--line);margin-left:12px;padding-left:26px;
+}
+.steps li:last-child{border-left-color:transparent;padding-bottom:4px}
+.steps li::before{
+  content:counter(st);position:absolute;left:-13px;top:0;
+  width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  border:1px solid var(--accent);font-size:.78rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.steps .st{display:block;font-weight:650;margin-bottom:2px}
+.steps .sb{display:block;color:var(--ink-soft)}
+.eq{
+  display:block;margin:8px 0;padding:9px 12px;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:9px;
+  font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);
+  overflow-x:auto;white-space:nowrap;
+}
+.note{border-radius:11px;padding:11px 13px;margin:12px 0 0;border:1px solid;font-size:.95rem}
+.note .nlab{display:block;font-weight:700;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.note.check{background:var(--ok-bg);border-color:var(--ok-line)}
+.note.check .nlab{color:var(--ok)}
+.note.trap{background:var(--warn-bg);border-color:var(--warn-line)}
+.note.trap .nlab{color:var(--warn)}
+.note.info{background:var(--accent-soft);border-color:var(--accent)}
+.note.info .nlab{color:var(--accent)}
+
+/* ---------- calculator ---------- */
+.calcwrap{margin-top:18px}
+.calc{
+  border:1px solid var(--line-strong);border-radius:14px;padding:12px;background:var(--panel-2);margin-top:10px;
+  max-width:340px;
+}
+.calcscreen{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;text-align:right;font-size:1.5rem;font-weight:650;
+  font-variant-numeric:tabular-nums;overflow-x:auto;white-space:nowrap;min-height:50px;
+  display:flex;align-items:center;justify-content:flex-end;
+}
+.calckeys{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
+.calckeys button{
+  appearance:none;font:inherit;font-size:1.05rem;font-weight:600;cursor:pointer;
+  background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;
+  min-height:46px;color:var(--ink);
+}
+.calckeys button:hover{border-color:var(--accent)}
+.calckeys button.op{background:var(--chip)}
+.calckeys button.eqk{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.calckeys button.wide{grid-column:span 2}
+
+/* ---------- learn / tips ---------- */
+details.topic{
+  border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  margin:12px 0;box-shadow:var(--shadow);overflow:hidden;
+}
+details.topic>summary{
+  list-style:none;cursor:pointer;padding:15px 16px;font-weight:650;font-size:1.05rem;
+  display:flex;align-items:center;gap:12px;
+}
+details.topic>summary::-webkit-details-marker{display:none}
+details.topic>summary:hover{background:var(--panel-2)}
+.sumnum{
+  flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;
+}
+.sumtext{flex:1;min-width:0}
+.sumtext .sumsub{display:block;font-weight:450;font-size:.84rem;color:var(--muted);line-height:1.3}
+.chev{flex:none;width:16px;height:16px;color:var(--muted);transition:transform .2s ease}
+details.topic[open]>summary .chev{transform:rotate(180deg)}
+.topicbody{padding:0 16px 18px;border-top:1px solid var(--line)}
+.topicbody>h4{
+  margin:18px 0 6px;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);
+}
+.topicbody>h4:first-child{margin-top:16px}
+.qref{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-top:6px}
+.qref ul{margin:0;padding-left:1.2em}
+.qref li{margin:.35em 0}
+.worked{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel-2);margin:6px 0 0}
+.worked .wq{font-weight:650;margin-bottom:10px}
+kbd.k{
+  font:inherit;font-size:.92rem;font-weight:650;background:var(--chip);border:1px solid var(--line-strong);
+  border-radius:6px;padding:1px 6px;
+}
+table.mini{border-collapse:collapse;font-size:.95rem;margin:4px 0 10px;width:100%;max-width:420px;font-variant-numeric:tabular-nums}
+table.mini th,table.mini td{border:1px solid var(--line-strong);padding:6px 10px;text-align:left}
+table.mini thead th{background:var(--chip);font-weight:650}
+
+/* ---------- progress ---------- */
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.statgrid{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat .v{font-size:1.5rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.8rem;color:var(--muted);line-height:1.3}
+.chartbars{display:flex;align-items:flex-end;gap:6px;height:150px;margin:14px 0 4px;overflow-x:auto;padding-bottom:2px}
+.chartbars .cb{flex:1 1 20px;min-width:18px;display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:5px}
+.chartbars .cb i{display:block;flex:none;background:var(--accent);border-radius:5px 5px 2px 2px;min-height:4px}
+.chartbars .cb span{flex:none;font-size:.68rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.axis{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);border-top:1px solid var(--line);padding-top:6px}
+.trow{display:grid;grid-template-columns:1fr 62px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.trow:last-child{border-bottom:0}
+.trow .tn{font-size:.95rem;font-weight:600}
+.trow .tbar{height:7px;background:var(--chip);border-radius:999px;overflow:hidden;margin-top:5px}
+.trow .tbar i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.trow .tv{text-align:right;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted)}
+/* ---------- small screens ---------- */
+@media (max-width:560px){
+  body{font-size:16px}
+  .wrap{padding:0 14px 56px}
+  .card{padding:15px;border-radius:13px}
+  #startBtn{width:100%}
+  .qstem{font-size:1.08rem}
+  .steps li{padding-left:22px;margin-left:11px}
+  .calc{max-width:100%}
+}
+@media (max-width:480px){
+  .topbar{padding:8px 14px;gap:8px}
+  .brand .sub{display:none}
+  .t-full{display:none}
+  .t-short{display:inline}
+  h1{font-size:.97rem;line-height:1.25}
+  .streak{font-size:.78rem;padding:4px 9px;gap:5px}
+  .iconbtn{width:34px;height:34px}
+  .tabsinner{padding:7px 8px}
+  .tab{padding:7px 12px;font-size:.92rem}
+  .statgrid{gap:8px}
+  .stat{padding:10px}
+  .stat .v{font-size:1.3rem}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+<style>
+/* symbol colours - every symbol differs in shape as well as hue, so colour
+   is never the only thing telling them apart */
+:root{ --sy-a:#3f6fb5; --sy-b:#b0601f; --sy-c:#2f7d5e; --sy-d:#97406f; --sy-e:#6355b0; --sy-f:#8d7520; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --sy-a:#8ab2e8; --sy-b:#e8a765; --sy-c:#6fc2a0; --sy-d:#e08cb4; --sy-e:#a79ae8; --sy-f:#d4bd6a; } }
+:root[data-theme="dark"]{
+  --sy-a:#8ab2e8; --sy-b:#e8a765; --sy-c:#6fc2a0; --sy-d:#e08cb4; --sy-e:#a79ae8; --sy-f:#d4bd6a; }
+/* ---------- the grid ---------- */
+.gridwrap{display:flex;justify-content:center;margin:16px 0 0}
+.lsgrid{
+  display:grid;gap:6px;background:var(--line);padding:6px;border-radius:14px;
+  border:1px solid var(--line-strong);width:100%;max-width:360px;
+}
+.cell{
+  position:relative;appearance:none;padding:0;margin:0;border:0;
+  background:var(--panel);border-radius:9px;aspect-ratio:1/1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--ink);font:inherit;overflow:hidden;
+}
+.cell svg{display:block;width:72%;height:72%}
+.cell.given{background:var(--panel);cursor:default}
+.cell.empty{background:var(--panel-2);border:1.5px dashed var(--line-strong)}
+.cell.empty:hover{border-color:var(--accent)}
+.cell.note svg{opacity:.45}
+.cell.note{background:var(--panel-2)}
+.cell.target{
+  background:var(--accent-soft);border:2.5px solid var(--accent);cursor:default;
+  font-size:1.5rem;font-weight:700;color:var(--accent);
+}
+.cell.target.right{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.cell.target.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.cell.hl{box-shadow:inset 0 0 0 2.5px var(--accent)}
+.cell.dimrow{background:var(--chip)}
+@media (max-width:420px){ .lsgrid{gap:4px;padding:4px} .cell{border-radius:7px} }
+
+.answerrow{margin-top:18px}
+.answerrow .lab{font-size:.88rem;font-weight:650;color:var(--muted);margin:0 0 9px}
+.symrow{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.symbtn{
+  appearance:none;background:var(--panel);border:1.5px solid var(--line-strong);
+  border-radius:11px;width:58px;height:58px;cursor:pointer;padding:7px;
+  display:flex;align-items:center;justify-content:center;
+}
+.symbtn svg{width:100%;height:100%}
+.symbtn:hover:not(:disabled){border-color:var(--accent);background:var(--panel-2)}
+.symbtn:disabled{cursor:default}
+.symbtn.right{border-color:var(--ok);border-width:3px;background:var(--ok-bg)}
+.symbtn.wrong{border-color:var(--bad);border-width:3px;background:var(--bad-bg)}
+.notehint{font-size:.84rem;color:var(--muted);text-align:center;margin:12px 0 0}
+
+/* ---------- derivation ---------- */
+.derive{list-style:none;padding:0;margin:10px 0 0;counter-reset:dv}
+.derive li{
+  counter-increment:dv;position:relative;padding:0 0 13px 26px;
+  border-left:2px solid var(--line);margin-left:12px;
+}
+.derive li:last-child{border-left-color:transparent;padding-bottom:2px}
+.derive li::before{
+  content:counter(dv);position:absolute;left:-13px;top:0;width:24px;height:24px;
+  border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  border:1px solid var(--accent);font-size:.78rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.derive .dw{display:block;color:var(--ink-soft)}
+.derive .dw b{color:var(--ink)}
+.inlinesym{display:inline-block;vertical-align:-0.28em;width:1.22em;height:1.22em;margin:0 1px}
+
+/* ---------- learn examples ---------- */
+.exwrap{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel-2);margin:8px 0 0}
+.exwrap .lsgrid{max-width:230px}
+.exwrap .cell{background:var(--panel)}
+.exnote{font-size:.93rem;margin:12px 0 0;color:var(--ink-soft)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.legend svg{width:18px;height:18px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <div class="brand">
+      <h1><span class="t-full">Deductive Reasoning Trainer</span><span class="t-short">Deduction</span></h1>
+      <span class="sub">gapChallenge style grids &middot; works offline</span>
+    </div>
+    <div id="streakChip" class="streak" title="Days practised in a row">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.2 2.1c.3 3-1.1 4.3-2.4 5.5-1.4 1.3-2.8 2.6-2.8 5.2 0 .9.2 1.7.6 2.4-1-.6-1.7-1.6-2-2.8-1.1 1.3-1.7 3-1.7 4.7 0 3.8 3.2 6.9 7.1 6.9s7.1-3.1 7.1-6.9c0-4.6-2.9-6.6-4.3-9.1-.8-1.4-1.2-3.2-1.6-5.9z"/></svg>
+      <span id="streakText">0 days</span>
+    </div>
+    <button id="themeBtn" class="iconbtn" type="button" aria-label="Switch between light and dark" title="Light / dark">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="tabsinner" role="tablist">
+    <button class="tab" role="tab" id="tab-practice" aria-controls="panel-practice" aria-selected="true" type="button">Practice</button>
+    <button class="tab" role="tab" id="tab-learn" aria-controls="panel-learn" aria-selected="false" type="button">Learn</button>
+    <button class="tab" role="tab" id="tab-tips" aria-controls="panel-tips" aria-selected="false" type="button">Tips</button>
+    <button class="tab" role="tab" id="tab-progress" aria-controls="panel-progress" aria-selected="false" type="button">Progress</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ================= PRACTICE ================= -->
+<section id="panel-practice" role="tabpanel" aria-labelledby="tab-practice">
+
+  <div id="setup" class="card">
+    <h2>Start a practice session</h2>
+    <p class="muted small">A grid where <b>no symbol is repeated in any row or any column</b>. One square is marked <b>?</b>. Work out what belongs there.</p>
+
+    <div style="margin-top:18px">
+      <label class="field" for="modeSeg">How do you want to practise?</label>
+      <div class="segmented" id="modeSeg">
+        <button type="button" data-mode="learn" aria-pressed="true">Untimed (learn)</button>
+        <button type="button" data-mode="timed" aria-pressed="false">Timed</button>
+      </div>
+      <p id="modeNote" class="hintline"></p>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div>
+        <label class="field" for="lenSel">How many grids?</label>
+        <select id="lenSel">
+          <option value="5">5 &mdash; a quick go</option>
+          <option value="10" selected>10 &mdash; a normal session</option>
+          <option value="15">15 &mdash; a longer stretch</option>
+        </select>
+      </div>
+      <div>
+        <label class="field" for="diffSel">How hard?</label>
+        <select id="diffSel">
+          <option value="easy">Gentle &mdash; 4&times;4, answer is right there</option>
+          <option value="mixed" selected>Mixed &mdash; like the real thing</option>
+          <option value="hard">Hard &mdash; 5&times;5, several steps</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:18px">
+      <button id="startBtn" class="btn primary" type="button">Start</button>
+    </div>
+    <p class="hintline" id="weakHint"></p>
+    <div id="installRow" class="hidden" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+      <p class="hintline" id="installText" style="margin:0 0 9px"></p>
+      <button id="installBtn" class="btn ghost hidden" type="button">Add to home screen</button>
+    </div>
+  </div>
+
+  <div id="quiz" class="card hidden">
+    <div class="qhead">
+      <span class="chip" id="qDiff">Mixed</span>
+      <span class="spacer"></span>
+      <span class="timer" id="qTimer"></span>
+      <span class="small muted" id="qCount">Grid 1 of 10</span>
+    </div>
+    <div class="progressline"><i id="qProgress" style="width:0%"></i></div>
+
+    <p class="qstem">Which symbol belongs in the <b>?</b> square?</p>
+
+    <div class="gridwrap"><div class="lsgrid" id="grid" role="group" aria-label="Puzzle grid"></div></div>
+    <p class="notehint" id="noteHint">Tap any empty square to pencil a symbol in. Tap it again to change or clear it.</p>
+
+    <div class="answerrow">
+      <p class="lab" id="answerLab">Your answer:</p>
+      <div class="symrow" id="symrow"></div>
+    </div>
+
+    <div class="row tight" style="margin-top:16px">
+      <button id="unsureBtn" class="btn ghost small" type="button">Not sure &mdash; show me how</button>
+      <button id="clearBtn" class="btn ghost small" type="button">Clear my pencil marks</button>
+    </div>
+
+    <div id="qResult"></div>
+
+    <div class="calcwrap">
+      <button id="listToggle" class="btn ghost" type="button" aria-expanded="false" aria-controls="listPanel">How to crack it</button>
+      <div id="listPanel" class="checklist hidden">
+        <p class="tiny muted" style="margin:10px 0 0">Three moves. That is the whole game.</p>
+        <ol>
+          <li><b>Cross off the row and the column.</b> Look along the ? square's row and down its column. Every symbol you see is ruled out. If only one symbol survives, that is your answer.</li>
+          <li><b>Fill an easier square first.</b> If more than one survives, find a different empty square you <i>can</i> work out, pencil it in, and look again. One new symbol in the right place is often all it takes.</li>
+          <li><b>"Nowhere else to go."</b> If a symbol is missing from a row, and every empty square in that row except one already has that symbol in its column, it must go in the square that is left.</li>
+        </ol>
+        <p class="tiny muted" style="margin:10px 0 0">Only rows and columns matter. Diagonals do not.</p>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button id="quitBtn" class="btn ghost small" type="button">End session</button>
+    </div>
+  </div>
+
+  <div id="summary" class="card hidden"></div>
+</section>
+
+<!-- ================= LEARN ================= -->
+<section id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" class="hidden">
+
+  <div class="card plain">
+    <h2>Learn</h2>
+    <p class="muted">Seven short chapters with real grids in them, already worked through. The whole test rests on one rule and three moves.</p>
+  </div>
+
+  <!-- 1 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">1</span>
+      <span class="sumtext">The one rule
+        <span class="sumsub">What the grid is, and what you are actually asked to do</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+
+      <h4>Start here</h4>
+      <p>If you have ever done a sudoku, you already know this test. And this is the easier cousin of it.</p>
+      <p>A grid. A handful of symbols. One rule:</p>
+      <p style="font-size:1.08rem;font-weight:650;text-align:center;margin:14px 0;padding:12px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:11px;color:var(--accent)">
+        No symbol appears twice in the same row, or twice in the same column.</p>
+      <p>That's it. There are no 3&times;3 boxes to worry about, no arithmetic, and &mdash; this is the part people miss &mdash; <b>you do not have to fill in the grid</b>. One square is marked with a <b>?</b>, and your only job is to say which symbol belongs there.</p>
+      <p>Everything else on the screen is just material for working it out.</p>
+
+      <h4>Why it feels harder than it is</h4>
+      <p>Two reasons, and neither is about ability.</p>
+      <p>The first is that the symbols are meaningless shapes, so there is nothing to hold on to. A sudoku has numbers, and you can say "I need a 7 here". Here you have to say "I need the&hellip; the star-ish one", and that is harder to keep in your head.</p>
+      <p>The second is the clock. It's a short, brisk test, and the squares you need to look at are scattered.</p>
+      <p>Both are fixed by the same thing: a fixed order of looking, and using the pencil. More on both shortly.</p>
+
+      <h4>What you can do that most people don't</h4>
+      <p>You can <b>fill in other squares</b> as you go. The real test lets you place symbols in the empty squares, and so does this app &mdash; tap an empty square and pencil something in.</p>
+      <p>People skip this because it feels like extra work. It isn't: it's how you stop holding five things in your head at once. Writing one symbol down frees up all the attention you were spending remembering it.</p>
+
+      <h4>A grid, worked through</h4>
+      <p>Here is a real one. The ? is the square you have to name.</p>
+      <div class="exwrap" data-level="easy" data-seed="21"></div>
+    </div>
+  </details>
+
+  <!-- 2 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">2</span>
+      <span class="sumtext">Move 1 &mdash; cross off the row and the column
+        <span class="sumsub">The move that solves most grids on its own</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+      <h4>The idea</h4>
+      <p>The ? square sits in one row and one column. Those two lines are the only things that constrain it.</p>
+      <p>So: run your eye along the row and note every symbol already in it. Those are all impossible &mdash; the rule forbids a repeat. Then run your eye down the column and do the same.</p>
+      <p>Whatever is left standing is the answer.</p>
+
+      <h4>Doing it without losing your place</h4>
+      <ol>
+        <li>Look at the strip of symbols underneath the grid. That is the full set, and it never changes.</li>
+        <li>Go along the <b>row</b> first, and mentally knock out each symbol you meet from that set.</li>
+        <li>Then go down the <b>column</b> and knock out the rest.</li>
+        <li>Name what survives.</li>
+      </ol>
+      <p>Always row first, then column, every time. Not because the order matters logically &mdash; it doesn't &mdash; but because having a fixed order means you never lose track of where you had got to.</p>
+
+      <h4>Worked through</h4>
+      <div class="exwrap" data-level="easy" data-seed="5"></div>
+
+      <div class="note check"><span class="nlab">When this works</span>
+        It works whenever the row and column between them contain every symbol but one. On a 4&times;4 grid that's common, and it is the fastest mark in the test. Always try it first, even when the grid looks busy.</div>
+
+      <div class="note trap"><span class="nlab">Watch out</span>
+        Checking the row and forgetting the column, or vice versa. If two symbols are still standing after move 1, you haven't failed &mdash; you've just learned that this grid needs move 2.</div>
+    </div>
+  </details>
+
+  <!-- 3 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">3</span>
+      <span class="sumtext">Move 2 &mdash; fill an easier square first
+        <span class="sumsub">What to do when two symbols are still standing</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+      <h4>The idea</h4>
+      <p>Sometimes move 1 leaves you with two or three possibilities. The instinct is to stare harder at the ? square. That never helps, because you have already taken everything that square can tell you.</p>
+      <p>The information you need is somewhere else in the grid.</p>
+      <p>So go and get it: find a <b>different</b> empty square that move 1 <i>does</i> solve, pencil that symbol in, and come back. You have now added a symbol to a row and a column &mdash; and if you picked well, one of them is the ? square's.</p>
+
+      <h4>Which square to go for</h4>
+      <p>Not any old empty square. Pick one that is <b>in the same row or the same column as the ?</b>. Those are the only squares whose answer can change what the ? square sees.</p>
+      <p>Among those, go for the one in the fullest line &mdash; the row or column with the fewest gaps. The fuller the line, the more likely move 1 cracks it straight away.</p>
+
+      <h4>Worked through</h4>
+      <div class="exwrap" data-level="medium" data-seed="14"></div>
+
+      <div class="note check"><span class="nlab">The habit worth building</span>
+        When move 1 fails, don't re-read the ? square. Ask instead: <i>which other empty square in this row or column can I solve?</i> That one question turns a stuck grid into a solved one more often than anything else in this app.</div>
+    </div>
+  </details>
+
+  <!-- 4 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">4</span>
+      <span class="sumtext">Move 3 &mdash; "nowhere else to go"
+        <span class="sumsub">The one that feels like a trick until it clicks</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+      <h4>A different way of asking the question</h4>
+      <p>Moves 1 and 2 ask: <i>what can go in this square?</i></p>
+      <p>Move 3 turns it round and asks: <i>where can this symbol go?</i></p>
+      <p>Here's the reasoning. Take a row. Every row must end up containing all the symbols &mdash; that's the rule. So pick a symbol the row is still missing, and ask where in that row it could possibly sit. Check each empty square in turn: does that square's <b>column</b> already contain the symbol? If it does, it can't go there.</p>
+      <p>Knock out enough squares and you may find the symbol has exactly one place left. Then it must go there &mdash; even though that square, looked at on its own, might have had several possibilities.</p>
+
+      <h4>Why it's worth the effort</h4>
+      <p>Because it finds answers the other moves can't. A square with three candidates looks hopeless from the inside; from the symbol's point of view it can be forced.</p>
+      <p>It is also the move that the harder grids are built around. If you've done moves 1 and 2 and you're still stuck, this is almost always what's wanted.</p>
+
+      <h4>Worked through</h4>
+      <div class="exwrap" data-level="hard" data-seed="33"></div>
+
+      <div class="note trap"><span class="nlab">Watch out</span>
+        You can run this on a <b>column</b> just as well as a row &mdash; pick a symbol the column is missing and ask which of its empty squares could take it. Same logic, turned ninety degrees. People forget the column version and miss easy marks.</div>
+    </div>
+  </details>
+
+  <!-- 5 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">5</span>
+      <span class="sumtext">Using the pencil
+        <span class="sumsub">How to stop holding five things in your head</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+      <h4>Why this matters more than it sounds</h4>
+      <p>The thing that actually runs out on this test is not cleverness. It is <b>working memory</b> &mdash; the small number of things you can hold in mind at once. Most people can hold about four, and these grids will happily ask you for six.</p>
+      <p>The moment you feel yourself thinking "so that one was the star&hellip; no, wait" &mdash; that's working memory overflowing. It is not a sign you can't do it. It is a sign you are doing it in your head when you don't have to.</p>
+
+      <h4>What to do</h4>
+      <ul>
+        <li><b>The moment you deduce a square, place it.</b> Don't hold it while you look at the next thing.</li>
+        <li><b>Pencil in anything you are sure of</b>, even if it isn't the ? square. Every symbol you place makes the grid easier.</li>
+        <li><b>Don't try to finish the grid.</b> You are not being marked on it. Place only what helps the ?.</li>
+        <li><b>Only rows and columns matter.</b> Diagonals mean nothing here, however tempting the pattern looks.</li>
+      </ul>
+      <p>In this app, tap any empty square to pencil a symbol in, and tap again to change it. Your pencil marks show faded, so you can always tell them from the symbols the puzzle gave you.</p>
+
+      <div class="note check"><span class="nlab">The honest version</span>
+        People who are good at this aren't holding more in their heads than you. They're holding <i>less</i>, because they write things down sooner.</div>
+    </div>
+  </details>
+
+  <!-- 6 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">6</span>
+      <span class="sumtext">Traps
+        <span class="sumsub">The mistakes that cost marks</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+      <h4>1. Answering with a symbol that is already in the row</h4>
+      <p>It sounds impossible, and it is the single most common error under time pressure &mdash; you check the column carefully, and your eye never goes back along the row.</p>
+      <p><b>The fix:</b> before you commit, one last sweep. Is my answer anywhere else in this row? In this column? Two seconds.</p>
+
+      <h4>2. Trying to solve the whole grid</h4>
+      <p>You only need one square. Filling the rest is unpaid work, and on a 5&times;5 it will eat your clock.</p>
+      <p><b>The fix:</b> only pencil in squares that sit in the ?'s row or column. Everything else is scenery.</p>
+
+      <h4>3. Believing in diagonals</h4>
+      <p>The rule covers rows and columns. Not diagonals, not corners, not pretty patterns. Your eye will find patterns anyway &mdash; ignore them.</p>
+
+      <h4>4. Losing your place halfway</h4>
+      <p>You get three symbols crossed off, something distracts you, and you start again. Twice. Now the clock has gone.</p>
+      <p><b>The fix:</b> the fixed order &mdash; row first, then column &mdash; and the pencil. Both exist to make interruptions survivable.</p>
+
+      <h4>5. Freezing on a hard one</h4>
+      <p>Some grids need move 3 and several steps, and they are genuinely harder. The test may well be feeding you harder ones <i>because you are doing well</i>.</p>
+      <p><b>The fix:</b> decide your limit in advance. Run moves 1, 2 and 3 once each. If nothing, pick the most likely survivor and move on.</p>
+    </div>
+  </details>
+
+  <!-- 7 -->
+  <details class="topic">
+    <summary>
+      <span class="sumnum">7</span>
+      <span class="sumtext">Working at speed
+        <span class="sumsub">What the clock actually rewards</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="topicbody">
+      <h4>What this test is like</h4>
+      <p>Short and brisk, like the rest of the Aon suite &mdash; a few minutes, a run of grids, and it keeps serving them up. It is often <b>adaptive</b>: get them right and the grids get harder.</p>
+      <p>Two things follow from that, and they're both reassuring.</p>
+      <p><b>You are not meant to find them all easy.</b> If the grids are getting harder, that is the test telling you that you are doing well. The difficulty is a scoreboard, not a verdict.</p>
+      <p><b>Nobody finishes feeling they aced it.</b> An adaptive test is designed to push you to the edge of what you can do. Feeling stretched at the end is the normal, expected experience &mdash; including for the people who score highest.</p>
+
+      <h4>A rhythm that works</h4>
+      <ul>
+        <li><b>Move 1 immediately, every time.</b> It's ten seconds and it solves a good share of grids outright.</li>
+        <li><b>If two survive, go straight to move 2.</b> Don't re-read the ? square.</li>
+        <li><b>Pencil as you go.</b> Never hold a deduction in your head while you look elsewhere.</li>
+        <li><b>Check your answer against the row and column before committing.</b> Two seconds, and it kills the most common error.</li>
+        <li><b>Have a give-up rule.</b> Moves 1, 2, 3, once each &mdash; then best guess and on.</li>
+      </ul>
+
+      <h4>How to train for it</h4>
+      <p>Untimed and gentle until the three moves are automatic. Then mixed. Only then timed. Going to timed early just teaches you to panic.</p>
+      <p>Ten minutes a day. Grid puzzles improve fast &mdash; faster than almost anything else you could revise &mdash; because you're building a habit, not learning facts.</p>
+
+      <div class="note check"><span class="nlab">The summary</span>
+        One rule, three moves, and a pencil. There is nothing else in this test.</div>
+    </div>
+  </details>
+</section>
+
+<!-- ================= TIPS ================= -->
+<section id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" class="hidden">
+  <div class="card plain">
+    <h2>Tips</h2>
+    <p class="muted">Short and practical. Mostly about the clock and about not panicking.</p>
+  </div>
+
+  <div class="card">
+    <h3>1. Always open with move 1</h3>
+    <p>Row first, then column, crossing symbols off the set as you go. It takes about ten seconds, needs no cleverness, and solves a large share of grids on its own.</p>
+    <p style="margin-bottom:0" class="small muted">Even when the grid looks complicated, do this first. It either hands you the answer or tells you the grid needs more, and both are useful.</p>
+  </div>
+
+  <div class="card">
+    <h3>2. Check your answer before you commit</h3>
+    <p>One sweep along the row, one down the column. Is the symbol you are about to pick already sitting in either of them?</p>
+    <p style="margin-bottom:0">That two-second check removes the most common wrong answer in the whole test.</p>
+  </div>
+
+  <div class="card">
+    <h3>3. Place things, don't remember them</h3>
+    <p>The limit on this test is working memory, not reasoning. The instant you work a square out, put the symbol in it. Holding it while you look somewhere else is how deductions get dropped.</p>
+    <p style="margin-bottom:0" class="small muted">People who look fast at this are mostly just writing things down sooner.</p>
+  </div>
+
+  <div class="card">
+    <h3>4. Only work on squares that can help</h3>
+    <p>You are asked for one square, not the grid. The only other squares worth filling are the ones sharing a row or column with the <b>?</b> &mdash; they're the only ones that can change what it sees.</p>
+    <p style="margin-bottom:0">Solving the far corner is unpaid work.</p>
+  </div>
+
+  <div class="card">
+    <h3>5. Getting harder means doing well</h3>
+    <p>These assessments are usually adaptive. If the grids grow from 4&times;4 to 5&times;5, or start needing several steps, that is the test responding to a good run.</p>
+    <p style="margin-bottom:0">So the feeling of "this is getting hard" is not a sign it's going badly. It is evidence of the opposite, and it's worth knowing that in advance so it doesn't rattle you on the day.</p>
+  </div>
+
+  <div class="card">
+    <h3>6. Have a give-up rule, decided now</h3>
+    <p>Moves 1, 2 and 3, once each. If the answer hasn't appeared, pick the best survivor and move on.</p>
+    <p style="margin-bottom:0">A rule made in advance is a plan. The same decision made mid-test is panic. One grid is cheap; two minutes stuck on it is not.</p>
+  </div>
+
+  <div class="card">
+    <h3>7. On the day</h3>
+    <ul>
+      <li><b>Laptop, not phone.</b> The squares are small and you'll be moving between them constantly.</li>
+      <li><b>Do the practice tasks the publisher gives you</b> &mdash; they show you the exact interface, which removes a whole layer of surprise.</li>
+      <li><b>One quiet uninterrupted go.</b> You get one attempt, and this is a test where losing your place is expensive.</li>
+      <li><b>Paper next to you</b> is still worth having, even with an on-screen grid.</li>
+    </ul>
+    <p class="small muted" style="margin-bottom:0">And remember what it actually is: a sudoku with no boxes, where you only have to fill one square.</p>
+  </div>
+</section>
+
+<!-- ================= PROGRESS ================= -->
+<section id="panel-progress" role="tabpanel" aria-labelledby="tab-progress" class="hidden">
+  <div class="card plain">
+    <h2>Progress</h2>
+    <p class="muted">Stored only in this browser, on this device. Nothing is sent anywhere.</p>
+  </div>
+  <div class="card">
+    <h3>Your streak</h3>
+    <div class="statgrid" id="streakStats"></div>
+    <p class="hintline" id="streakNote"></p>
+  </div>
+  <div class="card">
+    <h3>Totals</h3>
+    <div class="statgrid" id="totalStats"></div>
+  </div>
+  <div class="card">
+    <h3>Recent sessions</h3>
+    <div id="sessionChart"></div>
+  </div>
+  <div class="card">
+    <h3>Accuracy by grid type</h3>
+    <p class="small muted">Which kinds of grid are costing you.</p>
+    <div id="topicBreakdown"></div>
+  </div>
+  <div class="card">
+    <h3>Reset</h3>
+    <p class="small muted">Clears your streak, sessions and history from this browser. It can't be undone.</p>
+    <button id="resetBtn" class="btn danger" type="button">Reset all progress</button>
+  </div>
+  <p class="tiny muted center" id="storageNote" style="margin:20px 0 0"></p>
+</section>
+
+</main>
+
+<script>
+/* ============================================================
+   Deductive Reasoning Trainer  (gapChallenge style grids)
+   Everything runs locally. No network, no libraries, no tracking.
+   ============================================================ */
+(function(){
+"use strict";
+
+/* ---------- PURE SECTION START (grid engine) ---------- */
+
+function rng(seed){
+  var s = (seed >>> 0) || 1;
+  function next(){ s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }
+  for(var w=0; w<12; w++) next();
+  return {
+    next: next,
+    int: function(a,b){ return a + Math.floor(next()*(b-a+1)); },
+    pick: function(arr){ return arr[Math.floor(next()*arr.length)]; },
+    shuffle: function(arr){
+      var b = arr.slice();
+      for(var i=b.length-1;i>0;i--){ var j=Math.floor(next()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; }
+      return b;
+    }
+  };
+}
+
+/* the symbols, drawn as SVG so they scale and follow the theme */
+var SYMBOLS = [
+  { id:'circle',   name:'circle',   colour:'a' },
+  { id:'square',   name:'square',   colour:'b' },
+  { id:'triangle', name:'triangle', colour:'c' },
+  { id:'star',     name:'star',     colour:'d' },
+  { id:'diamond',  name:'diamond',  colour:'e' },
+  { id:'hexagon',  name:'hexagon',  colour:'f' }
+];
+function polyPoints(cx, cy, rad, sides, rotDeg){
+  var pts = [], i, a;
+  for(i=0;i<sides;i++){
+    a = (rotDeg - 90 + i*360/sides) * Math.PI/180;
+    pts.push((cx + rad*Math.cos(a)).toFixed(1) + ',' + (cy + rad*Math.sin(a)).toFixed(1));
+  }
+  return pts.join(' ');
+}
+function symbolSVG(k, extraClass){
+  var s = SYMBOLS[k];
+  if(!s) return '';
+  var fill = 'fill:var(--sy-' + s.colour + ')';
+  var body;
+  if(s.id === 'circle')        body = '<circle cx="50" cy="50" r="30" style="'+fill+'"/>';
+  else if(s.id === 'square')   body = '<rect x="22" y="22" width="56" height="56" rx="4" style="'+fill+'"/>';
+  else if(s.id === 'triangle') body = '<polygon points="'+polyPoints(50,52,34,3,0)+'" style="'+fill+'"/>';
+  else if(s.id === 'diamond')  body = '<polygon points="'+polyPoints(50,50,36,4,0)+'" style="'+fill+'"/>';
+  else if(s.id === 'hexagon')  body = '<polygon points="'+polyPoints(50,50,33,6,0)+'" style="'+fill+'"/>';
+  else {
+    var pts = [], i, rr, a;
+    for(i=0;i<10;i++){
+      rr = (i % 2 === 0) ? 36 : 16;
+      a = (-90 + i*36) * Math.PI/180;
+      pts.push((50 + rr*Math.cos(a)).toFixed(1) + ',' + (50 + rr*Math.sin(a)).toFixed(1));
+    }
+    body = '<polygon points="'+pts.join(' ')+'" style="'+fill+'"/>';
+  }
+  return '<svg viewBox="0 0 100 100" class="'+(extraClass||'')+'" role="img" aria-label="'+s.name+'">'+body+'</svg>';
+}
+function symbolName(k){ return SYMBOLS[k] ? SYMBOLS[k].name : '?'; }
+function inlineSym(k){ return symbolSVG(k, 'inlinesym'); }
+
+/* ---------- grid helpers ---------- */
+function rowOf(i, n){ return Math.floor(i/n); }
+function colOf(i, n){ return i % n; }
+function rowCells(r, n){ var a=[], c; for(c=0;c<n;c++) a.push(r*n+c); return a; }
+function colCells(c, n){ var a=[], r; for(r=0;r<n;r++) a.push(r*n+c); return a; }
+
+/* which symbols could still go in cell i */
+function candidates(cells, n, i){
+  var used = {}, k, j, cs;
+  cs = rowCells(rowOf(i,n), n);
+  for(k=0;k<cs.length;k++){ j = cs[k]; if(j !== i && cells[j] >= 0) used[cells[j]] = 1; }
+  cs = colCells(colOf(i,n), n);
+  for(k=0;k<cs.length;k++){ j = cs[k]; if(j !== i && cells[j] >= 0) used[cells[j]] = 1; }
+  var out = [];
+  for(k=0;k<n;k++) if(!used[k]) out.push(k);
+  return out;
+}
+
+/* a complete random Latin square */
+function latinSquare(r, n){
+  var cells = new Array(n*n).fill(-1);
+  function solve(idx){
+    if(idx >= n*n) return true;
+    var opts = r.shuffle(candidates(cells, n, idx));
+    for(var k=0;k<opts.length;k++){
+      cells[idx] = opts[k];
+      if(solve(idx+1)) return true;
+      cells[idx] = -1;
+    }
+    return false;
+  }
+  return solve(0) ? cells : null;
+}
+
+/* Can the grid be completed with cell q set to v? Backtracking with
+   most-constrained-cell-first, which keeps this quick even on 5x5. */
+function completable(cells, n, q, v){
+  var work = cells.slice();
+  work[q] = v;
+  function step(){
+    var best = -1, bestOpts = null, i, opts;
+    for(i=0;i<work.length;i++){
+      if(work[i] >= 0) continue;
+      opts = candidates(work, n, i);
+      if(opts.length === 0) return false;
+      if(bestOpts === null || opts.length < bestOpts.length){ best = i; bestOpts = opts; }
+      if(opts.length === 1) break;
+    }
+    if(best === -1) return true;
+    for(var k=0;k<bestOpts.length;k++){
+      work[best] = bestOpts[k];
+      if(step()) return true;
+      work[best] = -1;
+    }
+    return false;
+  }
+  return step();
+}
+/* every value the ? square could legitimately take */
+function possibleAnswers(cells, n, q){
+  var out = [], opts = candidates(cells, n, q), k;
+  for(k=0;k<opts.length;k++) if(completable(cells, n, q, opts[k])) out.push(opts[k]);
+  return out;
+}
+
+/* ---------- the solver that also explains itself ----------
+   Only two techniques, both of which a person can actually follow:
+   - "only symbol left for this square"
+   - "only square left for this symbol" (within a row or a column)
+   Each deduction records the filled cells it relied on, so a readable
+   chain can be rebuilt afterwards. */
+function solveWithReasons(cells, n, q){
+  var work = cells.slice();
+  var steps = [], guard = 0;
+  while(work[q] < 0 && guard < 200){
+    guard++;
+    var did = false, i, k;
+
+    /* only symbol left for this square */
+    for(i=0;i<work.length && !did;i++){
+      if(work[i] >= 0) continue;
+      var opts = candidates(work, n, i);
+      if(opts.length !== 1) continue;
+      var usedBy = [], cs = rowCells(rowOf(i,n), n).concat(colCells(colOf(i,n), n));
+      for(k=0;k<cs.length;k++) if(cs[k] !== i && work[cs[k]] >= 0 && usedBy.indexOf(cs[k]) === -1) usedBy.push(cs[k]);
+      work[i] = opts[0];
+      steps.push({ cell:i, val:opts[0], how:'only-symbol', used:usedBy });
+      did = true;
+    }
+    if(did) continue;
+
+    /* only square left for this symbol, along a row or a column */
+    for(var line=0; line<2*n && !did; line++){
+      var isRow = line < n, idx = isRow ? line : line - n;
+      var group = isRow ? rowCells(idx, n) : colCells(idx, n);
+      var present = {}, empties = [];
+      for(k=0;k<group.length;k++){
+        if(work[group[k]] >= 0) present[work[group[k]]] = 1; else empties.push(group[k]);
+      }
+      for(var v=0; v<n && !did; v++){
+        if(present[v]) continue;
+        var fits = [], blockers = [];
+        for(k=0;k<empties.length;k++){
+          var cell = empties[k];
+          var cross = isRow ? colCells(colOf(cell,n), n) : rowCells(rowOf(cell,n), n);
+          var blocked = -1;
+          for(var m=0;m<cross.length;m++) if(work[cross[m]] === v){ blocked = cross[m]; break; }
+          if(blocked === -1) fits.push(cell); else blockers.push({ cell:cell, by:blocked });
+        }
+        if(fits.length === 1){
+          var usedB = blockers.map(function(b){ return b.by; });
+          work[fits[0]] = v;
+          steps.push({ cell:fits[0], val:v, how:'only-square', isRow:isRow, line:idx, used:usedB, blockers:blockers });
+          did = true;
+        }
+      }
+    }
+    if(!did) break;
+  }
+  return { solved: work[q] >= 0, value: work[q], steps: steps, grid: work };
+}
+
+/* keep only the deductions the answer actually depended on */
+function relevantChain(steps, q){
+  var byCell = {}, i;
+  for(i=0;i<steps.length;i++) byCell[steps[i].cell] = i;
+  if(!(q in byCell)) return [];
+  var keep = {}, stack = [byCell[q]];
+  while(stack.length){
+    var si = stack.pop();
+    if(keep[si]) continue;
+    keep[si] = true;
+    var used = steps[si].used || [];
+    for(i=0;i<used.length;i++){
+      var src = byCell[used[i]];
+      if(src !== undefined && !keep[src]) stack.push(src);
+    }
+  }
+  var out = [];
+  for(i=0;i<steps.length;i++) if(keep[i]) out.push(steps[i]);
+  return out;
+}
+/* ---------- PURE SECTION MARK ---------- */
+
+/* ============================================================
+   BUILDING A PUZZLE
+   Start from a full grid, then take symbols away for as long as the ?
+   square still has exactly one possible answer AND that answer can still
+   be reached by the two explainable techniques.
+   ============================================================ */
+/* How long a chain of reasoning each setting is allowed to need. Without a
+   cap, stripping the grid as far as it will go produces grids needing a
+   dozen-plus deductions - correct, but nothing like the real test, and no
+   use to anyone. */
+var CHAIN_CAP = { easy:[1,1], medium:[2,3], hard:[3,5] };
+
+function levelOf(cells, n, q, chainLen){
+  if(chainLen <= 1 && candidates(cells, n, q).length === 1) return 'easy';
+  if(chainLen <= 3) return 'medium';
+  return 'hard';
+}
+
+function buildPuzzle(r, n, want){
+  var band = CHAIN_CAP[want] || CHAIN_CAP.medium;
+  var minChain = band[0], maxChain = band[1];
+  var minGivens = Math.max(n, Math.round(n*n*0.50));
+
+  var full = latinSquare(r, n);
+  if(!full) return null;
+  var q = r.int(0, n*n - 1);
+  var answer = full[q];
+  var cells = full.slice();
+  cells[q] = -1;
+  var givens = n*n - 1;
+
+  function stillGood(){
+    if(possibleAnswers(cells, n, q).length !== 1) return false;
+    var sol = solveWithReasons(cells, n, q);
+    if(!sol.solved || sol.value !== answer) return false;
+    var ch = relevantChain(sol.steps, q);
+    if(ch.length > maxChain) return false;
+    if(want === 'easy' && candidates(cells, n, q).length !== 1) return false;
+    return true;
+  }
+
+  var order = r.shuffle((function(){ var a=[], i; for(i=0;i<n*n;i++) if(i !== q) a.push(i); return a; })());
+  for(var k=0;k<order.length;k++){
+    if(givens <= minGivens) break;
+    var i = order[k], keep = cells[i];
+    cells[i] = -1;
+    if(stillGood()) givens--;
+    else cells[i] = keep;
+  }
+
+  var sol2 = solveWithReasons(cells, n, q);
+  if(!sol2.solved || sol2.value !== answer) return null;
+  var chain = relevantChain(sol2.steps, q);
+  if(chain.length < minChain || chain.length > maxChain) return null;
+
+  var level = levelOf(cells, n, q, chain.length);
+  if(want && want !== level) return null;
+
+  return { n:n, cells:cells, q:q, answer:answer, chain:chain, level:level, givens:givens, size:n };
+}
+
+function makePuzzle(r, difficulty){
+  var plan;
+  if(difficulty === 'easy')      plan = [[4,'easy'],[4,'easy'],[5,'easy']];
+  else if(difficulty === 'hard') plan = [[5,'hard'],[5,'hard'],[5,'medium']];
+  else                           plan = [[4,'easy'],[4,'medium'],[5,'medium'],[5,'hard'],[4,'medium'],[5,'medium']];
+  for(var attempt=0; attempt<400; attempt++){
+    var pick = plan[Math.floor(r.next()*plan.length)];
+    var p = buildPuzzle(r, pick[0], pick[1]);
+    if(p) return p;
+  }
+  for(var fb=0; fb<200; fb++){
+    var q = buildPuzzle(r, 4, null);
+    if(q) return q;
+  }
+  return null;
+}
+
+/* ---------- putting the reasoning into words ---------- */
+function cellName(i, n){ return 'row ' + (rowOf(i,n)+1) + ', column ' + (colOf(i,n)+1); }
+function listSymbols(ks){
+  var parts = ks.map(function(k){ return inlineSym(k); });
+  if(parts.length <= 1) return parts.join('');
+  return parts.slice(0,-1).join(' ') + ' and ' + parts[parts.length-1];
+}
+function describeStep(step, n, puzzle, isFinal){
+  var where = (step.cell === puzzle.q) ? 'the <b>?</b> square' : 'the square at <b>' + cellName(step.cell, n) + '</b>';
+  if(step.how === 'only-symbol'){
+    var inRow = [], inCol = [], k;
+    var rc = rowCells(rowOf(step.cell,n), n), cc = colCells(colOf(step.cell,n), n);
+    var snapshot = puzzle.snapshot || puzzle.cells;
+    for(k=0;k<rc.length;k++) if(rc[k] !== step.cell && step.at[rc[k]] >= 0) inRow.push(step.at[rc[k]]);
+    for(k=0;k<cc.length;k++) if(cc[k] !== step.cell && step.at[cc[k]] >= 0) inCol.push(step.at[cc[k]]);
+    var txt = 'Look at ' + where + '. ';
+    if(inRow.length) txt += 'Its row already has ' + listSymbols(inRow) + '. ';
+    if(inCol.length) txt += 'Its column already has ' + listSymbols(inCol) + '. ';
+    txt += 'That rules out everything except <b>' + inlineSym(step.val) + ' the ' + symbolName(step.val) + '</b>' +
+           (isFinal ? ', which is the answer.' : ', so it goes there.');
+    return txt;
+  }
+  var lineWord = step.isRow ? ('row ' + (step.line+1)) : ('column ' + (step.line+1));
+  var crossWord = step.isRow ? 'column' : 'row';
+  var t = 'Now ask where <b>' + inlineSym(step.val) + ' the ' + symbolName(step.val) + '</b> can go in <b>' + lineWord + '</b>. ';
+  if(step.blockers && step.blockers.length){
+    t += 'It cannot go in ' + step.blockers.map(function(b){
+      return 'the square at ' + cellName(b.cell, n);
+    }).join(', or ') + ', because each of those already has one in its ' + crossWord + '. ';
+  }
+  t += 'The only square left in ' + lineWord + ' is ' + where +
+       (isFinal ? ', so that is the answer.' : ', so it goes there.');
+  return t;
+}
+/* record the grid as it stood before each step, so the wording can name
+   exactly what was visible at the time */
+function annotateChain(puzzle){
+  var work = puzzle.cells.slice();
+  for(var i=0;i<puzzle.chain.length;i++){
+    puzzle.chain[i].at = work.slice();
+    work[puzzle.chain[i].cell] = puzzle.chain[i].val;
+  }
+  return puzzle;
+}
+function explain(puzzle){
+  annotateChain(puzzle);
+  var out = [], i;
+  for(i=0;i<puzzle.chain.length;i++){
+    out.push(describeStep(puzzle.chain[i], puzzle.n, puzzle, i === puzzle.chain.length - 1));
+  }
+  return out;
+}
+
+var LEVEL_NAMES = {
+  easy:   'Straight from the row and column',
+  medium: 'One or two steps',
+  hard:   'Several steps'
+};
+var LEVEL_ORDER = ['easy','medium','hard'];
+/* ---------- PURE SECTION END ---------- */
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+var KEY = 'drt.v1';
+var memoryOnly = false, memData = null;
+function blankData(){
+  return { v:1, theme:'auto', streak:{cur:0,best:0,last:''}, sessions:[], levels:{}, totals:{q:0,c:0} };
+}
+function load(){
+  if(memoryOnly) return memData || (memData = blankData());
+  try {
+    var raw = window.localStorage.getItem(KEY);
+    if(!raw) return blankData();
+    var d = JSON.parse(raw), base = blankData();
+    if(!d || typeof d !== 'object') return base;
+    if(d.theme) base.theme = d.theme;
+    if(d.streak){ base.streak.cur = d.streak.cur|0; base.streak.best = d.streak.best|0; base.streak.last = d.streak.last||''; }
+    if(Array.isArray(d.sessions)) base.sessions = d.sessions;
+    if(d.levels && typeof d.levels === 'object') base.levels = d.levels;
+    if(d.totals){ base.totals.q = d.totals.q|0; base.totals.c = d.totals.c|0; }
+    return base;
+  } catch(e){ memoryOnly = true; memData = blankData(); return memData; }
+}
+function save(d){
+  if(memoryOnly){ memData = d; return; }
+  try { window.localStorage.setItem(KEY, JSON.stringify(d)); }
+  catch(e){ memoryOnly = true; memData = d; showStorageNote(); }
+}
+function showStorageNote(){
+  var el = document.getElementById('storageNote');
+  if(el) el.textContent = memoryOnly
+    ? 'This browser is not letting the page save data (private browsing can do this), so progress will be lost when you close the tab. Everything else still works.'
+    : 'Saved in this browser only. Nothing is uploaded, and there is no account to sign into.';
+}
+function pad2(n){ return n < 10 ? '0'+n : ''+n; }
+function dayKey(d){ d = d || new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function keyToDate(k){ var p = String(k).split('-'); return new Date(+p[0], (+p[1])-1, +p[2]); }
+function daysBetween(a,b){ return Math.round((keyToDate(b).getTime() - keyToDate(a).getTime())/86400000); }
+function liveStreak(d){
+  if(!d.streak.last) return 0;
+  var gap = daysBetween(d.streak.last, dayKey());
+  return (gap === 0 || gap === 1) ? d.streak.cur : 0;
+}
+function markPractisedToday(){
+  var d = load(), today = dayKey();
+  if(d.streak.last === today) return d;
+  if(!d.streak.last) d.streak.cur = 1;
+  else d.streak.cur = (daysBetween(d.streak.last, today) === 1) ? d.streak.cur + 1 : 1;
+  d.streak.last = today;
+  if(d.streak.cur > d.streak.best) d.streak.best = d.streak.cur;
+  save(d); renderStreak();
+  return d;
+}
+function renderStreak(){
+  var d = load(), n = liveStreak(d);
+  var chip = document.getElementById('streakChip'), txt = document.getElementById('streakText');
+  var done = d.streak.last === dayKey();
+  txt.innerHTML = n === 0 ? 'Start a streak' : n + (n === 1 ? ' day' : ' days') + (done ? '' : ' · due today');
+  chip.className = 'streak' + (done ? ' on' : '');
+  chip.title = done ? 'Practised today. Current streak ' + n + ', best ' + d.streak.best + '.'
+                    : (n === 0 ? 'Answer one grid to start a streak.' : 'Answer one grid today to keep your ' + n + '-day streak.');
+}
+
+/* ============================================================
+   SHELL
+   ============================================================ */
+var SUN = '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/>';
+var MOON = '<path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/>';
+function effectiveTheme(){
+  var a = document.documentElement.getAttribute('data-theme');
+  if(a) return a;
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+}
+function applyTheme(mode){
+  if(mode === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', mode);
+  document.getElementById('themeIcon').innerHTML = effectiveTheme() === 'dark' ? SUN : MOON;
+  var tc = document.getElementById('themeColor');
+  if(tc) tc.setAttribute('content', effectiveTheme() === 'dark' ? '#13151a' : '#f6f6f3');
+  document.getElementById('themeBtn').setAttribute('aria-label',
+    effectiveTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+function setupTheme(){
+  applyTheme(load().theme || 'auto');
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var next = effectiveTheme() === 'light' ? 'dark' : 'light';
+    var dd = load(); dd.theme = next; save(dd);
+    applyTheme(next);
+  });
+  if(window.matchMedia){
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onChange = function(){ if((load().theme || 'auto') === 'auto') applyTheme('auto'); };
+    if(mq.addEventListener) mq.addEventListener('change', onChange);
+    else if(mq.addListener) mq.addListener(onChange);
+  }
+}
+var TABS = ['practice','learn','tips','progress'];
+function showTab(name){
+  TABS.forEach(function(t){
+    document.getElementById('tab-'+t).setAttribute('aria-selected', t === name ? 'true' : 'false');
+    document.getElementById('panel-'+t).classList.toggle('hidden', t !== name);
+  });
+  if(name === 'progress') renderProgress();
+  if(name === 'learn') buildExamples();
+  window.scrollTo(0,0);
+}
+function setupTabs(){
+  TABS.forEach(function(t, i){
+    var btn = document.getElementById('tab-'+t);
+    btn.addEventListener('click', function(){ showTab(t); });
+    btn.addEventListener('keydown', function(e){
+      var dir = e.key === 'ArrowRight' ? 1 : (e.key === 'ArrowLeft' ? -1 : 0);
+      if(!dir) return;
+      e.preventDefault();
+      var next = TABS[(i + dir + TABS.length) % TABS.length];
+      document.getElementById('tab-'+next).focus();
+      showTab(next);
+    });
+  });
+}
+
+/* ============================================================
+   PRACTICE
+   ============================================================ */
+var sess = null, tickHandle = null, notes = [];
+
+function startSession(){
+  var mode = document.querySelector('#modeSeg button[aria-pressed="true"]').getAttribute('data-mode');
+  sess = {
+    mode: mode,
+    total: parseInt(document.getElementById('lenSel').value, 10),
+    level: document.getElementById('diffSel').value,
+    i: 0, correct: 0, times: [], results: [], answered: false, p: null, startedAt: 0
+  };
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('summary').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  document.getElementById('qDiff').textContent =
+    sess.level === 'easy' ? 'Gentle' : (sess.level === 'hard' ? 'Hard' : 'Mixed');
+  nextPuzzle();
+}
+function nextPuzzle(){
+  if(sess.i >= sess.total){ endSession(); return; }
+  sess.p = makePuzzle(rng(Math.floor(Math.random()*4294967295)), sess.level);
+  if(!sess.p){ sess.p = makePuzzle(rng(Math.floor(Math.random()*4294967295)), 'easy'); }
+  notes = new Array(sess.p.n * sess.p.n).fill(-1);
+  sess.answered = false;
+  sess.startedAt = Date.now();
+  renderPuzzle();
+  startTicker();
+}
+function gridHTML(p, showNotes, markAnswer, chosen){
+  var html = '', i;
+  for(i=0;i<p.n*p.n;i++){
+    var cls = 'cell', inner = '', aria = '';
+    if(i === p.q){
+      cls += ' target';
+      if(markAnswer){
+        cls += (chosen === p.answer) ? ' right' : ' wrong';
+        inner = symbolSVG(p.answer);
+        aria = 'The answer: ' + symbolName(p.answer);
+      } else { inner = '?'; aria = 'The missing square'; }
+    } else if(p.cells[i] >= 0){
+      cls += ' given';
+      inner = symbolSVG(p.cells[i]);
+      aria = symbolName(p.cells[i]);
+    } else if(showNotes && notes[i] >= 0){
+      cls += ' note';
+      inner = symbolSVG(notes[i]);
+      aria = 'your pencil mark: ' + symbolName(notes[i]);
+    } else {
+      cls += ' empty';
+      aria = 'empty square';
+    }
+    html += '<button type="button" class="'+cls+'" data-i="'+i+'" aria-label="Row '+(Math.floor(i/p.n)+1)+
+            ', column '+((i % p.n)+1)+', '+aria+'">'+inner+'</button>';
+  }
+  return html;
+}
+function renderPuzzle(){
+  var p = sess.p;
+  document.getElementById('qCount').textContent = 'Grid ' + (sess.i+1) + ' of ' + sess.total;
+  document.getElementById('qProgress').style.width = (sess.i / sess.total * 100) + '%';
+  document.getElementById('qResult').innerHTML = '';
+  document.getElementById('unsureBtn').classList.remove('hidden');
+  document.getElementById('clearBtn').classList.remove('hidden');
+  document.getElementById('noteHint').classList.remove('hidden');
+  document.getElementById('answerLab').textContent = 'Your answer:';
+
+  var grid = document.getElementById('grid');
+  grid.style.gridTemplateColumns = 'repeat(' + p.n + ', 1fr)';
+  grid.innerHTML = gridHTML(p, true, false, -1);
+  grid.querySelectorAll('.cell').forEach(function(b){
+    b.addEventListener('click', function(){
+      if(sess.answered) return;
+      var i = parseInt(b.getAttribute('data-i'), 10);
+      if(i === p.q || p.cells[i] >= 0) return;      /* givens and the ? are fixed */
+      notes[i] = (notes[i] + 2 > p.n) ? -1 : notes[i] + 1;   /* cycle, then clear */
+      refreshGrid();
+    });
+  });
+
+  var row = document.getElementById('symrow'), html = '', k;
+  for(k=0;k<p.n;k++){
+    html += '<button type="button" class="symbtn" data-s="'+k+'" aria-label="Answer: '+symbolName(k)+'">' +
+            symbolSVG(k) + '</button>';
+  }
+  row.innerHTML = html;
+  row.querySelectorAll('.symbtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      if(!sess.answered) answer(parseInt(b.getAttribute('data-s'), 10));
+    });
+  });
+  updateTimerLabel();
+}
+function refreshGrid(){
+  var p = sess.p, grid = document.getElementById('grid');
+  var buttons = grid.querySelectorAll('.cell');
+  for(var i=0;i<buttons.length;i++){
+    if(i === p.q || p.cells[i] >= 0) continue;
+    var b = buttons[i];
+    if(notes[i] >= 0){ b.className = 'cell note'; b.innerHTML = symbolSVG(notes[i]); }
+    else { b.className = 'cell empty'; b.innerHTML = ''; }
+  }
+}
+function startTicker(){
+  stopTicker();
+  if(sess.mode !== 'timed'){ document.getElementById('qTimer').textContent = ''; return; }
+  tickHandle = window.setInterval(updateTimerLabel, 1000);
+  updateTimerLabel();
+}
+function stopTicker(){ if(tickHandle){ window.clearInterval(tickHandle); tickHandle = null; } }
+function updateTimerLabel(){
+  if(sess.mode !== 'timed' || sess.answered) return;
+  var secs = Math.floor((Date.now() - sess.startedAt)/1000);
+  document.getElementById('qTimer').textContent = Math.floor(secs/60)+':'+pad2(secs%60);
+}
+function answer(k){ finish(k === sess.p.answer, k, false); }
+function giveUp(){ finish(false, -1, true); }
+
+function finish(right, chosen, skipped){
+  sess.answered = true;
+  stopTicker();
+  var secs = Math.max(1, Math.round((Date.now() - sess.startedAt)/1000));
+  sess.times.push(secs);
+  if(right) sess.correct++;
+  sess.results.push({ level: sess.p.level, n: sess.p.n, right: right, secs: secs });
+  document.getElementById('unsureBtn').classList.add('hidden');
+  document.getElementById('clearBtn').classList.add('hidden');
+  document.getElementById('noteHint').classList.add('hidden');
+  markPractisedToday();
+
+  var p = sess.p, grid = document.getElementById('grid');
+  notes = new Array(p.n*p.n).fill(-1);
+  for(var c=0;c<p.chain.length;c++){
+    if(p.chain[c].cell !== p.q) notes[p.chain[c].cell] = p.chain[c].val;
+  }
+  grid.innerHTML = gridHTML(p, true, true, chosen);
+  grid.querySelectorAll('.cell').forEach(function(b){ b.disabled = true; });
+
+  document.getElementById('answerLab').textContent = skipped ? 'The answer was:' : 'Your answer:';
+  document.querySelectorAll('#symrow .symbtn').forEach(function(b){
+    b.disabled = true;
+    var k = parseInt(b.getAttribute('data-s'), 10);
+    if(k === p.answer) b.classList.add('right');
+    else if(k === chosen) b.classList.add('wrong');
+  });
+  renderResult(right, chosen, skipped, secs);
+}
+function renderResult(right, chosen, skipped, secs){
+  var p = sess.p, html = '', head, sub;
+  if(skipped){
+    head = 'Marked as not yet';
+    sub = 'The answer was <b>the ' + symbolName(p.answer) + '</b>. This counts as not-yet in your stats — that is what keeps the breakdown honest.';
+  } else if(right){
+    head = 'Correct';
+    sub = 'The ' + symbolName(p.answer) + ' it was.';
+  } else {
+    head = 'Not this time';
+    sub = 'You chose the ' + symbolName(chosen) + '. The answer was <b>the ' + symbolName(p.answer) +
+          '</b>. Follow the steps below and find the one where your reasoning and this came apart.';
+  }
+  html += '<div class="verdict ' + (right ? 'ok' : 'bad') + '" role="status">' + head + '<span class="vsub">' + sub + '</span></div>';
+
+  if(sess.mode === 'timed'){
+    var pace = secs <= 25 ? 'Quick. Keep that only if it is not costing you accuracy.'
+      : (secs <= 70 ? 'A good steady rhythm for a grid this size.'
+      : 'Slower than test pace, which is fine while the three moves are still new.');
+    html += '<p class="hintline" style="margin-top:10px"><b>' + secs + ' seconds.</b> ' + pace + '</p>';
+  }
+
+  var words = explain(p);
+  html += '<div class="solution"><h4>How it is worked out</h4>';
+  html += '<p class="small muted" style="margin:0 0 4px">' +
+          (words.length === 1 ? 'One step was enough here.'
+            : words.length + ' steps, in order. The faded symbols in the grid above are the squares this reasoning fills in along the way.') + '</p>';
+  html += '<ol class="derive">';
+  for(var i=0;i<words.length;i++) html += '<li><span class="dw">' + words[i] + '</span></li>';
+  html += '</ol>';
+  if(words.length === 1){
+    html += '<div class="note check"><span class="nlab">Move 1</span>That was the fastest kind: everything the ? square needed was already in its own row and column. Always try this first — it takes about ten seconds.</div>';
+  } else {
+    html += '<div class="note check"><span class="nlab">Move 2 and beyond</span>The ? square alone was not enough here, so the answer came from solving another square first. When move 1 leaves you with more than one option, do not stare at the ? — go and find a square you <i>can</i> fill in its row or column.</div>';
+  }
+  html += '</div>';
+
+  var last = (sess.i + 1 >= sess.total);
+  html += '<div class="row" style="margin-top:18px"><button class="btn primary" type="button" id="nextBtn">' +
+          (last ? 'Finish and see your score' : 'Next grid') + '</button></div>';
+  var res = document.getElementById('qResult');
+  res.innerHTML = html;
+  var nb = document.getElementById('nextBtn');
+  nb.addEventListener('click', function(){ sess.i++; nextPuzzle(); });
+  nb.focus();
+}
+function encouragement(pct){
+  if(pct === 100) return 'Full marks. The three moves are doing their job.';
+  if(pct >= 80) return 'Strong session — you are reading these grids properly now.';
+  if(pct >= 60) return 'Solid. The misses are the useful part: look at which kind of grid they were.';
+  if(pct >= 40) return 'Middle of the road, which is normal while the moves are still settling.';
+  return 'A tough one. That is information, not a verdict — the worked steps show exactly where each answer comes from.';
+}
+function endSession(){
+  stopTicker();
+  document.getElementById('quiz').classList.add('hidden');
+  var answered = sess.results.length, sum = document.getElementById('summary');
+  sum.classList.remove('hidden');
+  if(answered === 0){
+    sum.innerHTML = '<h2>Session ended</h2><p class="muted">No grids answered, so nothing has been recorded.</p>' +
+      '<div class="row"><button class="btn primary" type="button" id="againBtn">Back to the start</button></div>';
+    document.getElementById('againBtn').addEventListener('click', backToSetup);
+    sess = null; return;
+  }
+  var pct = Math.round(sess.correct/answered*100);
+  var totalSecs = sess.times.reduce(function(a,b){ return a+b; }, 0);
+  var avg = Math.round(totalSecs/answered);
+  var byLevel = {};
+  sess.results.forEach(function(r){
+    if(!byLevel[r.level]) byLevel[r.level] = {n:0,c:0};
+    byLevel[r.level].n++;
+    if(r.right) byLevel[r.level].c++;
+  });
+  var d = load();
+  d.sessions.push({ date: dayKey(), mode: sess.mode, level: sess.level, n: answered, c: sess.correct, avg: avg });
+  if(d.sessions.length > 60) d.sessions = d.sessions.slice(-60);
+  d.totals.q += answered; d.totals.c += sess.correct;
+  Object.keys(byLevel).forEach(function(k){
+    if(!d.levels[k]) d.levels[k] = {n:0,c:0};
+    d.levels[k].n += byLevel[k].n;
+    d.levels[k].c += byLevel[k].c;
+  });
+  save(d);
+
+  var html = '<h2>' + sess.correct + ' out of ' + answered + '</h2>';
+  html += '<p>' + encouragement(pct) + '</p>';
+  html += '<div class="statgrid" style="margin:16px 0">';
+  html += '<div class="stat"><div class="v">' + pct + '%</div><div class="l">this session</div></div>';
+  html += '<div class="stat"><div class="v">' + avg + 's</div><div class="l">average per grid</div></div>';
+  html += '<div class="stat"><div class="v">' + Math.floor(totalSecs/60) + 'm ' + (totalSecs%60) + 's</div><div class="l">time on task</div></div>';
+  html += '<div class="stat"><div class="v">' + liveStreak(d) + '</div><div class="l">day streak</div></div>';
+  html += '</div>';
+  if(sess.mode === 'timed'){
+    html += '<div class="note info"><span class="nlab">On pace</span>You averaged <b>' + avg +
+      ' seconds</b> a grid. Under a minute is a realistic rhythm for these, but chase that only once the three moves run without thinking.</div>';
+  }
+  html += '<h3 style="margin-top:22px">How each kind of grid went</h3><div>';
+  LEVEL_ORDER.forEach(function(k){
+    if(!byLevel[k]) return;
+    var o = byLevel[k], q = Math.round(o.c/o.n*100);
+    html += '<div class="trow"><div><div class="tn">' + LEVEL_NAMES[k] + '</div>' +
+            '<div class="tbar"><i style="width:' + q + '%"></i></div></div>' +
+            '<div class="tv">' + o.c + '/' + o.n + '</div></div>';
+  });
+  html += '</div>';
+  html += '<div class="row" style="margin-top:20px">' +
+          '<button class="btn primary" type="button" id="againBtn">Practise again</button>' +
+          '<button class="btn ghost" type="button" id="toProgress">See progress</button></div>';
+  sum.innerHTML = html;
+  document.getElementById('againBtn').addEventListener('click', backToSetup);
+  document.getElementById('toProgress').addEventListener('click', function(){ showTab('progress'); });
+  renderStreak();
+  sess = null;
+}
+function backToSetup(){
+  document.getElementById('summary').classList.add('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('setup').classList.remove('hidden');
+  renderWeakHint();
+  window.scrollTo(0,0);
+}
+function weakestLevel(d){
+  var best = null;
+  LEVEL_ORDER.forEach(function(k){
+    var o = d.levels[k];
+    if(!o || o.n < 3) return;
+    var rate = o.c/o.n;
+    if(!best || rate < best.rate) best = { id:k, rate:rate, n:o.n };
+  });
+  return best;
+}
+function renderWeakHint(){
+  var d = load(), el = document.getElementById('weakHint');
+  var w = weakestLevel(d);
+  if(w && w.rate < 0.75) el.innerHTML = 'Suggestion: grids in the "<b>' + LEVEL_NAMES[w.id] +
+    '</b>" group are costing you most (' + Math.round(w.rate*100) + '% over ' + w.n + ' grids). The Learn tab has a chapter for each move.';
+  else if(d.totals.q === 0) el.innerHTML = 'First time here? Start gentle and untimed, and read chapter 1 of the Learn tab — the whole test rests on one rule.';
+  else el.innerHTML = '';
+}
+
+/* ============================================================
+   LEARN EXAMPLES
+   ============================================================ */
+var examplesBuilt = false;
+function buildExamples(){
+  if(examplesBuilt) return;
+  var nodes = document.querySelectorAll('.exwrap[data-level]');
+  if(!nodes.length) return;
+  nodes.forEach(function(node){
+    var want = node.getAttribute('data-level');
+    var seed = parseInt(node.getAttribute('data-seed'), 10) || 1;
+    var p = null, tries = 0;
+    while(!p && tries < 60){ p = makePuzzle(rng(seed + tries*7919), want); tries++; }
+    if(!p) return;
+    notes = new Array(p.n*p.n).fill(-1);
+    for(var c=0;c<p.chain.length;c++){
+      if(p.chain[c].cell !== p.q) notes[p.chain[c].cell] = p.chain[c].val;
+    }
+    var html = '<div class="gridwrap"><div class="lsgrid" style="grid-template-columns:repeat('+p.n+',1fr)">' +
+               gridHTML(p, true, true, p.answer) + '</div></div>';
+    html += '<div class="legend">';
+    for(var k=0;k<p.n;k++) html += '<span>' + symbolSVG(k) + symbolName(k) + '</span>';
+    html += '</div>';
+    var words = explain(p);
+    html += '<ol class="derive" style="margin-top:14px">';
+    for(var i=0;i<words.length;i++) html += '<li><span class="dw">' + words[i] + '</span></li>';
+    html += '</ol>';
+    html += '<p class="exnote" style="margin-top:4px">So the <b>?</b> square is <b>the ' + symbolName(p.answer) + '</b>.</p>';
+    node.innerHTML = html;
+    node.querySelectorAll('.cell').forEach(function(b){ b.disabled = true; });
+  });
+  examplesBuilt = true;
+}
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+function renderProgress(){
+  var d = load(), live = liveStreak(d);
+  document.getElementById('streakStats').innerHTML =
+    '<div class="stat"><div class="v">' + live + '</div><div class="l">current streak (days)</div></div>' +
+    '<div class="stat"><div class="v">' + d.streak.best + '</div><div class="l">best streak</div></div>' +
+    '<div class="stat"><div class="v">' + (d.streak.last === dayKey() ? 'Yes' : 'Not yet') + '</div><div class="l">practised today</div></div>' +
+    '<div class="stat"><div class="v">' + d.sessions.length + '</div><div class="l">sessions</div></div>';
+  var note = document.getElementById('streakNote');
+  if(!d.streak.last) note.textContent = 'A day counts as soon as you answer one grid — you do not have to finish a whole session.';
+  else if(d.streak.last === dayKey()) note.textContent = 'Today is logged. Come back tomorrow to keep it going.';
+  else if(live > 0) note.textContent = 'Your ' + live + '-day streak is still alive. One grid today keeps it.';
+  else note.textContent = 'The streak reset after a missed day. One grid today starts a new one, and your best (' + d.streak.best + ') is still on record.';
+
+  var rate = d.totals.q ? Math.round(d.totals.c/d.totals.q*100) : 0;
+  var allSecs = d.sessions.reduce(function(a,s){ return a + (s.avg||0)*(s.n||0); }, 0);
+  var allQ = d.sessions.reduce(function(a,s){ return a + (s.n||0); }, 0);
+  document.getElementById('totalStats').innerHTML =
+    '<div class="stat"><div class="v">' + d.totals.q + '</div><div class="l">grids answered</div></div>' +
+    '<div class="stat"><div class="v">' + d.totals.c + '</div><div class="l">correct</div></div>' +
+    '<div class="stat"><div class="v">' + rate + '%</div><div class="l">average score</div></div>' +
+    '<div class="stat"><div class="v">' + (allQ ? Math.round(allSecs/allQ) + 's' : '—') + '</div><div class="l">average per grid</div></div>';
+
+  var chart = document.getElementById('sessionChart');
+  var recent = d.sessions.slice(-12);
+  if(!recent.length){
+    chart.innerHTML = '<p class="muted small" style="margin:0">Your session scores will appear here as a bar chart once you have finished one.</p>';
+  } else {
+    var bars = '<div class="chartbars">';
+    recent.forEach(function(s){
+      var q = s.n ? Math.round(s.c/s.n*100) : 0;
+      bars += '<div class="cb" title="' + s.date + ': ' + s.c + '/' + s.n + '">' +
+              '<i style="height:' + Math.max(4, Math.round(q/100*126)) + 'px" aria-hidden="true"></i>' +
+              '<span>' + q + '</span></div>';
+    });
+    bars += '</div><div class="axis"><span>oldest</span><span>score %, last ' + recent.length +
+            ' session' + (recent.length===1?'':'s') + '</span><span>latest</span></div>';
+    chart.innerHTML = bars;
+  }
+
+  var tb = document.getElementById('topicBreakdown');
+  var any = LEVEL_ORDER.some(function(k){ return d.levels[k] && d.levels[k].n; });
+  if(!any){
+    tb.innerHTML = '<p class="muted small" style="margin:0">Nothing here yet. After a session or two this shows which kinds of grid are costing you.</p>';
+  } else {
+    var rows = '';
+    LEVEL_ORDER.forEach(function(k){
+      var o = d.levels[k];
+      if(!o || !o.n){
+        rows += '<div class="trow"><div><div class="tn">' + LEVEL_NAMES[k] + '</div>' +
+                '<div class="tbar"><i style="width:0%"></i></div></div><div class="tv">—</div></div>';
+        return;
+      }
+      var q = Math.round(o.c/o.n*100);
+      rows += '<div class="trow"><div><div class="tn">' + LEVEL_NAMES[k] + '</div>' +
+              '<div class="tbar"><i style="width:' + q + '%"></i></div></div>' +
+              '<div class="tv">' + q + '%<br><span class="tiny">' + o.c + '/' + o.n + '</span></div></div>';
+    });
+    tb.innerHTML = rows;
+  }
+  showStorageNote();
+}
+
+/* ============================================================
+   INSTALLING AS AN APP
+   ============================================================ */
+function isInstalled(){
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+         window.navigator.standalone === true;
+}
+function setupInstall(){
+  var row = document.getElementById('installRow');
+  var text = document.getElementById('installText');
+  var btn = document.getElementById('installBtn');
+  var deferred = null;
+  if(isInstalled() || location.protocol === 'file:') return;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferred = e;
+    text.innerHTML = 'You can install this as an app: it gets its own icon, opens without the browser bars, and still works with no connection.';
+    btn.classList.remove('hidden'); row.classList.remove('hidden');
+  });
+  btn.addEventListener('click', function(){
+    if(!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function(){ deferred = null; row.classList.add('hidden'); });
+  });
+  window.addEventListener('appinstalled', function(){ row.classList.add('hidden'); });
+  var ua = navigator.userAgent || '';
+  var iOS = /iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1);
+  if(iOS && !/CriOS|FxiOS|EdgiOS/.test(ua)){
+    text.innerHTML = 'To keep this on your home screen like an app: tap the <b>Share</b> button in Safari, then <b>Add to Home Screen</b>. It will open without the browser bars and still work with no connection.';
+    row.classList.remove('hidden');
+  }
+}
+function setupServiceWorker(){
+  if(!('serviceWorker' in navigator)) return;
+  var host = location.hostname;
+  if(location.protocol !== 'https:' && host !== 'localhost' && host !== '127.0.0.1') return;
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function setupModeSeg(){
+  var note = document.getElementById('modeNote');
+  function paint(){
+    var mode = document.querySelector('#modeSeg button[aria-pressed="true"]').getAttribute('data-mode');
+    note.innerHTML = (mode === 'timed')
+      ? 'Times each grid. The real thing is short and brisk and often gets harder as you go — which means harder grids are a sign you are doing well, not badly.'
+      : 'No clock. After every grid you get the reasoning written out step by step, so you can see exactly where the answer comes from. Use this until the three moves are automatic.';
+  }
+  document.querySelectorAll('#modeSeg button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#modeSeg button').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      paint();
+    });
+  });
+  paint();
+}
+function init(){
+  setupTheme();
+  setupTabs();
+  setupModeSeg();
+  renderStreak();
+  renderWeakHint();
+  showStorageNote();
+  document.getElementById('startBtn').addEventListener('click', startSession);
+  document.getElementById('unsureBtn').addEventListener('click', giveUp);
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    if(!sess || sess.answered) return;
+    notes = new Array(sess.p.n * sess.p.n).fill(-1);
+    refreshGrid();
+  });
+  document.getElementById('listToggle').addEventListener('click', function(){
+    var panel = document.getElementById('listPanel');
+    var open = panel.classList.toggle('hidden') === false;
+    this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.getElementById('quitBtn').addEventListener('click', function(){
+    if(sess && sess.results.length && !window.confirm('End the session here? Your answers so far will still be recorded.')) return;
+    if(sess) endSession();
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if(!window.confirm('Delete all saved progress from this browser? This cannot be undone.')) return;
+    var theme = load().theme;
+    var fresh = blankData(); fresh.theme = theme;
+    if(!memoryOnly){ try { window.localStorage.removeItem(KEY); } catch(e){} }
+    memData = fresh; save(fresh);
+    renderStreak(); renderProgress(); renderWeakHint();
+  });
+  setupInstall();
+  setupServiceWorker();
+  showTab('practice');
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+})();
+</script>
+</body>
+</html>
