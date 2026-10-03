@@ -1,8 +1,8 @@
 /* Service worker: makes the trainer open instantly and work with no connection.
    Cache-first so a launch never waits on the network, with a quiet background
    refresh so a new version is picked up the next time the app is opened. */
-var PREFIX = 'nrt-';
-var VERSION = 'nrt-2026-10-03';
+var PREFIX = 'irt-';
+var VERSION = 'irt-2026-10-03';
 var SHELL = [
   './',
   './index.html',
