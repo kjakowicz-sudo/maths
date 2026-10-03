@@ -8,6 +8,7 @@ browser on the device you're using.
 |---|---|---|
 | **Numerical Reasoning** — percentages, ratios, rates, data | `/` | `…github.io/maths/` |
 | **Inductive Reasoning** — nine boxes, find the odd one out | `/inductive/` | `…github.io/maths/inductive/` |
+| **Deductive Reasoning** — gapChallenge style grids | `/deductive/` | `…github.io/maths/deductive/` |
 
 Both install to a phone home screen separately, with their own icon, and keep
 their own streak and progress.
@@ -66,14 +67,43 @@ fourteen features across all nine boxes and refuses any puzzle where more than o
 box could be argued for, or where a simpler rule than the one it explains would
 also solve it.
 
+## Deductive Reasoning Trainer
+
+For Aon's **gapChallenge**, the gamified deductive reasoning task: a 4×4 or 5×5
+grid where no symbol may repeat in any row or column, one square marked `?`, and
+you work out what belongs in it.
+
+**To use it:** open `deductive/index.html`.
+
+### What's in it
+
+- **Practice** — grids generated fresh, in three bands: the answer readable
+  straight off the row and column, one or two steps, or several. You can pencil
+  symbols into empty squares as working, exactly as the real task allows.
+- **Learn** — seven chapters built around one rule and three moves: cross off the
+  row and column; fill an easier square first; and "nowhere else to go".
+- **Tips** — pacing, and why the grids getting harder is a sign of doing well.
+- **Progress** — streak, sessions, and accuracy split by how many steps each grid
+  needed.
+
+Every grid is proved before it is shown. The generator checks that exactly one
+symbol can occupy the `?` square across *all* valid completions of the grid, and
+that the answer is reachable using only the two techniques the app teaches — so
+every grid both has one right answer and can be explained. Afterwards the
+reasoning is written out step by step, and the squares it fills in appear faded
+in the grid, so the picture and the words always agree.
+
+---
+
+
 ## Installing it on your phone
 
 The app can live on your home screen with its own icon, opening without any
 browser bars and working with no connection. To do that it needs to be served
 over `https://` — phones will not install a page opened from a file.
 
-**Step 1 — put it online.** Any static host works. Upload the whole folder: both
-apps, their `manifest.webmanifest`, `sw.js` and `.png` icons.
+**Step 1 — put it online.** Any static host works. Upload the whole folder: all
+three apps, their `manifest.webmanifest`, `sw.js` and `.png` icons.
 
 - *GitHub Pages* (free, but the repository must be public on a free plan):
   Settings → General → change visibility to public, then Settings → Pages →
@@ -109,7 +139,7 @@ install first and build the streak there.
 ## Privacy
 
 Everything is stored in your browser's `localStorage`, on the device you're using.
-The two apps store their progress under separate keys and keep separate streaks.
+The three apps store their progress under separate keys and keep separate streaks.
 No accounts, no servers, no analytics — and no network requests of any kind once
 the page has loaded. `index.html` still works entirely on its own: open it straight
 from disk, with the other files deleted, and everything but the home-screen install
