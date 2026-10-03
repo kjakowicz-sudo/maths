@@ -1262,21 +1262,33 @@ table.mini thead th{background:var(--chip);font-weight:650}
   </div>
 
   <div class="card">
-    <h3>7. Multiple choice: work it out <i>before</i> you look at the options</h3>
+    <h3>7. Find out <i>whose</i> test you are sitting &mdash; the pacing depends on it</h3>
+    <p>There is no single "numerical reasoning test". Different publishers run very different things, and the right pace for one is the wrong pace for another.</p>
+    <ul>
+      <li><b>Cappfinity</b> (Lloyds and others) &mdash; calculation questions much like the ones in this app. A minute to a minute and a half each is a sensible rhythm.</li>
+      <li><b>Aon / cut-e</b> &mdash; the platform at <b>maptq.com</b>. A different animal: subtests are short, often <b>5 to 12 minutes</b>, with a lot of items in them. Their numerical test spreads data across <b>tabs</b> and asks you to judge statements as <b>True, False or Cannot Say</b>. You are not doing long sums; you are finding the right figure fast and deciding whether it supports the claim. Expect nearer <b>20 seconds</b> an item.</li>
+      <li><b>Sova</b> (Babcock) &mdash; often adaptive, and sometimes timed per question rather than overall.</li>
+    </ul>
+    <p>Your invitation email names the platform. If the link goes to <b>maptq.com</b>, it is Aon/cut-e, and the most useful hour you can spend beforehand is on <b>Aon's own free practice tests</b> &mdash; the real engine, the real interface, the real clock.</p>
+    <p style="margin-bottom:0"><b>"Cannot Say" is the trap in that format.</b> It means the data in front of you does not settle the question &mdash; not that the statement sounds unlikely. If answering would need a figure that is not there, the answer is Cannot Say, however reasonable the claim seems.</p>
+  </div>
+
+  <div class="card">
+    <h3>8. Multiple choice: work it out <i>before</i> you look at the options</h3>
     <p>The wrong options aren't random. They are deliberately built from the classic mistakes &mdash; the discount instead of the price, the division done upside down, the figure with 20% taken off instead of divided by 1.2.</p>
     <p>That means a plausible-looking option is no evidence you're right. Get your own answer first, <i>then</i> go looking for it in the list.</p>
     <p style="margin-bottom:0">If your answer isn't there, don't grab the nearest one. Go back and check the set-up &mdash; usually you've divided by the wrong number, or missed a units line.</p>
   </div>
 
   <div class="card">
-    <h3>8. If your mind goes blank</h3>
+    <h3>9. If your mind goes blank</h3>
     <p>It happens, and it isn't a sign of anything. Blankness is nearly always the body reacting to pressure, not the brain failing to know something.</p>
     <p>A reset that works: breathe out slowly, then do the smallest possible concrete thing &mdash; write down the two numbers in the question. Not the method, just the numbers. Almost always, the next step reappears once something is on the paper.</p>
     <p style="margin-bottom:0">And remember what an aptitude test actually is: a few percentage and ratio questions in unfamiliar clothes. You have met every idea in it before.</p>
   </div>
 
   <div class="card">
-    <h3>9. What to do between now and the test</h3>
+    <h3>10. What to do between now and the test</h3>
     <ul>
       <li><b>Short and daily beats long and occasional.</b> Ten minutes a day will move you further than two hours on a Sunday.</li>
       <li>Start untimed until a topic feels automatic, then switch that topic to timed.</li>
@@ -2833,7 +2845,7 @@ function endSession(){
 
   if(sess.mode === 'timed'){
     html += '<div class="note info"><span class="nlab">On pace</span>' +
-      'You averaged <b>' + avg + ' seconds</b> a question. Around 60–90 seconds is a realistic test rhythm. Speed is worth having, but only once the method is automatic — a fast wrong answer scores nothing.</div>';
+      'You averaged <b>' + avg + ' seconds</b> a question. For calculation questions like these, 60–90 seconds is a realistic rhythm. Speed is worth having, but only once the method is automatic — a fast wrong answer scores nothing. (Aon/cut-e tests are much shorter per item — see the Tips tab.)</div>';
   }
 
   html += '<h3 style="margin-top:22px">How each topic went</h3><div>';
@@ -3051,7 +3063,7 @@ function setupModeSeg(){
   function paint(){
     var mode = document.querySelector('#modeSeg button[aria-pressed="true"]').getAttribute('data-mode');
     note.innerHTML = (mode === 'timed')
-      ? 'Times each question and shows how long you took. Cappfinity scores <b>speed and accuracy</b> together, which sounds stressful but really means one thing: rushing is not rewarded. Aim for a steady 60–90 seconds, not a sprint.'
+      ? 'Times each question and shows how long you took. Cappfinity scores <b>speed and accuracy</b> together, which sounds stressful but really means one thing: rushing is not rewarded. For calculation questions like these, a steady 60–90 seconds is the right rhythm — but check the Tips tab, because some publishers run far shorter tests.'
       : 'No clock. Every question is followed by a full worked solution, written out step by step. This is the mode to use while a method is still new.';
   }
   document.querySelectorAll('#modeSeg button').forEach(function(b){
