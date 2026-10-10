@@ -6,6 +6,14 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="A multiple-choice quiz on Python for Data Science, weeks 1 to 3. Works offline; progress is saved in this browser.">
 <title>Python Quiz &mdash; Weeks 1&ndash;3</title>
+<meta name="theme-color" id="themeColor" content="#f7f7f5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Python Quiz">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2373395f'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='30' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%7B%3F%7D%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f7f7f5; --panel:#ffffff; --panel-2:#fbfbf9;
@@ -4088,6 +4096,41 @@ function highlight(code){
   return outHTML + plain(rest);
 }
 
+/* ---------------- installing it as an app ----------------
+   None of this is needed for the quiz to work. Opened straight from a file
+   it is skipped entirely, so index.html on its own behaves exactly as before. */
+let installMsg = null, deferredPrompt = null;
+function isInstalled(){
+  return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+         window.navigator.standalone === true;
+}
+function setupInstall(){
+  if(isInstalled() || location.protocol === "file:") return;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installMsg = "You can install this as an app: it gets its own icon, opens without the " +
+                 "browser bars, and still works with no connection.";
+    if(screen === "home") renderHome();
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null; installMsg = null;
+    if(screen === "home") renderHome();
+  });
+  const ua = navigator.userAgent || "";
+  const iOS = /iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1);
+  if(iOS && !/CriOS|FxiOS|EdgiOS/.test(ua)){
+    installMsg = "To keep this on your home screen like an app: tap the <b>Share</b> button in " +
+                 "Safari, then <b>Add to Home Screen</b>.";
+  }
+}
+function setupServiceWorker(){
+  if(!("serviceWorker" in navigator)) return;
+  const host = location.hostname;
+  if(location.protocol !== "https:" && host !== "localhost" && host !== "127.0.0.1") return;
+  window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch(() => {}); });
+}
+
 /* ---------------- screens ---------------- */
 let screen = "home";
 function show(name){
@@ -4116,7 +4159,14 @@ function renderHome(){
     '<button class="btn primary" id="quizMe">Quiz me</button>';
   if(d.wrong.length) html += '<button class="btn" id="mistakes">Mistakes round (' + d.wrong.length + ')</button>';
   html += '<button class="btn ghost" id="resetBtn">Reset progress</button></div>' +
-    '<div id="confirmSlot"></div></div>';
+    '<div id="confirmSlot"></div>';
+  if(installMsg){
+    html += '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">' +
+            '<p class="small muted" style="margin:0 0 9px">' + installMsg + '</p>' +
+            (deferredPrompt ? '<button class="btn" id="installBtn">Add to home screen</button>' : '') +
+            '</div>';
+  }
+  html += '</div>';
 
   AREAS.forEach(area => {
     const ts = TOPICS.filter(t => t.area === area.name);
@@ -4136,6 +4186,12 @@ function renderHome(){
   });
   $("screen-home").innerHTML = html;
 
+  const ib = $("installBtn");
+  if(ib) ib.onclick = () => {
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; installMsg = null; renderHome(); });
+  };
   $("quizMe").onclick = () => renderSetup(null);
   const mb = $("mistakes"); if(mb) mb.onclick = startMistakes;
   $("resetBtn").onclick = askReset;
@@ -4396,6 +4452,8 @@ document.addEventListener("keydown", e => {
   }
 });
 
+setupInstall();
+setupServiceWorker();
 $("homeBtn").onclick = () => { renderHome(); show("home"); };
 renderHome();
 show("home");

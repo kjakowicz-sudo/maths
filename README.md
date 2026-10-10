@@ -1,14 +1,15 @@
-# Aptitude test trainers
+# Offline learning apps
 
-Two offline trainers for graduate-scheme aptitude tests. Each is a self-contained
-HTML file that works with no internet connection, and keeps all progress in the
-browser on the device you're using.
+Four self-contained HTML apps: three trainers for graduate-scheme aptitude tests,
+and a quiz on Python for Data Science. Each works with no internet connection and
+keeps all progress in the browser on the device you're using.
 
 | App | Folder | Address once published |
 |---|---|---|
 | **Numerical Reasoning** — percentages, ratios, rates, data | `/` | `…github.io/maths/` |
 | **Inductive Reasoning** — nine boxes, find the odd one out | `/inductive/` | `…github.io/maths/inductive/` |
 | **Deductive Reasoning** — gapChallenge style grids | `/deductive/` | `…github.io/maths/deductive/` |
+| **Python Quiz** — Data Science weeks 1–3 | `/python/` | `…github.io/maths/python/` |
 
 Both install to a phone home screen separately, with their own icon, and keep
 their own streak and progress.
@@ -96,6 +97,50 @@ in the grid, so the picture and the words always agree.
 ---
 
 
+## Python Quiz
+
+Multiple-choice practice on Python for Data Science, weeks 1–3 (module ITNPBD2),
+built from the course's own materials.
+
+**To use it:** open `python/index.html`.
+
+### What's in it
+
+- **161 questions** across five colour-coded areas: Foundations, Data structures,
+  Conditions, Loops and Comprehensions — about ten per topic, each topic tested
+  from at least four different angles.
+- Home screen with per-topic best scores and progress rings, a mistakes round
+  that empties as you get questions right, and set-up by topic, length and
+  difficulty.
+- Code shown with indentation preserved and simple syntax colouring; keyboard
+  answering with 1–4 or A–D, Enter for next, Esc for home.
+
+### Checking the questions
+
+`check_questions.py` is the accuracy harness. Run it from the `python/` folder:
+
+```
+python3 check_questions.py
+```
+
+It reads the bank straight out of `index.html`, so the HTML stays the single
+source of truth. It runs every predict-the-output snippet in Python 3 with the
+course's team data defined and compares the real output against the question;
+runs *every* option of a choose-the-code question so a distractor cannot quietly
+be correct too; checks that questions claiming an error really raise it; and
+enforces four options, a wrong-answer line for each, and at least four angles per
+topic.
+
+### Adding questions for later weeks
+
+Open `index.html`, find `=== QUESTION BANK START ===`, and paste more objects
+into the array. The comment block there lists every field. Give any
+predict-the-output question an `expect` field with the exact text it prints, then
+re-run the checker — it refuses any predict or choose question without one.
+
+---
+
+
 ## Installing it on your phone
 
 The app can live on your home screen with its own icon, opening without any
@@ -103,7 +148,7 @@ browser bars and working with no connection. To do that it needs to be served
 over `https://` — phones will not install a page opened from a file.
 
 **Step 1 — put it online.** Any static host works. Upload the whole folder: all
-three apps, their `manifest.webmanifest`, `sw.js` and `.png` icons.
+four apps, their `manifest.webmanifest`, `sw.js` and `.png` icons.
 
 - *GitHub Pages* (free, but the repository must be public on a free plan):
   Settings → General → change visibility to public, then Settings → Pages →
@@ -139,7 +184,8 @@ install first and build the streak there.
 ## Privacy
 
 Everything is stored in your browser's `localStorage`, on the device you're using.
-The three apps store their progress under separate keys and keep separate streaks.
+The four apps store their progress under separate keys, and the three trainers keep
+separate streaks.
 No accounts, no servers, no analytics — and no network requests of any kind once
 the page has loaded. `index.html` still works entirely on its own: open it straight
 from disk, with the other files deleted, and everything but the home-screen install

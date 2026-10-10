@@ -1,0 +1,18 @@
+{
+  "name": "Python Quiz — Data Science weeks 1–3",
+  "short_name": "Python Quiz",
+  "description": "Multiple-choice practice on Python for Data Science, weeks 1 to 3. Works offline; progress is saved in this browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f7f5",
+  "theme_color": "#f7f7f5",
+  "lang": "en-GB",
+  "dir": "ltr",
+  "categories": ["education"],
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
