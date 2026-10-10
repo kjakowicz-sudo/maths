@@ -1,0 +1,4405 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="A multiple-choice quiz on Python for Data Science, weeks 1 to 3. Works offline; progress is saved in this browser.">
+<title>Python Quiz &mdash; Weeks 1&ndash;3</title>
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --panel-2:#fbfbf9;
+  --ink:#21242a; --ink-soft:#3b4149; --muted:#616a75;
+  --line:#e4e4de; --line-strong:#d1d1c9; --chip:#eceee9;
+  --ok:#2d6a4b; --ok-bg:#eaf5ee; --ok-line:#b9dbc5;
+  --bad:#9d3b3b; --bad-bg:#fbeceb; --bad-line:#eec7c2;
+  --focus:#1f6feb;
+  --shadow:0 1px 2px rgba(20,22,26,.06), 0 6px 18px rgba(20,22,26,.05);
+  /* the five areas */
+  --a-found:#2f5fa8;  --a-found-bg:#e9eff8;
+  --a-data:#1f7a66;   --a-data-bg:#e6f3ef;
+  --a-cond:#9a6212;   --a-cond-bg:#f8f0e2;
+  --a-loop:#6a4aa8;   --a-loop-bg:#efebf8;
+  --a-comp:#a23e67;   --a-comp-bg:#fbeaf1;
+  /* code colours */
+  --c-kw:#9a3fa8; --c-str:#1f7a4d; --c-num:#b2591a; --c-com:#78828d; --c-fn:#2f5fa8;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#14161a; --panel:#1c1f25; --panel-2:#22262d;
+  --ink:#e9ebee; --ink-soft:#d2d6dc; --muted:#a3abb7;
+  --line:#2b3039; --line-strong:#3b424d; --chip:#252a32;
+  --ok:#7fc79c; --ok-bg:#192a21; --ok-line:#305340;
+  --bad:#e79a93; --bad-bg:#2c1c1b; --bad-line:#5a3430;
+  --focus:#79a9ff;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.25);
+  --a-found:#8fb3e8; --a-found-bg:#1b2434;
+  --a-data:#6fc3aa;  --a-data-bg:#152a26;
+  --a-cond:#e0b06a;  --a-cond-bg:#2c2416;
+  --a-loop:#ac97e4;  --a-loop-bg:#231f33;
+  --a-comp:#e493b4;  --a-comp-bg:#2e1c25;
+  --c-kw:#d79ae8; --c-str:#86cfa4; --c-num:#e2a470; --c-com:#8a939e; --c-fn:#8fb3e8;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px; line-height:1.6; -webkit-text-size-adjust:100%;
+}
+h1,h2,h3{line-height:1.3;margin:0 0 .45em}
+h1{font-size:1.3rem;font-weight:650}
+h2{font-size:1.15rem;font-weight:650}
+h3{font-size:1rem;font-weight:650}
+p{margin:0 0 .85em}
+.wrap{max-width:780px;margin:0 auto;padding:0 16px 72px}
+.muted{color:var(--muted)}
+.small{font-size:.92rem}
+.tiny{font-size:.84rem}
+.hidden{display:none !important}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
+
+header.top{
+  position:sticky;top:0;z-index:20;background:var(--bg);
+  border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top);
+}
+.topbar{max-width:780px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.topbar h1{margin:0;font-size:1.05rem}
+.topbar .sub{font-size:.78rem;color:var(--muted);line-height:1.2;display:block}
+.spacer{flex:1}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0;box-shadow:var(--shadow)}
+.card.plain{box-shadow:none;background:transparent;border:0;padding:0}
+.btn{
+  appearance:none;font:inherit;font-weight:600;cursor:pointer;
+  background:var(--panel);color:var(--ink);border:1px solid var(--line-strong);
+  border-radius:11px;padding:11px 16px;min-height:46px;
+}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{opacity:.9}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad-line)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- home ---------- */
+.areahead{display:flex;align-items:center;gap:10px;margin:26px 0 10px}
+.areadot{width:12px;height:12px;border-radius:50%;flex:none}
+.areahead h2{margin:0;font-size:1rem;letter-spacing:.02em}
+.topicgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:10px}
+.topiccard{
+  display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  padding:13px 14px;cursor:pointer;font:inherit;color:var(--ink);box-shadow:var(--shadow);
+}
+.topiccard:hover{border-color:var(--line-strong)}
+.topiccard .tname{flex:1;min-width:0}
+.topiccard .tname b{display:block;font-weight:650;font-size:.97rem}
+.topiccard .tname span{display:block;font-size:.8rem;color:var(--muted)}
+.ring{width:42px;height:42px;flex:none}
+.ring text{font-size:11px;font-weight:700;fill:var(--ink)}
+
+/* ---------- setup ---------- */
+.optrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pill{
+  appearance:none;font:inherit;font-size:.94rem;font-weight:600;cursor:pointer;
+  background:var(--panel);border:1.5px solid var(--line-strong);color:var(--ink);
+  border-radius:999px;padding:8px 15px;min-height:42px;
+}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fieldlab{display:block;font-size:.88rem;font-weight:650;color:var(--muted);margin:18px 0 0}
+
+/* ---------- question ---------- */
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.badge{display:inline-block;border-radius:999px;padding:3px 11px;font-size:.78rem;font-weight:700}
+.pbar{height:6px;background:var(--chip);border-radius:999px;overflow:hidden;margin-bottom:18px}
+.pbar i{display:block;height:100%;background:var(--ink);border-radius:999px;transition:width .25s ease}
+.qtext{font-size:1.1rem;line-height:1.55;margin:0 0 14px}
+pre.code{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
+  padding:13px 15px;overflow-x:auto;margin:0 0 16px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:.95rem;line-height:1.55;white-space:pre;tab-size:4;
+}
+.kw{color:var(--c-kw);font-weight:600} .str{color:var(--c-str)} .num{color:var(--c-num)}
+.com{color:var(--c-com);font-style:italic} .fn{color:var(--c-fn)}
+.answers{display:grid;gap:10px}
+.ans{
+  display:flex;align-items:flex-start;gap:12px;text-align:left;width:100%;
+  background:var(--panel);border:1.5px solid var(--line-strong);border-radius:12px;
+  padding:14px 15px;font:inherit;font-size:1rem;cursor:pointer;color:var(--ink);min-height:54px;
+}
+.ans:hover:not(:disabled){border-color:var(--muted);background:var(--panel-2)}
+.ans .key{
+  flex:none;width:26px;height:26px;border-radius:7px;background:var(--chip);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--muted);
+}
+.ans .atext{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.95rem;word-break:break-word}
+.ans.prose .atext{font-family:inherit;font-size:1rem}
+.ans.right{background:var(--ok-bg);border-color:var(--ok)}
+.ans.right .key{background:var(--ok);color:#fff}
+.ans.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.ans.wrong .key{background:var(--bad);color:#fff}
+.ans:disabled{cursor:default}
+.fb{border-radius:12px;padding:13px 15px;margin:18px 0 0;border:1px solid}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok-line)}
+.fb.no{background:var(--bad-bg);border-color:var(--bad-line)}
+.fb .fbhead{font-weight:700;margin:0 0 5px}
+.fb.ok .fbhead{color:var(--ok)} .fb.no .fbhead{color:var(--bad)}
+.fb p{margin:0 0 .5em;color:var(--ink-soft)}
+.fb p:last-child{margin-bottom:0}
+.fb code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.93em;background:var(--chip);padding:1px 5px;border-radius:5px}
+.fade{animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---------- results ---------- */
+.scoreline{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.scoreline .big{font-size:2.3rem;font-weight:700;line-height:1}
+.trow{display:grid;grid-template-columns:1fr 58px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.trow:last-child{border-bottom:0}
+.tbar{height:7px;background:var(--chip);border-radius:999px;overflow:hidden;margin-top:5px}
+.tbar i{display:block;height:100%;border-radius:999px}
+.tv{text-align:right;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted)}
+.wrongitem{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin:10px 0;background:var(--panel-2)}
+.wrongitem .wq{font-weight:600;margin:0 0 7px}
+.confirm{background:var(--bad-bg);border:1px solid var(--bad-line);border-radius:12px;padding:14px;margin-top:12px}
+@media (max-width:560px){
+  body{font-size:16px}
+  .wrap{padding:0 14px 60px}
+  .card{padding:15px}
+  .topicgrid{grid-template-columns:1fr}
+  pre.code{font-size:.9rem;padding:11px 12px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topbar">
+    <div>
+      <h1>Python Quiz</h1>
+      <span class="sub">Data Science &middot; weeks 1&ndash;3</span>
+    </div>
+    <span class="spacer"></span>
+    <button id="homeBtn" class="btn ghost small hidden" type="button">Home</button>
+  </div>
+</header>
+<main class="wrap">
+  <section id="screen-home"></section>
+  <section id="screen-setup" class="hidden"></section>
+  <section id="screen-quiz" class="hidden"></section>
+  <section id="screen-results" class="hidden"></section>
+</main>
+<script>
+/* ============================================================================
+   === QUESTION BANK START ===
+   Every question is one object. To add questions later, paste more objects
+   into this array and re-run check_questions.py. Nothing below this block
+   needs changing.
+
+     id                unique, e.g. "loops-07"
+     area              Foundations | Data structures | Conditions | Loops | Comprehensions
+     topic             must match a topic listed in TOPICS further down
+     angle             concept | predict | bug | choose | error | structure | logic
+     difficulty        1 easy, 2 medium, 3 harder
+     question          the wording shown above the code
+     code              optional snippet, "\n" between lines, 4 spaces to indent
+     options           exactly 4
+     answer            index 0-3 of the right one
+     explanation       1-3 short sentences on why it is right
+     wrongExplanations 4 entries, "" in the answer's slot, one line for each other
+     expect            optional: exact text the snippet prints (checked by running it)
+     setup             optional: code run before `code` in the checker only
+     stdin             optional: what is typed at input(), for the checker
+     expectError       optional: the error the snippet should raise, e.g. "TypeError"
+   ============================================================================ */
+const QUESTIONS = [
+ {
+  "id": "print-01",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "In the line print('Total:', 10 + 5), what are the round brackets there to do?",
+  "code": "print('Total:', 10 + 5)",
+  "options": [
+   "They hold the arguments being passed to the function",
+   "They turn the whole line into a string",
+   "They multiply what is inside them",
+   "They mark the line as a comment"
+  ],
+  "answer": 0,
+  "explanation": "print is a function. The round brackets after its name hold the arguments, which are the pieces of information you are handing to it. Here there are two arguments, separated by a comma.",
+  "wrongExplanations": [
+   "",
+   "Quotes make a string, not brackets. Only 'Total:' is a string here.",
+   "Round brackets group things; the multiplying here is done by nothing at all, the + adds.",
+   "A comment starts with a # and is ignored by Python."
+  ]
+ },
+ {
+  "id": "print-02",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print('Total:', 10 + 5)",
+  "options": [
+   "Total: 15",
+   "Total: 10 + 5",
+   "Total:15",
+   "Total: , 15"
+  ],
+  "answer": 0,
+  "expect": "Total: 15\n",
+  "explanation": "Python works out 10 + 5 first and gets 15. When print is given several arguments it puts a single space between them, so you get 'Total:' then a space then 15.",
+  "wrongExplanations": [
+   "",
+   "10 + 5 is an expression, so Python works it out rather than printing it as text.",
+   "print always puts a space between arguments, so there is a gap after the colon.",
+   "The comma separates the arguments; it is not printed."
+  ]
+ },
+ {
+  "id": "print-03",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "bug",
+  "difficulty": 1,
+  "question": "This line will not run at all. What is wrong with it?",
+  "code": "print('Name:' names[0])",
+  "options": [
+   "There is no comma between the two arguments",
+   "names should be in quotes",
+   "print should be in capitals",
+   "The square brackets should be round"
+  ],
+  "answer": 0,
+  "expectError": "SyntaxError",
+  "explanation": "Arguments inside the brackets must be separated by commas. Without one, Python cannot tell where the first argument ends and gives a SyntaxError before anything runs.",
+  "wrongExplanations": [
+   "",
+   "Putting names in quotes would print the word 'names' instead of using the list.",
+   "Python is case sensitive and print is lower case; Print would be an error.",
+   "Square brackets are correct for getting an item out of a list."
+  ]
+ },
+ {
+  "id": "print-04",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "name = names[0]\nprint(f'{name} works in {depts[0]}')",
+  "options": [
+   "Aisha works in HR",
+   "{name} works in {depts[0]}",
+   "name works in depts[0]",
+   "Aisha works in Finance"
+  ],
+  "answer": 0,
+  "expect": "Aisha works in HR\n",
+  "explanation": "The f before the quote makes it an f-string, so anything in curly brackets is worked out and dropped into the text. name holds 'Aisha' and depts[0] is 'HR'.",
+  "wrongExplanations": [
+   "",
+   "That is what you get without the f at the front; here the f is present.",
+   "An f-string replaces the curly brackets with values, it does not print the names of the variables.",
+   "depts[0] is the first department, 'HR'. 'Finance' is depts[1]."
+  ]
+ },
+ {
+  "id": "print-05",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "The f has been left off the front of the string. What does this print?",
+  "code": "print('{names[0]} works in {depts[0]}')",
+  "options": [
+   "{names[0]} works in {depts[0]}",
+   "Aisha works in HR",
+   "names[0] works in depts[0]",
+   "Nothing, it is an error"
+  ],
+  "answer": 0,
+  "expect": "{names[0]} works in {depts[0]}\n",
+  "explanation": "Without the f, it is an ordinary string and the curly brackets have no special meaning, so they are printed exactly as written. This is a common slip and Python gives no error, which makes it easy to miss.",
+  "wrongExplanations": [
+   "",
+   "That would need f'...' with the f in front of the opening quote.",
+   "The curly brackets are printed too, because the whole thing is just text.",
+   "It runs perfectly happily; it just prints something you did not want."
+  ]
+ },
+ {
+  "id": "print-06",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "This was meant to print the second person's name. What does it actually print?",
+  "code": "i = 1\nprint(f'Person {1} is {names[1]}')",
+  "options": [
+   "Person 1 is Ben",
+   "Person 1 is Aisha",
+   "Person i is Ben",
+   "Person {1} is Ben"
+  ],
+  "answer": 0,
+  "expect": "Person 1 is Ben\n",
+  "explanation": "The first set of curly brackets has the digit 1 in it, not the variable i. Python works out the expression 1, which is just 1, so it prints the number rather than the value of i. Here they happen to look the same, which is why this bug can hide for a long time.",
+  "wrongExplanations": [
+   "",
+   "names[1] is 'Ben'. 'Aisha' is names[0].",
+   "An f-string works out what is inside the brackets, so you never see the letter i itself.",
+   "The curly brackets are replaced, not printed, because this is an f-string."
+  ]
+ },
+ {
+  "id": "print-07",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "error",
+  "difficulty": 2,
+  "question": "Running a line gives: TypeError: 'builtin_function_or_method' object is not subscriptable. Which line caused it?",
+  "code": "print(len[names])",
+  "options": [
+   "len[names] uses square brackets, but len is a function and needs round ones",
+   "names has not been defined yet",
+   "len cannot be used on a list",
+   "print needs its arguments in square brackets"
+  ],
+  "answer": 0,
+  "expectError": "TypeError",
+  "explanation": "Square brackets mean 'get an item out of this', which is why Python complains that len cannot be indexed. Calling a function always uses round brackets: len(names).",
+  "wrongExplanations": [
+   "",
+   "If names were missing you would get a NameError that mentions names by name.",
+   "len works on lists perfectly well; it is the brackets that are wrong.",
+   "print takes round brackets, like every other function call."
+  ]
+ },
+ {
+  "id": "print-08",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "choose",
+  "difficulty": 1,
+  "question": "Which line prints how many people are in the team?",
+  "options": [
+   "print(len(names))",
+   "print(len[names])",
+   "print(names.len())",
+   "print(count(names))"
+  ],
+  "answer": 0,
+  "expect": "6\n",
+  "explanation": "len() is a built-in function that gives the number of items in a list. You pass the list to it in round brackets, and print shows the result.",
+  "wrongExplanations": [
+   "",
+   "Square brackets are for getting an item out of something; function calls use round brackets.",
+   "len is a stand-alone function, not something a list carries, so names.len() does not exist.",
+   "There is no built-in function called count. Lists have a .count() method, but it counts how many times one value appears."
+  ]
+ },
+ {
+  "id": "print-09",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "This line will not run. Why not?",
+  "code": "print('Ben's extension is 2102')",
+  "options": [
+   "The apostrophe in Ben's ends the string early",
+   "2102 should be in quotes",
+   "print cannot take an apostrophe at all",
+   "There should be a comma after Ben's"
+  ],
+  "answer": 0,
+  "expectError": "SyntaxError",
+  "explanation": "The string starts at the first quote and Python treats the next single quote it meets as the end, so the apostrophe in Ben's closes it too soon. Use double quotes around the whole thing instead: \"Ben's extension is 2102\".",
+  "wrongExplanations": [
+   "",
+   "2102 is inside the string already, so it is text like everything else.",
+   "An apostrophe is fine; it just cannot be a single quote inside a single-quoted string.",
+   "There is only one argument here, so there is nothing to separate."
+  ]
+ },
+ {
+  "id": "print-10",
+  "area": "Foundations",
+  "topic": "print",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "In print('Years:', years[2]), which part is a literal?",
+  "code": "print('Years:', years[2])",
+  "options": [
+   "'Years:'",
+   "years",
+   "years[2]",
+   "print"
+  ],
+  "answer": 0,
+  "explanation": "A literal is a value written out directly in the code. 'Years:' is written out as it is, so it is a literal. years is a variable and years[2] looks a value up, so neither is written out directly.",
+  "wrongExplanations": [
+   "",
+   "years is a variable: a name standing for a value stored elsewhere.",
+   "years[2] is an expression that Python has to work out before it can print anything.",
+   "print is the name of the function being called."
+  ]
+ },
+ {
+  "id": "var-01",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "a = 1\na = a + 1\nprint(a)",
+  "options": [
+   "2",
+   "1",
+   "a + 1",
+   "11"
+  ],
+  "answer": 0,
+  "expect": "2\n",
+  "explanation": "The second line works out the right-hand side first. a is 1, so a + 1 is 2, and that result is then stored back under the name a.",
+  "wrongExplanations": [
+   "",
+   "The second line replaces the old value, so a is no longer 1.",
+   "Python works the expression out rather than storing it as text.",
+   "The + adds the numbers; it does not stick them together. That only happens with strings."
+  ]
+ },
+ {
+  "id": "var-02",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "What does the equals sign do in the line  hours = 10 ?",
+  "options": [
+   "It creates a variable called hours and stores 10 in it",
+   "It checks whether hours is the same as 10",
+   "It prints the value of hours",
+   "It makes 10 permanent so it can never change"
+  ],
+  "answer": 0,
+  "explanation": "A single = is an assignment: it puts a value into a name. Checking whether two things are equal is a double ==, which is a different thing entirely.",
+  "wrongExplanations": [
+   "",
+   "That is ==, with two equals signs. Mixing up the two is one of the most common beginner errors.",
+   "Nothing is printed unless you call print.",
+   "You can give hours a new value at any time by assigning to it again."
+  ]
+ },
+ {
+  "id": "var-03",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "bug",
+  "difficulty": 1,
+  "question": "What goes wrong here?",
+  "code": "number = 12\nprint(numbers)",
+  "options": [
+   "numbers has never been given a value, so Python stops with a NameError",
+   "print cannot show a number",
+   "number should be in quotes",
+   "Python will print 12 anyway"
+  ],
+  "answer": 0,
+  "expectError": "NameError",
+  "explanation": "The variable is called number but the print asks for numbers, with an s. Python has no idea what numbers is, so it raises a NameError. Spelling mistakes in names are one of the most common causes of this error.",
+  "wrongExplanations": [
+   "",
+   "print is perfectly happy with numbers.",
+   "Putting it in quotes would print the word rather than the value.",
+   "Python does not guess what you meant; the name must match exactly."
+  ]
+ },
+ {
+  "id": "var-04",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "a, b, c, d = 3, 5, 7, 11\nprint(c)",
+  "options": [
+   "7",
+   "3",
+   "c",
+   "3, 5, 7, 11"
+  ],
+  "answer": 0,
+  "expect": "7\n",
+  "explanation": "You can assign several variables on one line. Python matches them up in order, so a gets 3, b gets 5, c gets 7 and d gets 11.",
+  "wrongExplanations": [
+   "",
+   "3 goes to a, the first name on the left.",
+   "print(c) shows what c holds, not the letter itself.",
+   "Each name gets one value; the whole set is not stored in each one."
+  ]
+ },
+ {
+  "id": "var-05",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "x = 10\nx = 'ten'\nprint(type(x))",
+  "options": [
+   "<class 'str'>",
+   "<class 'int'>",
+   "<class 'float'>",
+   "It is an error to change the type"
+  ],
+  "answer": 0,
+  "expect": "<class 'str'>\n",
+  "explanation": "A variable in Python is just a name pointing at a value, and you can point it at a different kind of value whenever you like. After the second line, x holds a string.",
+  "wrongExplanations": [
+   "",
+   "That was the type before the second line replaced the value.",
+   "'ten' is text, not a number with a decimal point.",
+   "Python allows it. Some other languages do not, but Python is relaxed about this."
+  ]
+ },
+ {
+  "id": "var-06",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "The variable was named with an underscore but used with a dot. What happens?",
+  "code": "s_names = names[0]\nprint(s.names)",
+  "options": [
+   "A NameError, because there is no variable called s",
+   "It prints Aisha anyway",
+   "A SyntaxError, because of the dot",
+   "It prints s.names as text"
+  ],
+  "answer": 0,
+  "expectError": "NameError",
+  "explanation": "A dot means 'something belonging to', so Python looks for a variable called s first. There isn't one, so it stops with a NameError. An underscore and a dot are not interchangeable.",
+  "wrongExplanations": [
+   "",
+   "Python matches names exactly; s.names and s_names are completely different.",
+   "The dot is valid syntax, so the code runs and then fails on the missing name.",
+   "Without quotes it is treated as code, not as text."
+  ]
+ },
+ {
+  "id": "var-07",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "In a notebook you delete the line that created total, then run the cell again and it still prints a number. Why?",
+  "options": [
+   "The old value is still in the notebook's memory from the earlier run",
+   "Python saved it to a file automatically",
+   "Deleting a line never removes a variable",
+   "The number is being guessed from the other variables"
+  ],
+  "answer": 0,
+  "explanation": "A notebook keeps every variable you have ever created until the kernel is restarted, so code can appear to work when it would fail for anyone else. Restart the kernel and run all the cells from the top to find out what your code really needs.",
+  "wrongExplanations": [
+   "",
+   "Nothing is written to a file. It is only in memory, and it disappears when the kernel restarts.",
+   "Deleting a line does remove it from the code; the point is that the value made earlier is still in memory.",
+   "Python never invents values."
+  ]
+ },
+ {
+  "id": "var-08",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Ella is the fifth person in the team. Which line prints her years of service?",
+  "options": [
+   "print(years[4])",
+   "print(years[5])",
+   "print(years['Ella'])",
+   "print(years(4))"
+  ],
+  "answer": 0,
+  "expect": "4\n",
+  "explanation": "Counting in a list starts at 0, so the fifth person is at position 4. years[4] is 4, which is Ella's years of service.",
+  "wrongExplanations": [
+   "",
+   "years[5] is the sixth person, Finn, whose value is 3. This off-by-one is worth watching for.",
+   "years is a list, so it is looked up by position number, not by name. That would work on the ext dictionary.",
+   "Round brackets mean 'call this like a function'. A list is looked up with square brackets."
+  ]
+ },
+ {
+  "id": "var-09",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "a = 1\nb = a\na = 2\nprint(b)",
+  "options": [
+   "1",
+   "2",
+   "a",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "1\n",
+  "explanation": "b was given the value a had at that moment, which was 1. Changing a afterwards does not reach back and change b. Numbers cannot be altered in place, so the third line simply points the name a at a different value.",
+  "wrongExplanations": [
+   "",
+   "b does not follow a around; it was given a copy of the value at the time.",
+   "print(b) shows what b holds, not the letter.",
+   "This is all perfectly ordinary Python."
+  ]
+ },
+ {
+  "id": "var-10",
+  "area": "Foundations",
+  "topic": "variables",
+  "angle": "error",
+  "difficulty": 1,
+  "question": "You see: NameError: name 'attempts' is not defined. What usually causes this?",
+  "options": [
+   "The name has been misspelled, or the line that creates it has not run yet",
+   "The variable is holding the wrong type of value",
+   "You used too many variables",
+   "The variable name is too long"
+  ],
+  "answer": 0,
+  "explanation": "A NameError means Python has reached a name it has never been given a value for. Nearly always it is a typo, such as attemps for attempts, or a cell you have not run yet.",
+  "wrongExplanations": [
+   "",
+   "A wrong type gives a TypeError, and the message mentions the types involved.",
+   "There is no limit worth worrying about.",
+   "Length is not the issue; spelling is."
+  ]
+ },
+ {
+  "id": "types-01",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "Which of these lists the four basic data types the course introduces?",
+  "options": [
+   "str, int, float, bool",
+   "list, tuple, set, dict",
+   "text, number, decimal, yes/no",
+   "print, input, len, type"
+  ],
+  "answer": 0,
+  "explanation": "str holds text, int holds whole numbers, float holds numbers with a decimal point, and bool holds True or False. The others are built out of these.",
+  "wrongExplanations": [
+   "",
+   "Those are structures for holding several values at once, built on top of the basic types.",
+   "Those are the everyday English names; Python's own names are str, int, float and bool.",
+   "Those are functions, which do things rather than hold values."
+  ]
+ },
+ {
+  "id": "types-02",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print(type(years[0]))",
+  "options": [
+   "<class 'int'>",
+   "<class 'float'>",
+   "<class 'list'>",
+   "6"
+  ],
+  "answer": 0,
+  "expect": "<class 'int'>\n",
+  "explanation": "years[0] is 6, a whole number with no decimal point, so its type is int. type() tells you what kind of value something is.",
+  "wrongExplanations": [
+   "",
+   "A float has a decimal point, like 6.0. This is written as 6.",
+   "years is a list, but years[0] is one item out of it.",
+   "type() reports the type, not the value. print(years[0]) would give 6."
+  ]
+ },
+ {
+  "id": "types-03",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(type(10 / 2))",
+  "options": [
+   "<class 'float'>",
+   "<class 'int'>",
+   "<class 'str'>",
+   "<class 'bool'>"
+  ],
+  "answer": 0,
+  "expect": "<class 'float'>\n",
+  "explanation": "A single / always gives a float in Python 3, even when the numbers divide exactly. 10 / 2 is 5.0, not 5.",
+  "wrongExplanations": [
+   "",
+   "It would be an int with //, which divides and throws away any remainder.",
+   "Dividing numbers gives a number, not text.",
+   "bool is only True or False."
+  ]
+ },
+ {
+  "id": "types-04",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "Which of these can be changed after it has been created?",
+  "options": [
+   "A list",
+   "An int",
+   "A string",
+   "A float"
+  ],
+  "answer": 0,
+  "explanation": "Lists are mutable, which means you can add to them or change an item in place. Ints, floats and strings are immutable: you can point the name at a new value, but the value itself never changes.",
+  "wrongExplanations": [
+   "",
+   "Writing a = a + 1 does not alter the number 1; it makes 2 and points a at that instead.",
+   "Strings cannot be edited in place. Methods like .lower() hand you a brand new string.",
+   "Like ints, floats are fixed once created."
+  ]
+ },
+ {
+  "id": "types-05",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "nums = [1, 2]\nnums.append(3)\nprint(nums)",
+  "options": [
+   "[1, 2, 3]",
+   "[1, 2]",
+   "[3, 1, 2]",
+   "It is an error, because lists cannot change"
+  ],
+  "answer": 0,
+  "expect": "[1, 2, 3]\n",
+  "explanation": "Lists are mutable, so .append() adds to the end of the very same list. Notice there is no nums = in front of it: the list is changed in place.",
+  "wrongExplanations": [
+   "",
+   "append really does change the list, so the 3 is there afterwards.",
+   "append always adds to the end. .insert(0, 3) would put it at the front.",
+   "Lists are the mutable type; it is tuples and strings that cannot be changed."
+  ]
+ },
+ {
+  "id": "types-06",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print('42' == 42)",
+  "options": [
+   "False",
+   "True",
+   "It is an error",
+   "42"
+  ],
+  "answer": 0,
+  "expect": "False\n",
+  "explanation": "'42' with quotes is text and 42 without is a number, and Python does not treat them as the same thing. This matters because input() always gives you text, even when the user types digits.",
+  "wrongExplanations": [
+   "",
+   "They look alike on screen, but one is a string and the other is an int.",
+   "== happily compares any two things; it just answers False when they do not match.",
+   "== gives True or False, not the value itself."
+  ]
+ },
+ {
+  "id": "types-07",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "error",
+  "difficulty": 2,
+  "question": "What happens when this line runs?",
+  "options": [
+   "A TypeError: Python will not rank text against a number",
+   "It prints False",
+   "It prints True",
+   "A NameError, because 'a' is not defined"
+  ],
+  "answer": 0,
+  "expectError": "TypeError",
+  "explanation": "Python will put two strings in alphabetical order, or compare two numbers, but it will not guess how text ranks against a number, so <= between them is a TypeError.",
+  "wrongExplanations": [
+   "",
+   "== and != would give False here, but < and <= refuse outright.",
+   "Nothing about this is True; Python cannot decide the order at all.",
+   "'a' in quotes is a string value, not a variable name, so it is defined fine."
+  ],
+  "code": "print('a' <= 2)"
+ },
+ {
+  "id": "types-08",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "print(int(True))\nprint(int(False))",
+  "options": [
+   "1 / 0",
+   "True / False",
+   "1 / 1",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "1\n0\n",
+  "explanation": "True and False can be turned into the numbers 1 and 0. This is why conditions can be used as counters, and why a number can be used where a condition is expected.",
+  "wrongExplanations": [
+   "",
+   "int() converts them to numbers, so you see digits rather than the words.",
+   "False becomes 0, not 1. Only True becomes 1.",
+   "It is allowed, and it is used quite often in Python."
+  ]
+ },
+ {
+  "id": "types-09",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "The person is asked 'How many?' and types 7. Why does this still print the 'not the number' message?",
+  "code": "answer = input()\nif answer == 7:\n    print('It is seven')\nelse:\n    print('That is not the number')",
+  "options": [
+   "input() gives back text, so answer is '7' and never equals the number 7",
+   "The if statement is missing a colon",
+   "input() can only be used once",
+   "7 should be in quotes in the if line"
+  ],
+  "answer": 0,
+  "expect": "That is not the number\n",
+  "stdin": "7\n",
+  "explanation": "input() always hands back a string, whatever the person typed. '7' and 7 are different things, so the comparison is False. Use int(answer) == 7, after checking the text really is digits.",
+  "wrongExplanations": [
+   "",
+   "The colon is there on the if line.",
+   "input() can be used as often as you like.",
+   "That would compare text with text and work, but the real lesson is to convert the input to a number instead."
+  ]
+ },
+ {
+  "id": "types-10",
+  "area": "Foundations",
+  "topic": "types",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "Which of these is a float?",
+  "options": [
+   "0.002",
+   "2",
+   "'2.0'",
+   "True"
+  ],
+  "answer": 0,
+  "explanation": "A float is a number with a decimal point. 0.002 has one, so it is a float.",
+  "wrongExplanations": [
+   "",
+   "2 has no decimal point, so it is an int.",
+   "The quotes make it a string: it is the text '2.0', not a number.",
+   "True is a bool, which is a different basic type again."
+  ]
+ },
+ {
+  "id": "pep8-01",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "PEP 8 is the style guide for Python. How should you indent a block of code?",
+  "options": [
+   "Four spaces, never a tab",
+   "One tab",
+   "Two spaces",
+   "It does not matter as long as you are consistent"
+  ],
+  "answer": 0,
+  "explanation": "PEP 8 asks for four spaces and says not to use tabs. Most editors can be set to insert four spaces when you press Tab, which is the easiest way to get this right without thinking about it.",
+  "wrongExplanations": [
+   "",
+   "Tabs and spaces look identical on screen but are different characters, which causes confusing errors when they are mixed.",
+   "Two spaces is the convention in some other languages, not in Python.",
+   "Python does require consistency, but PEP 8 goes further and asks specifically for four spaces."
+  ]
+ },
+ {
+  "id": "pep8-02",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "structure",
+  "difficulty": 1,
+  "question": "Which line follows PEP 8 spacing around commas?",
+  "options": [
+   "my_list = [1, 2, 3]",
+   "my_list = [1 ,2 ,3]",
+   "my_list = [1,2,3]",
+   "my_list = [ 1 , 2 , 3 ]"
+  ],
+  "answer": 0,
+  "explanation": "PEP 8 asks for a space after a comma but not before it, which is exactly how commas work in ordinary English writing.",
+  "wrongExplanations": [
+   "",
+   "The space belongs after the comma, not before it.",
+   "It runs, but PEP 8 asks for a space after each comma to make the items easier to read.",
+   "There should be no space just inside the brackets, and none before the commas."
+  ]
+ },
+ {
+  "id": "pep8-03",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "PEP 8 asks for spaces around the = in an assignment, but not around the = for a keyword argument. Which line is correct?",
+  "options": [
+   "print('Total', value, sep=': ')",
+   "print('Total', value, sep = ': ')",
+   "total=10",
+   "total = 10 and sep=': ' both need the same spacing"
+  ],
+  "answer": 0,
+  "explanation": "Assignment gets spaces, as in total = 10. A keyword argument inside a function call does not, as in sep=': '. The different spacing is a quiet signal about which one you are looking at.",
+  "wrongExplanations": [
+   "",
+   "A keyword argument inside a call has no spaces around its equals sign.",
+   "An assignment should have a space either side: total = 10.",
+   "They deliberately differ, and that is the point of the rule."
+  ]
+ },
+ {
+  "id": "pep8-04",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "PEP 8 says not to use I, O or L on their own as variable names. Why?",
+  "options": [
+   "In many fonts they are hard to tell apart from the digits 1 and 0",
+   "They are reserved words in Python",
+   "They are too short for Python to accept",
+   "They make the code run more slowly"
+  ],
+  "answer": 0,
+  "explanation": "A lower case l, a capital I and the digit 1 can look almost identical, as can a capital O and a zero. Anyone reading your code, including you next week, can easily misread them.",
+  "wrongExplanations": [
+   "",
+   "They are allowed as names; the guidance is about readability, not legality.",
+   "Python accepts names of any length, including one character.",
+   "Style has no effect on speed at all."
+  ]
+ },
+ {
+  "id": "pep8-05",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "Why is using list as a variable name a bad idea?",
+  "code": "list = [1, 2, 3]",
+  "options": [
+   "It hides the built-in list function, so you cannot use list() afterwards",
+   "Python will refuse to run the line",
+   "list is a reserved word like if and for",
+   "It makes the list read-only"
+  ],
+  "answer": 0,
+  "explanation": "list is the name of a built-in function. Assigning to it replaces it for the rest of the session, so a later list('abc') fails with a confusing message. The same goes for names like str, dict, set and sum.",
+  "wrongExplanations": [
+   "",
+   "It runs quite happily, which is exactly what makes it dangerous.",
+   "Reserved words like if and for cannot be assigned at all. list is not reserved, just already in use.",
+   "The list behaves normally; it is the built-in function that has been lost."
+  ]
+ },
+ {
+  "id": "pep8-06",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "According to PEP 8, how long should a line of code be?",
+  "options": [
+   "Less than 80 characters",
+   "Less than 20 characters",
+   "As long as you like",
+   "Exactly 100 characters"
+  ],
+  "answer": 0,
+  "explanation": "Keeping rows under 80 characters means they fit side by side on most screens and in printouts without wrapping.",
+  "wrongExplanations": [
+   "",
+   "That would be far too short for ordinary code.",
+   "Very long lines are hard to read and hard to compare side by side.",
+   "It is an upper limit to stay under, not a target to hit."
+  ]
+ },
+ {
+  "id": "pep8-07",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "PEP 8 says a comment should explain what the code does and also something else. What?",
+  "options": [
+   "Why the code is there",
+   "Who wrote it",
+   "How long it takes to run",
+   "Which version of Python it needs"
+  ],
+  "answer": 0,
+  "explanation": "Anyone can read the code to see what it does. What they cannot recover is why you did it that way, so that is the part worth writing down.",
+  "wrongExplanations": [
+   "",
+   "Version control keeps track of who wrote what.",
+   "Timings belong in notes or tests, not in a comment on every line.",
+   "That belongs in the project's documentation, not in ordinary comments."
+  ]
+ },
+ {
+  "id": "pep8-08",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "PEP 8 allows spaces around operators to make groups easier to read. Which line uses that idea?",
+  "options": [
+   "total = a*b + c*d",
+   "total=a * b+c * d",
+   "total = a * b + c * d",
+   "total = a*b+c*d"
+  ],
+  "answer": 0,
+  "explanation": "Leaving out the spaces inside each multiplication and keeping them around the + shows at a glance that the two products are added. The spacing is doing some of the explaining for you.",
+  "wrongExplanations": [
+   "",
+   "The spacing here groups the wrong things and the assignment has lost its spaces.",
+   "It is valid and readable, but it does not show the grouping; everything looks equally important.",
+   "Correct Python, but hard to read because nothing is separated at all."
+  ]
+ },
+ {
+  "id": "pep8-09",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "Which variable name best follows PEP 8's advice about meaningful names?",
+  "options": [
+   "years_of_service",
+   "y",
+   "l",
+   "thingy2"
+  ],
+  "answer": 0,
+  "explanation": "A name should say what the value is. years_of_service tells the next reader exactly what is stored, with words separated by underscores, which is the usual Python style.",
+  "wrongExplanations": [
+   "",
+   "A single letter says nothing about what is in it, except in a very short loop.",
+   "A lone l is one of the three letters PEP 8 asks you to avoid, because it looks like the digit 1.",
+   "It is neither meaningful nor memorable."
+  ]
+ },
+ {
+  "id": "pep8-10",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "concept",
+  "difficulty": 3,
+  "question": "How many blank lines does PEP 8 ask for around a top-level function definition?",
+  "options": [
+   "Two",
+   "One",
+   "None",
+   "Four"
+  ],
+  "answer": 0,
+  "explanation": "Two blank lines go above and below a function or class defined at the top level of a file. Single blank lines are used inside a function, and sparingly, to separate groups of related lines.",
+  "wrongExplanations": [
+   "",
+   "A single blank line is for use inside a function, not around a top-level definition.",
+   "Without blank lines, separate definitions run into one another and are hard to pick out.",
+   "Two is the convention; four is simply a lot of empty space."
+  ]
+ },
+ {
+  "id": "lists-01",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print(names[0])",
+  "options": [
+   "Aisha",
+   "Ben",
+   "names[0]",
+   "1"
+  ],
+  "answer": 0,
+  "expect": "Aisha\n",
+  "explanation": "Counting positions in a list starts at 0, so names[0] is the first person.",
+  "wrongExplanations": [
+   "",
+   "Ben is names[1]. It is easy to read [0] as 'the first' and then count from one anyway.",
+   "Without quotes it is code, so Python looks the value up.",
+   "The square brackets ask for the item at that position, not the position itself."
+  ]
+ },
+ {
+  "id": "lists-02",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print(names[-1])",
+  "options": [
+   "Finn",
+   "Aisha",
+   "An IndexError",
+   "Ella"
+  ],
+  "answer": 0,
+  "expect": "Finn\n",
+  "explanation": "A negative position counts back from the end, so -1 is the last item. It is a neat way of getting the last thing without knowing how long the list is.",
+  "wrongExplanations": [
+   "",
+   "That is names[0]. Negative numbers count from the other end.",
+   "Negative positions are perfectly legal in Python, unlike in many other languages.",
+   "Ella is names[-2], the second from the end."
+  ]
+ },
+ {
+  "id": "lists-03",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(names[0:2])",
+  "options": [
+   "['Aisha', 'Ben']",
+   "['Aisha', 'Ben', 'Carla']",
+   "['Ben', 'Carla']",
+   "Aisha Ben"
+  ],
+  "answer": 0,
+  "expect": "['Aisha', 'Ben']\n",
+  "explanation": "A slice starts at the first number and stops just before the second, so [0:2] gives positions 0 and 1. The result is a new list, which is why it prints with square brackets.",
+  "wrongExplanations": [
+   "",
+   "The item at position 2 is where it stops, so Carla is not included.",
+   "The slice starts at position 0, not 1, so Aisha is included.",
+   "A slice gives back a list, so you see the brackets and quotes."
+  ]
+ },
+ {
+  "id": "lists-04",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(names.index('Carla'))",
+  "options": [
+   "2",
+   "3",
+   "Carla",
+   "True"
+  ],
+  "answer": 0,
+  "expect": "2\n",
+  "explanation": ".index() tells you the position a value sits at. Carla is third in the list, and counting starts at 0, so her position is 2.",
+  "wrongExplanations": [
+   "",
+   "That would be the answer if counting started at 1, but it starts at 0.",
+   ".index() gives back a position number, not the value you asked about.",
+   "That would be the answer to 'Carla' in names, which is a different question."
+  ]
+ },
+ {
+  "id": "lists-05",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "team = ['Aisha', 'Ben']\nteam.append('Carla')\nteam.insert(0, 'Zoe')\nprint(team)",
+  "options": [
+   "['Zoe', 'Aisha', 'Ben', 'Carla']",
+   "['Aisha', 'Ben', 'Carla', 'Zoe']",
+   "['Zoe', 'Carla', 'Aisha', 'Ben']",
+   "['Aisha', 'Ben', 'Carla']"
+  ],
+  "answer": 0,
+  "expect": "['Zoe', 'Aisha', 'Ben', 'Carla']\n",
+  "explanation": ".append() always adds to the end, so Carla goes last. .insert(0, 'Zoe') puts Zoe at position 0, pushing everyone else along one.",
+  "wrongExplanations": [
+   "",
+   "insert(0, ...) puts the value at the front, not the back.",
+   "Carla was appended to the end before Zoe was inserted at the front.",
+   "Both lines really do change the list; lists are mutable."
+  ]
+ },
+ {
+  "id": "lists-06",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "team = ['Aisha', 'Ben', 'Carla', 'Dan']\nteam.remove('Ben')\nprint(team.pop(0))\nprint(team)",
+  "options": [
+   "Aisha / ['Carla', 'Dan']",
+   "Ben / ['Carla', 'Dan']",
+   "Aisha / ['Ben', 'Carla', 'Dan']",
+   "['Carla', 'Dan'] / Aisha"
+  ],
+  "answer": 0,
+  "expect": "Aisha\n['Carla', 'Dan']\n",
+  "explanation": ".remove() takes out a value you name, so Ben goes. .pop(0) takes out the item at a position and hands it back, so it prints Aisha and leaves Carla and Dan.",
+  "wrongExplanations": [
+   "",
+   "Ben was already removed by the line before, so pop(0) finds Aisha at the front.",
+   "Both lines change the list, so Ben is not still in it.",
+   "The print lines run in the order they are written: the popped name first."
+  ]
+ },
+ {
+  "id": "lists-07",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "What is wrong with this line?",
+  "code": "names.add('Gus')",
+  "options": [
+   "Lists use .append(), not .add(); .add() belongs to sets",
+   "The name should not be in quotes",
+   "A list can never be added to",
+   "It should be names.add['Gus']"
+  ],
+  "answer": 0,
+  "expectError": "AttributeError",
+  "explanation": "Each kind of structure has its own methods. Lists grow with .append(); sets grow with .add(). Using the wrong one gives an AttributeError that says the object has no attribute 'add'.",
+  "wrongExplanations": [
+   "",
+   "'Gus' is a piece of text, so the quotes are right.",
+   "Lists are mutable and can certainly be added to, with .append().",
+   "Calling a method always uses round brackets."
+  ]
+ },
+ {
+  "id": "lists-08",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "error",
+  "difficulty": 2,
+  "question": "There are six people in names. What does this line do?",
+  "code": "print(names[6])",
+  "options": [
+   "Raises an IndexError, because the last position is 5",
+   "Prints Finn",
+   "Prints an empty value",
+   "Starts again at the beginning and prints Aisha"
+  ],
+  "answer": 0,
+  "expectError": "IndexError",
+  "explanation": "Six items sit at positions 0 to 5, so there is nothing at 6. Python stops with an IndexError rather than guessing. This off-by-one is why range(len(names)) is a safe way to loop over positions.",
+  "wrongExplanations": [
+   "",
+   "Finn is at position 5, the last one.",
+   "Python does not invent an empty value; it stops.",
+   "Positions do not wrap around to the start."
+  ]
+ },
+ {
+  "id": "lists-09",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(type('Aisha Khan'.split()))",
+  "options": [
+   "<class 'list'>",
+   "<class 'tuple'>",
+   "<class 'str'>",
+   "<class 'set'>"
+  ],
+  "answer": 0,
+  "expect": "<class 'list'>\n",
+  "explanation": ".split() hands back a list of the pieces, so 'Aisha Khan'.split() gives ['Aisha', 'Khan']. Some notes say it returns a tuple, but it does not: you can check any time with type().",
+  "wrongExplanations": [
+   "",
+   "This is worth remembering, because it is written down incorrectly in places. It is a list, and you can prove it with type().",
+   "The pieces are strings, but the thing holding them is a list.",
+   "A set would lose the order and any repeats; .split() keeps both."
+  ]
+ },
+ {
+  "id": "lists-10",
+  "area": "Data structures",
+  "topic": "lists",
+  "angle": "structure",
+  "difficulty": 1,
+  "question": "You need to keep the six names in the order they were given, and you may need to add more later. Which structure fits?",
+  "options": [
+   "A list",
+   "A tuple",
+   "A set",
+   "A single string"
+  ],
+  "answer": 0,
+  "explanation": "A list keeps its order and can be changed after it is made, which is exactly what is needed here.",
+  "wrongExplanations": [
+   "",
+   "A tuple keeps order but cannot be added to once created.",
+   "A set has no order at all and silently drops repeated names.",
+   "One string would mean picking the names apart by hand every time."
+  ]
+ },
+ {
+  "id": "tuples-01",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "What is the main difference between a list and a tuple?",
+  "options": [
+   "A tuple cannot be changed after it is created",
+   "A tuple cannot hold text",
+   "A tuple has no order",
+   "A tuple can only hold two items"
+  ],
+  "answer": 0,
+  "explanation": "Both keep their items in order and both are looked up by position. The difference is that a tuple is immutable: once it exists, you cannot add to it or change an item.",
+  "wrongExplanations": [
+   "",
+   "A tuple can hold any mix of types, just like a list.",
+   "Tuples are ordered. Sets are the ones with no order.",
+   "A tuple can hold as many items as you like, including none at all."
+  ]
+ },
+ {
+  "id": "tuples-02",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "t = (1, 2, 3)\nt2 = t + (4, 5)\nprint(t2)",
+  "options": [
+   "(1, 2, 3, 4, 5)",
+   "[1, 2, 3, 4, 5]",
+   "(1, 2, 3, (4, 5))",
+   "(5, 7, 3)"
+  ],
+  "answer": 0,
+  "expect": "(1, 2, 3, 4, 5)\n",
+  "explanation": "Adding two tuples joins them into one longer tuple. Note that t itself has not changed: a brand new tuple was made and stored in t2.",
+  "wrongExplanations": [
+   "",
+   "Joining two tuples gives a tuple, shown with round brackets.",
+   "The second tuple is joined on, not tucked inside as a single item.",
+   "The + joins the tuples rather than adding the numbers inside them."
+  ]
+ },
+ {
+  "id": "tuples-03",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "What happens here?",
+  "code": "t = (1, 2, 3)\nt[0] = 9\nprint(t)",
+  "options": [
+   "A TypeError, because a tuple cannot be changed",
+   "It prints (9, 2, 3)",
+   "It prints (1, 2, 3)",
+   "A SyntaxError"
+  ],
+  "answer": 0,
+  "expectError": "TypeError",
+  "explanation": "Tuples are immutable, so there is no way to replace an item. Python says 'tuple object does not support item assignment'. If you need to change things, use a list.",
+  "wrongExplanations": [
+   "",
+   "That is what would happen with a list; a tuple refuses.",
+   "The line does not fail quietly: it stops the program with an error.",
+   "The syntax is fine; the problem only appears when the line runs."
+  ]
+ },
+ {
+  "id": "tuples-04",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "pairs = [(6, 7, 8), (1, 2), (9, 10)]\nprint(pairs[2][1])",
+  "options": [
+   "10",
+   "9",
+   "2",
+   "(9, 10)"
+  ],
+  "answer": 0,
+  "expect": "10\n",
+  "explanation": "Read the brackets from left to right. pairs[2] picks the third tuple, (9, 10), and then [1] picks the second item inside it, which is 10.",
+  "wrongExplanations": [
+   "",
+   "9 is at position 0 inside that tuple.",
+   "2 would be pairs[1][1], the second item of the second tuple.",
+   "That is pairs[2] on its own, before the second set of brackets."
+  ]
+ },
+ {
+  "id": "tuples-05",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "print(type((5)))\nprint(type((5,)))",
+  "options": [
+   "<class 'int'> / <class 'tuple'>",
+   "<class 'tuple'> / <class 'tuple'>",
+   "<class 'int'> / <class 'int'>",
+   "<class 'tuple'> / <class 'int'>"
+  ],
+  "answer": 0,
+  "expect": "<class 'int'>\n<class 'tuple'>\n",
+  "explanation": "It is the comma that makes a tuple, not the brackets. (5) is just 5 with brackets round it, the way you would group things in maths. (5,) with a trailing comma is a tuple holding one item.",
+  "wrongExplanations": [
+   "",
+   "Brackets on their own only group; without a comma there is no tuple.",
+   "The trailing comma in the second one really does make it a tuple.",
+   "It is the other way round: the one with the comma is the tuple."
+  ]
+ },
+ {
+  "id": "tuples-06",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "This was meant to store one name. What does it actually print?",
+  "code": "search = 'Dan'\nanswer = search, 'Not found'\nprint(answer)",
+  "options": [
+   "('Dan', 'Not found')",
+   "Dan",
+   "Not found",
+   "Dan Not found"
+  ],
+  "answer": 0,
+  "expect": "('Dan', 'Not found')\n",
+  "explanation": "The comma makes this a tuple of two items, even without brackets. It is an easy accident when a second value gets left on the line, and Python gives no warning at all.",
+  "wrongExplanations": [
+   "",
+   "A comma on the right-hand side builds a tuple, so both values are kept.",
+   "The first value is not thrown away; both are in there.",
+   "Printing a tuple shows the brackets, quotes and comma."
+  ]
+ },
+ {
+  "id": "tuples-07",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You want to store a point's x and y together, and it must never be altered by accident. Which fits best?",
+  "options": [
+   "A tuple",
+   "A list",
+   "A set",
+   "Two separate variables"
+  ],
+  "answer": 0,
+  "explanation": "A tuple keeps the two values in a fixed order and cannot be changed once made, which is exactly the protection you want for a pair that belongs together.",
+  "wrongExplanations": [
+   "",
+   "A list would work but gives no protection: any line could change it.",
+   "A set has no order, so you could not tell which was x and which was y.",
+   "That works, but the pair is no longer obviously one thing to pass about."
+  ]
+ },
+ {
+  "id": "tuples-08",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Which line makes a tuple containing just the number 7?",
+  "options": [
+   "print(type((7,)))",
+   "print(type((7)))",
+   "print(type([7]))",
+   "print(type({7}))"
+  ],
+  "answer": 0,
+  "expect": "<class 'tuple'>\n",
+  "explanation": "A single trailing comma is what tells Python you mean a tuple of one item.",
+  "wrongExplanations": [
+   "",
+   "Without the comma the brackets just group, so this is an int.",
+   "Square brackets make a list.",
+   "Curly brackets round a value make a set."
+  ]
+ },
+ {
+  "id": "tuples-09",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print((1, 2, 3, 4) == (4, 3, 2, 1))",
+  "options": [
+   "False",
+   "True",
+   "It is an error",
+   "(1, 2, 3, 4)"
+  ],
+  "answer": 0,
+  "expect": "False\n",
+  "explanation": "Tuples are ordered, so two tuples are only equal if they hold the same things in the same order. Sets and dictionaries are different: order does not count for them.",
+  "wrongExplanations": [
+   "",
+   "The same numbers in a different order make a different tuple.",
+   "Comparing two tuples with == is perfectly normal.",
+   "== gives True or False, not one of the values."
+  ]
+ },
+ {
+  "id": "tuples-10",
+  "area": "Data structures",
+  "topic": "tuples",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "Which statement about tuples is true?",
+  "options": [
+   "They keep their items in the order you wrote them",
+   "They remove duplicate values",
+   "They are looked up by key, like a dictionary",
+   "They can be sorted in place with .sort()"
+  ],
+  "answer": 0,
+  "explanation": "Tuples are an ordered sequence, so position 0 is always the thing you put first. That is what makes looking up by position meaningful.",
+  "wrongExplanations": [
+   "",
+   "Only sets remove duplicates. A tuple will happily hold (1, 1, 1).",
+   "Tuples are looked up by position number, like lists.",
+   "A tuple cannot be changed at all, so it has no .sort()."
+  ]
+ },
+ {
+  "id": "sets-01",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "What does a set do with duplicate values?",
+  "options": [
+   "It keeps only one copy of each value",
+   "It keeps them all, in order",
+   "It refuses to be created",
+   "It counts how many times each one appears"
+  ],
+  "answer": 0,
+  "explanation": "A set holds each value once and once only. That makes it the quick way to find the unique things in a collection.",
+  "wrongExplanations": [
+   "",
+   "That is a list. A set drops repeats and has no order at all.",
+   "Repeats are allowed when you build it; they are simply not kept.",
+   "That would need a dictionary of counts; a set only records what is present."
+  ]
+ },
+ {
+  "id": "sets-02",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "s = {1, 2, 2, 3, 3, 3}\nprint(len(s))",
+  "options": [
+   "3",
+   "6",
+   "1",
+   "2"
+  ],
+  "answer": 0,
+  "expect": "3\n",
+  "explanation": "The repeats are dropped as the set is built, so only 1, 2 and 3 are stored. len() then counts three items.",
+  "wrongExplanations": [
+   "",
+   "Six values were written, but a set only keeps the distinct ones.",
+   "Each different value is kept once, and there are three different values.",
+   "len() counts the items, not how many were removed."
+  ]
+ },
+ {
+  "id": "sets-03",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "What is wrong with this?",
+  "code": "s = {1, 2, 3}\ns.append(4)",
+  "options": [
+   "Sets use .add(), not .append()",
+   "Sets cannot be changed at all",
+   "4 should be in quotes",
+   "It should be s.append[4]"
+  ],
+  "answer": 0,
+  "expectError": "AttributeError",
+  "explanation": "Growing a set is done with .add(). .append() belongs to lists, and using it on a set gives an AttributeError. It is an easy slip because both add one item.",
+  "wrongExplanations": [
+   "",
+   "Sets are mutable; it is frozensets that cannot be changed.",
+   "4 is a number here, which is fine.",
+   "Methods are always called with round brackets."
+  ]
+ },
+ {
+  "id": "sets-04",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(type({}))",
+  "options": [
+   "<class 'dict'>",
+   "<class 'set'>",
+   "<class 'list'>",
+   "<class 'tuple'>"
+  ],
+  "answer": 0,
+  "expect": "<class 'dict'>\n",
+  "explanation": "Empty curly brackets make an empty dictionary, not an empty set. Dictionaries got the notation first. For an empty set you have to write set().",
+  "wrongExplanations": [
+   "",
+   "This catches almost everyone. {1, 2} is a set, but {} on its own is a dict.",
+   "Square brackets [] make an empty list.",
+   "Round brackets () make an empty tuple."
+  ]
+ },
+ {
+  "id": "sets-05",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Which line creates an empty set and shows its type?",
+  "options": [
+   "print(type(set()))",
+   "print(type({}))",
+   "print(type([]))",
+   "print(type(()))"
+  ],
+  "answer": 0,
+  "expect": "<class 'set'>\n",
+  "explanation": "set() with nothing in the brackets is the only way to make an empty set, because {} is already taken by the dictionary.",
+  "wrongExplanations": [
+   "",
+   "{} makes an empty dictionary.",
+   "[] makes an empty list.",
+   "() makes an empty tuple."
+  ]
+ },
+ {
+  "id": "sets-06",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "s = {1, 2, 3, 4, 5}\nprint(4 in s)\nprint(9 in s)",
+  "options": [
+   "True / False",
+   "False / True",
+   "True / True",
+   "1 / 0"
+  ],
+  "answer": 0,
+  "expect": "True\nFalse\n",
+  "explanation": "The in operator asks whether a value is present and gives back True or False. Sets are built for exactly this sort of check.",
+  "wrongExplanations": [
+   "",
+   "4 is in the set and 9 is not, so it is True then False.",
+   "9 was never put in the set.",
+   "in gives True or False, not 1 or 0, although those are the numbers behind them."
+  ]
+ },
+ {
+  "id": "sets-07",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "s1 = {1, 2, 3, 4}\ns2 = {3, 4, 5}\nprint(len(s1.intersection(s2)))\nprint(len(s1.union(s2)))",
+  "options": [
+   "2 / 5",
+   "2 / 7",
+   "4 / 3",
+   "3 / 4"
+  ],
+  "answer": 0,
+  "expect": "2\n5\n",
+  "explanation": "The intersection is the values in both sets, 3 and 4, so two of them. The union is everything from either set with no repeats: 1, 2, 3, 4, 5, so five.",
+  "wrongExplanations": [
+   "",
+   "The union drops the repeated 3 and 4 rather than counting them twice.",
+   "Those are the sizes of the original sets, not the result of combining them.",
+   "The intersection is the smaller result and the union the larger; these are the wrong way round."
+  ]
+ },
+ {
+  "id": "sets-08",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You want to record every different department in the team, with no repeats and no particular order. Which fits best?",
+  "options": [
+   "A set",
+   "A list",
+   "A tuple",
+   "A string"
+  ],
+  "answer": 0,
+  "explanation": "depts has HR, Finance and IT twice over. Putting it in a set leaves exactly one of each, which is what 'every different department' means.",
+  "wrongExplanations": [
+   "",
+   "A list would keep all six entries, repeats included.",
+   "A tuple keeps repeats too, and cannot be added to afterwards.",
+   "A string would need splitting apart again before you could use it."
+  ]
+ },
+ {
+  "id": "sets-09",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "concept",
+  "difficulty": 3,
+  "question": "What is a frozenset?",
+  "options": [
+   "A set that cannot be changed after it is created",
+   "A set that has been saved to a file",
+   "A set holding only numbers",
+   "A set that keeps its items in order"
+  ],
+  "answer": 0,
+  "explanation": "A frozenset is to a set what a tuple is to a list: the same thing, but fixed once made. It is written frozenset((4.0, 5, 'dog')).",
+  "wrongExplanations": [
+   "",
+   "Nothing is saved anywhere; it is just held in memory like any other value.",
+   "It can hold any mix of values, just like an ordinary set.",
+   "No set of any kind keeps an order."
+  ]
+ },
+ {
+  "id": "sets-10",
+  "area": "Data structures",
+  "topic": "sets",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "s = set(('HR', 'Finance', 'HR', 'IT'))\nprint(len(s))",
+  "options": [
+   "3",
+   "4",
+   "2",
+   "1"
+  ],
+  "answer": 0,
+  "expect": "3\n",
+  "explanation": "set() can build a set out of another collection. The tuple has four items but HR appears twice, so only HR, Finance and IT are kept.",
+  "wrongExplanations": [
+   "",
+   "Four went in, but the repeated HR is only stored once.",
+   "Three different departments are named, not two.",
+   "len() counts the stored items, and there are three."
+  ]
+ },
+ {
+  "id": "dicts-01",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print(ext['Ella'])",
+  "options": [
+   "2105",
+   "Ella",
+   "2104",
+   "4"
+  ],
+  "answer": 0,
+  "expect": "2105\n",
+  "explanation": "A dictionary is looked up by its key rather than by a position number. ext['Ella'] gives whatever value was stored under 'Ella'.",
+  "wrongExplanations": [
+   "",
+   "The square brackets hold the key you are looking up; what comes back is the value.",
+   "2104 is stored under 'Dan'.",
+   "Positions mean nothing to a dictionary; only keys do."
+  ]
+ },
+ {
+  "id": "dicts-02",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "error",
+  "difficulty": 2,
+  "question": "Gus is not in the dictionary. What does this line do?",
+  "code": "print(ext['Gus'])",
+  "options": [
+   "Raises a KeyError",
+   "Prints None",
+   "Prints an empty line",
+   "Adds Gus to the dictionary"
+  ],
+  "answer": 0,
+  "expectError": "KeyError",
+  "explanation": "Looking up a key that is not there stops the program with a KeyError. This is why you check with in first, or use .get() instead.",
+  "wrongExplanations": [
+   "",
+   "That is what .get() does when the key is missing. Square brackets are stricter.",
+   "Nothing is printed, because the line never finishes.",
+   "Looking something up never adds it. ext['Gus'] = 2107 would."
+  ]
+ },
+ {
+  "id": "dicts-03",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Which line prints Gus's extension, or a helpful message if he is not in the dictionary, without crashing?",
+  "options": [
+   "print(ext.get('Gus', 'Not found'))",
+   "print(ext['Gus'])",
+   "print(ext.get('Gus'))",
+   "print(ext['Gus'], 'Not found')"
+  ],
+  "answer": 0,
+  "expect": "Not found\n",
+  "explanation": ".get() takes a second argument: what to hand back when the key is missing. Nothing goes wrong and you get a message you chose yourself.",
+  "wrongExplanations": [
+   "",
+   "Square brackets raise a KeyError when the key is missing.",
+   "Without a second argument .get() gives None, which prints as the word None rather than a helpful message.",
+   "The lookup fails before print gets a chance to show anything."
+  ]
+ },
+ {
+  "id": "dicts-04",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print('Ella' in ext)\nprint(2105 in ext)",
+  "options": [
+   "True / False",
+   "True / True",
+   "False / True",
+   "False / False"
+  ],
+  "answer": 0,
+  "expect": "True\nFalse\n",
+  "explanation": "Used on a dictionary, in looks at the keys only. 'Ella' is a key, so that is True. 2105 is a value, not a key, so that is False.",
+  "wrongExplanations": [
+   "",
+   "in checks keys, not values, so the number is not found.",
+   "'Ella' really is one of the keys.",
+   "The first one is True; 'Ella' is in the dictionary."
+  ]
+ },
+ {
+  "id": "dicts-05",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "small = {'Aisha': 2101, 'Ben': 2102}\nfor name, number in small.items():\n    print(name, number)",
+  "options": [
+   "Aisha 2101 / Ben 2102",
+   "('Aisha', 2101) / ('Ben', 2102)",
+   "Aisha / Ben",
+   "2101 / 2102"
+  ],
+  "answer": 0,
+  "expect": "Aisha 2101\nBen 2102\n",
+  "explanation": ".items() hands back each key and value together as a pair, and the two names after for unpack that pair into separate variables. print then shows them with a space between.",
+  "wrongExplanations": [
+   "",
+   "You would see the tuples if you used a single loop variable, as in for pair in small.items().",
+   "Looping over the dictionary itself, without .items(), gives just the keys.",
+   "There is no way to get only the values with .items(); that would be .values()."
+  ]
+ },
+ {
+  "id": "dicts-06",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "d = {'HR': 1, 'IT': 2, 'HR': 3}\nprint(len(d))\nprint(d['HR'])",
+  "options": [
+   "2 / 3",
+   "3 / 1",
+   "2 / 1",
+   "3 / 3"
+  ],
+  "answer": 0,
+  "expect": "2\n3\n",
+  "explanation": "Keys cannot repeat. Writing 'HR' twice does not make two entries: the later value simply replaces the earlier one, leaving two keys in total.",
+  "wrongExplanations": [
+   "",
+   "There are only two different keys, and the second HR won.",
+   "The second value for HR replaced the first, so it is 3 rather than 1.",
+   "Python does not refuse the repeat; it quietly overwrites."
+  ]
+ },
+ {
+  "id": "dicts-07",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "In the family tree exercise, what problem comes from using a person's name as the dictionary key?",
+  "options": [
+   "Two relatives with the same name would clash, because keys cannot repeat",
+   "Names are too long to be keys",
+   "Keys have to be numbers",
+   "Dictionaries cannot hold other dictionaries"
+  ],
+  "answer": 0,
+  "explanation": "Keys must be unique, so a second Anna would overwrite the first. Giving everyone an ID number and using that as the key avoids the problem.",
+  "wrongExplanations": [
+   "",
+   "There is no length limit on a key.",
+   "Any fixed value can be a key: strings, numbers and tuples all work.",
+   "A dictionary can hold dictionaries inside it, which is exactly what that exercise does."
+  ]
+ },
+ {
+  "id": "dicts-08",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "The brackets have been put in the wrong place. What happens?",
+  "code": "person = {'name': 'Aisha', 'dept': 'HR'}\nprint(person['name'[0]])",
+  "options": [
+   "A KeyError, because it looks up the key 'n'",
+   "It prints A",
+   "It prints Aisha",
+   "It prints name"
+  ],
+  "answer": 0,
+  "expectError": "KeyError",
+  "explanation": "Python works out 'name'[0] first, which is the letter 'n', and then looks for a key called 'n'. There is no such key. The intended line is person['name'][0], which looks up the name and then takes its first letter.",
+  "wrongExplanations": [
+   "",
+   "That is what person['name'][0] would give. The brackets here are inside the quotes' position, not after it.",
+   "That would be person['name'], without the extra brackets.",
+   "The string 'name' is used as a lookup, not printed."
+  ]
+ },
+ {
+  "id": "dicts-09",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print(len(ext))",
+  "options": [
+   "6",
+   "12",
+   "2101",
+   "1"
+  ],
+  "answer": 0,
+  "expect": "6\n",
+  "explanation": "len() on a dictionary counts the entries, which is the same as counting the keys. There are six people in ext.",
+  "wrongExplanations": [
+   "",
+   "Keys and values are not counted separately; one entry is one item.",
+   "That is the first value, not a count.",
+   "len() counts the entries, not the dictionary itself."
+  ]
+ },
+ {
+  "id": "dicts-10",
+  "area": "Data structures",
+  "topic": "dicts",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You are building an encyclopedia where someone types a word and gets its description. Which structure fits best?",
+  "options": [
+   "A dictionary, with the word as key and the description as value",
+   "A list of descriptions",
+   "A set of words",
+   "A tuple of word and description pairs"
+  ],
+  "answer": 0,
+  "explanation": "People look an entry up by word, not by position, and that is exactly what a dictionary is for. Each word has one entry, which fits neatly with keys not being allowed to repeat.",
+  "wrongExplanations": [
+   "",
+   "You would have to know the position of each description, which nobody looking up a word does.",
+   "A set would record which words exist but could not store what they mean.",
+   "You could store pairs that way, but finding one would mean checking them one by one."
+  ]
+ },
+ {
+  "id": "choosing-01",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You keep a bird-watching diary: for each species, every different place you have seen it. Seeing a robin in the garden twice should not be recorded twice. Which structure fits?",
+  "options": [
+   "A dictionary with the species as key and a set of places as the value",
+   "A dictionary with the species as key and one place as the value",
+   "A list of species and a list of places",
+   "A set of species"
+  ],
+  "answer": 0,
+  "explanation": "The species is what you look up, so it is the key. The places need to be unique, which is exactly what a set does, so the value is a set.",
+  "wrongExplanations": [
+   "",
+   "With one place as the value, each new sighting would replace the last one and you would lose the earlier places.",
+   "Two matching lists would work, but you would have to search them yourself instead of looking a species up directly.",
+   "A set of species records which birds you have seen but nothing about where."
+  ]
+ },
+ {
+  "id": "choosing-02",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "structure",
+  "difficulty": 3,
+  "question": "A family tree holds, for each person, their date of birth and lists of parents, siblings and children. Which shape fits best?",
+  "options": [
+   "A dictionary of people, where each value is a smaller dictionary of labelled details",
+   "A list of names",
+   "A set of people",
+   "A tuple of four lists"
+  ],
+  "answer": 0,
+  "explanation": "The outer dictionary lets you find a person. Their own dictionary holds labelled details, and parents, siblings and children are lists, because there can be more than one of each.",
+  "wrongExplanations": [
+   "",
+   "A list of names cannot hold the details that go with each name.",
+   "A set would record who exists but nothing about them, and it has no order.",
+   "You could not tell which entry in each list belonged to which person."
+  ]
+ },
+ {
+  "id": "choosing-03",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print, and what does it tell you?",
+  "code": "print(len(depts))\nprint(len(set(depts)))",
+  "options": [
+   "6 / 3",
+   "6 / 6",
+   "3 / 3",
+   "3 / 6"
+  ],
+  "answer": 0,
+  "expect": "6\n3\n",
+  "explanation": "There are six entries in the list because every person has one, but only three different departments. Wrapping a list in set() is the usual way to ask 'how many different ones are there?'",
+  "wrongExplanations": [
+   "",
+   "The set drops the repeats, so the second number is smaller.",
+   "The list keeps all six entries, one per person.",
+   "These are the right numbers in the wrong order: the list is the longer one."
+  ]
+ },
+ {
+  "id": "choosing-04",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "structure",
+  "difficulty": 1,
+  "question": "You are recording the ID numbers of everyone who visits a website, and you only care whether someone has visited, not how often. Which structure fits?",
+  "options": [
+   "A set",
+   "A list",
+   "A tuple",
+   "A dictionary of counts"
+  ],
+  "answer": 0,
+  "explanation": "A set keeps one copy of each ID and makes checking 'has this person been here?' easy with the in operator.",
+  "wrongExplanations": [
+   "",
+   "A list would store the same ID again on every visit, which you have said you do not care about.",
+   "A tuple cannot be added to as new visitors arrive.",
+   "Counts would be the right answer to a different question, namely how often each person visits."
+  ]
+ },
+ {
+  "id": "choosing-05",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You need to look an employee's extension up by their name. Which structure fits?",
+  "options": [
+   "A dictionary with names as keys",
+   "A list of extensions",
+   "A set of names",
+   "Two tuples, one of names and one of extensions"
+  ],
+  "answer": 0,
+  "explanation": "Looking something up by a label is precisely what a dictionary does, which is why ext is written that way.",
+  "wrongExplanations": [
+   "",
+   "You would need to know each person's position in the list, which rather defeats the point.",
+   "A set records which names exist but cannot store a number against them.",
+   "That would work with zip, but you would be searching rather than looking up."
+  ]
+ },
+ {
+  "id": "choosing-06",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "Why is a set a poor choice for storing the order people joined the team?",
+  "options": [
+   "A set has no order, so the sequence is lost",
+   "A set cannot hold strings",
+   "A set can only hold six items",
+   "A set cannot be printed"
+  ],
+  "answer": 0,
+  "explanation": "Sets are unordered: when you loop over one, there is no promise about which item comes first. If order carries meaning, use a list or a tuple.",
+  "wrongExplanations": [
+   "",
+   "Sets hold strings happily.",
+   "There is no size limit worth worrying about.",
+   "A set prints fine; it is the order you cannot rely on."
+  ]
+ },
+ {
+  "id": "choosing-07",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "logic",
+  "difficulty": 3,
+  "question": "You want to record which department each person is in, and several people share a department. Why is a dictionary with the department as key a poor fit?",
+  "options": [
+   "Keys cannot repeat, so each department could only hold one person",
+   "Departments are strings and cannot be keys",
+   "A dictionary cannot hold more than three entries",
+   "You would have to know each person's position"
+  ],
+  "answer": 0,
+  "explanation": "With the department as key, adding the second HR person would overwrite the first. Either put the person as the key, or make the value a list of people.",
+  "wrongExplanations": [
+   "",
+   "Strings make perfectly good keys; that is what ext uses.",
+   "A dictionary can hold as many entries as you like.",
+   "Dictionaries are looked up by key, so positions never come into it."
+  ]
+ },
+ {
+  "id": "choosing-08",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "Someone used a list to collect the departments and is surprised that HR appears twice. What should they have used?",
+  "code": "found = []\nfound.append('HR')\nfound.append('Finance')\nfound.append('HR')\nprint(len(found))",
+  "options": [
+   "A set, which keeps only one copy of each value",
+   "A tuple, which cannot be changed",
+   "A dictionary, which is looked up by key",
+   "A string, joined together"
+  ],
+  "answer": 0,
+  "expect": "3\n",
+  "explanation": "A list keeps everything it is given, so HR is stored twice and len() says 3. A set would have kept one HR and given 2, which is what 'how many different departments' means.",
+  "wrongExplanations": [
+   "",
+   "A tuple keeps repeats too; it simply cannot be added to afterwards.",
+   "A dictionary would work if you needed a value against each department, but here there is nothing to store.",
+   "Joining into a string makes the repeats harder to deal with, not easier."
+  ]
+ },
+ {
+  "id": "choosing-09",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "Which structure keeps its order AND can be changed after it is created?",
+  "options": [
+   "A list",
+   "A tuple",
+   "A set",
+   "A frozenset"
+  ],
+  "answer": 0,
+  "explanation": "A list is the one that does both. Tuples keep order but are fixed; sets can be changed but have no order; a frozenset is fixed and unordered.",
+  "wrongExplanations": [
+   "",
+   "A tuple keeps its order but cannot be changed.",
+   "A set can be changed but does not keep an order.",
+   "A frozenset has neither: it is unordered and fixed."
+  ]
+ },
+ {
+  "id": "choosing-10",
+  "area": "Data structures",
+  "topic": "choosing",
+  "angle": "concept",
+  "difficulty": 3,
+  "question": "When does it make sense to put one structure inside another?",
+  "options": [
+   "When each entry needs to hold several pieces of information",
+   "Never, because Python does not allow it",
+   "Only when everything is the same type",
+   "Only for numbers"
+  ],
+  "answer": 0,
+  "explanation": "Nesting is normal and useful. A dictionary whose values are lists, or a list of tuples, lets one entry carry more than a single value, which is how the family tree and the bird diary are built.",
+  "wrongExplanations": [
+   "",
+   "Python allows nesting freely: lists in dictionaries, dictionaries in dictionaries, and so on.",
+   "A list can hold a mix of types, and so can a dictionary's values.",
+   "Any type can be nested, not only numbers."
+  ]
+ },
+ {
+  "id": "cond-01",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print(years[0] > years[1])",
+  "options": [
+   "True",
+   "False",
+   "6 > 2",
+   "6"
+  ],
+  "answer": 0,
+  "expect": "True\n",
+  "explanation": "years[0] is 6 and years[1] is 2, and 6 is greater than 2, so the comparison is True. A comparison always gives back True or False.",
+  "wrongExplanations": [
+   "",
+   "6 really is bigger than 2.",
+   "Python works the comparison out rather than printing it as text.",
+   "The comparison gives a True or False answer, not one of the numbers."
+  ]
+ },
+ {
+  "id": "cond-02",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "In what order does Python evaluate not, and, and or?",
+  "options": [
+   "not first, then and, then or",
+   "or first, then and, then not",
+   "They are done strictly left to right",
+   "and first, then or, then not"
+  ],
+  "answer": 0,
+  "explanation": "not binds most tightly, then and, then or. Brackets override this, exactly as they do in arithmetic, and they are worth using whenever a condition has more than two parts.",
+  "wrongExplanations": [
+   "",
+   "That is the reverse of the real order.",
+   "Precedence decides first; left to right only settles ties.",
+   "and does come before or, but not comes before both."
+  ]
+ },
+ {
+  "id": "cond-03",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(True or False and False)",
+  "options": [
+   "True",
+   "False",
+   "It is an error",
+   "None"
+  ],
+  "answer": 0,
+  "expect": "True\n",
+  "explanation": "and is worked out first, so False and False gives False. That leaves True or False, which is True. Reading it as (True or False) and False would give the wrong answer.",
+  "wrongExplanations": [
+   "",
+   "That is what you get if you work the or out first, which is the wrong order.",
+   "The line is perfectly valid Python.",
+   "A boolean expression gives True or False, never None."
+  ]
+ },
+ {
+  "id": "cond-04",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(not False or True)\nprint(not (False or True))",
+  "options": [
+   "True / False",
+   "True / True",
+   "False / True",
+   "False / False"
+  ],
+  "answer": 0,
+  "expect": "True\nFalse\n",
+  "explanation": "On the first line not applies only to False, giving True or True, which is True. On the second the brackets are worked out first, so not is applied to the whole thing: False or True is True, and not True is False.",
+  "wrongExplanations": [
+   "",
+   "The brackets on the second line change what not applies to, which flips the answer.",
+   "not False is True, so the first line is True.",
+   "The two lines really do give different answers; that is the point of the brackets."
+  ]
+ },
+ {
+  "id": "cond-05",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "This was meant to count people in HR or IT. What does it actually print, and why?",
+  "code": "dept = 'Finance'\nif dept == 'HR' or 'IT':\n    print('Counted')\nelse:\n    print('Not counted')",
+  "options": [
+   "Counted, because 'IT' on its own counts as true",
+   "Not counted, which is correct",
+   "Counted, because Finance is in IT",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "Counted\n",
+  "explanation": "Python reads this as (dept == 'HR') or ('IT'). The first part is False, but a non-empty string counts as true on its own, so the whole condition is true for everybody. Write both sides out: dept == 'HR' or dept == 'IT'.",
+  "wrongExplanations": [
+   "",
+   "That is what was wanted, but it is not what happens; the condition is true whatever dept holds.",
+   "Finance is not in IT; the bug is that the department is never actually compared with 'IT'.",
+   "It runs without complaint, which is what makes this bug so easy to miss."
+  ]
+ },
+ {
+  "id": "cond-06",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "What is the difference between == and is?",
+  "options": [
+   "== compares values; is asks whether they are the very same object",
+   "They are identical in every case",
+   "== works only on numbers; is works only on text",
+   "is compares values; == compares types"
+  ],
+  "answer": 0,
+  "explanation": "== asks 'do these hold the same value?'. is asks 'are these literally the same object in memory?'. Two separate lists holding the same numbers are equal but are not the same object.",
+  "wrongExplanations": [
+   "",
+   "They agree often enough to be confusing, but they ask different questions.",
+   "== works on anything, and is does too.",
+   "That is the wrong way round."
+  ]
+ },
+ {
+  "id": "cond-07",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "b = [1, 2, 3000]\nc = [1, 2, 3000]\nprint(b == c)\nprint(b is c)",
+  "options": [
+   "True / False",
+   "True / True",
+   "False / False",
+   "False / True"
+  ],
+  "answer": 0,
+  "expect": "True\nFalse\n",
+  "explanation": "The two lists hold the same values, so == says True. But they were built separately and sit in different places in memory, so is says False. This is the clearest demonstration of the difference.",
+  "wrongExplanations": [
+   "",
+   "is would only be True if both names pointed at one single list, as after c = b.",
+   "The values match, so == is True.",
+   "It is the other way round: equal in value, not the same object."
+  ]
+ },
+ {
+  "id": "cond-08",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "c = 7\nprint(3 <= c <= 7)",
+  "options": [
+   "True",
+   "False",
+   "It is an error",
+   "7"
+  ],
+  "answer": 0,
+  "expect": "True\n",
+  "explanation": "Python lets you chain comparisons, so this reads as 'is c between 3 and 7, ends included?'. c is 7, and <= allows the endpoint, so it is True.",
+  "wrongExplanations": [
+   "",
+   "<= includes the endpoint, so 7 counts. With < it would be False.",
+   "Chaining like this is normal Python and reads like ordinary maths.",
+   "A comparison gives True or False."
+  ]
+ },
+ {
+  "id": "cond-09",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "Why will this not run?",
+  "code": "if years[0] = 6:\n    print('Six years')",
+  "options": [
+   "A condition needs ==, not a single =",
+   "years should not have brackets",
+   "print must be indented further",
+   "if cannot be used with a list"
+  ],
+  "answer": 0,
+  "expectError": "SyntaxError",
+  "explanation": "A single = stores a value, which is not something a condition can do, so Python stops with a SyntaxError. Comparing takes two equals signs: ==.",
+  "wrongExplanations": [
+   "",
+   "years[0] is the normal way to get the first item out of a list.",
+   "Four spaces is the right amount; the problem is on the line above.",
+   "if works with a comparison on anything at all, lists included."
+  ]
+ },
+ {
+  "id": "cond-10",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print('HR' in depts)\nprint('Legal' in depts)",
+  "options": [
+   "True / False",
+   "False / True",
+   "True / True",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "True\nFalse\n",
+  "explanation": "in checks whether a value appears in a collection. HR is in the list of departments; Legal is not. It works on lists, tuples, sets, dictionary keys and even strings.",
+  "wrongExplanations": [
+   "",
+   "HR appears twice in depts, so the first answer is True.",
+   "Legal is nowhere in the list.",
+   "in is valid on any of the collections you have met."
+  ]
+ },
+ {
+  "id": "ifelse-01",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "bug",
+  "difficulty": 1,
+  "question": "Why will this not run?",
+  "code": "if years[0] > 5\n    print('Long service')",
+  "options": [
+   "There is no colon at the end of the if line",
+   "print should not be indented",
+   "years[0] needs quotes",
+   "if should be If"
+  ],
+  "answer": 0,
+  "expectError": "SyntaxError",
+  "explanation": "Every if, elif, else, for and while line ends with a colon. Leaving it off is probably the single most common beginner SyntaxError.",
+  "wrongExplanations": [
+   "",
+   "The indentation is right: the body of an if is indented four spaces.",
+   "Quotes would turn it into text rather than a lookup.",
+   "Python keywords are all lower case."
+  ]
+ },
+ {
+  "id": "ifelse-02",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "a, b, c, d = 3, 5, 7, 11\nif b < 1:\n    print('b is small')\nelif a > 3:\n    print('a is big')\nelif c <= 7:\n    print('c is seven or less')\nelif d == 11:\n    print('d is eleven')\nelse:\n    print('none of them')",
+  "options": [
+   "c is seven or less",
+   "a is big",
+   "d is eleven",
+   "c is seven or less / d is eleven"
+  ],
+  "answer": 0,
+  "expect": "c is seven or less\n",
+  "explanation": "Python tries each test in turn and runs the first one that is true, then skips everything else. b < 1 is false, a > 3 is false because a is exactly 3, c <= 7 is true, so that branch runs and d == 11 is never even looked at.",
+  "wrongExplanations": [
+   "",
+   "a is 3, and 3 > 3 is False. The > does not include the number itself.",
+   "It is true, but an earlier branch already matched, so Python never reaches it.",
+   "Only one branch of an if/elif/else ever runs."
+  ]
+ },
+ {
+  "id": "ifelse-03",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "logic",
+  "difficulty": 3,
+  "question": "You want: under 3 years 'new', 3 to 8 'settled', over 8 'experienced'. Which ordering works for every value?",
+  "options": [
+   "if y < 3 ... elif y <= 8 ... else ...",
+   "if y <= 8 ... elif y < 3 ... else ...",
+   "if y > 8 ... elif y > 3 ... else 'settled'",
+   "if y < 3 ... elif y < 3 ... else ..."
+  ],
+  "answer": 0,
+  "explanation": "Each test is only reached when the ones above it were false, so by the time you reach elif y <= 8 you already know y is 3 or more. That makes the second test short and correct.",
+  "wrongExplanations": [
+   "",
+   "y <= 8 catches everything under 3 as well, so the 'new' branch could never run.",
+   "y > 3 would put exactly 3 in the wrong band, because 3 > 3 is False.",
+   "The same test twice means the second one can never be true."
+  ]
+ },
+ {
+  "id": "ifelse-04",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "Nobody is ever reported as experienced. Why?",
+  "code": "y = 9\nif y > 3:\n    print('settled')\nelif y > 8:\n    print('experienced')\nprint('done')",
+  "options": [
+   "Anyone over 8 is also over 3, so the first branch always catches them first",
+   "y > 8 should be y >= 8",
+   "The elif needs a colon",
+   "print('done') should be indented"
+  ],
+  "answer": 0,
+  "expect": "settled\ndone\n",
+  "explanation": "The more specific test has been put after the more general one, so it can never be reached. Put the narrowest condition first: check y > 8 before y > 3.",
+  "wrongExplanations": [
+   "",
+   "Changing to >= does not help; the branch is still unreachable because the first test catches everything.",
+   "The colon is there on the elif line.",
+   "print('done') is meant to run either way, so leaving it unindented is correct."
+  ]
+ },
+ {
+  "id": "ifelse-05",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "dept = 'IT'\nif dept == 'HR':\n    label = 'people team'\nelif dept == 'Finance':\n    label = 'money team'\nprint(label)",
+  "options": [
+   "A NameError, because label was never set",
+   "IT",
+   "None",
+   "An empty line"
+  ],
+  "answer": 0,
+  "expectError": "NameError",
+  "explanation": "Neither branch matched, so label was never created, and the print then fails. When a variable is set inside an if, make sure every possible path sets it, or give it a starting value before the if.",
+  "wrongExplanations": [
+   "",
+   "label was never given a value at all, so there is nothing to print.",
+   "Python does not quietly create a variable as None; the name simply does not exist.",
+   "Nothing is printed, because the line raises an error instead."
+  ]
+ },
+ {
+  "id": "ifelse-06",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "b, c = 5, 7\ndummy = 'Just a string' if (b > 1 and 3 <= c <= 7) else ''\nprint(dummy)",
+  "options": [
+   "Just a string",
+   "An empty line",
+   "True",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "Just a string\n",
+  "explanation": "This is the shorthand if/else. Read it in order: set dummy to 'Just a string' if the condition is true, otherwise to ''. b is 5 so b > 1, and c is 7 which is between 3 and 7, so the condition holds.",
+  "wrongExplanations": [
+   "",
+   "The empty string is only used when the condition is false.",
+   "The shorthand hands back one of the two values, not the result of the test.",
+   "It is valid Python and a common way to set a variable in one line."
+  ]
+ },
+ {
+  "id": "ifelse-07",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Which line sets half to the value halved when it is even, and to a message when it is odd, in one line? (The value is 9.)",
+  "setup": "val = 9",
+  "options": [
+   "print('Not an even number' if val % 2 else val / 2)",
+   "print(val / 2 if val % 2 else 'Not an even number')",
+   "print('Not an even number' if val % 2 == 0 else val / 2)",
+   "print(val % 2 if val else 'Not an even number')"
+  ],
+  "answer": 0,
+  "expect": "Not an even number\n",
+  "explanation": "val % 2 is the remainder after dividing by 2: it is 1 for odd numbers, which counts as true, and 0 for even ones, which counts as false. So the 'if' part runs for odd numbers.",
+  "wrongExplanations": [
+   "",
+   "This has the two results the wrong way round: it would halve the odd numbers.",
+   "This tests for even rather than odd, so the two results are swapped: it would try to halve 9 and print 4.5.",
+   "val on its own is true for any number except 0, so this almost always shows the remainder."
+  ]
+ },
+ {
+  "id": "ifelse-08",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "How many else clauses can one if statement have?",
+  "options": [
+   "One at most, and it must come last",
+   "As many as you like",
+   "One for each elif",
+   "None; else is not allowed with elif"
+  ],
+  "answer": 0,
+  "explanation": "An if statement starts with if, may have any number of elif branches, and may finish with a single else that catches everything left over.",
+  "wrongExplanations": [
+   "",
+   "Only one else is allowed. Extra alternatives are written as elif.",
+   "Each elif has its own condition; the else is shared and covers everything not matched.",
+   "else works perfectly well after any number of elifs."
+  ]
+ },
+ {
+  "id": "ifelse-09",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "b, c = 5, 7\ndummy = ''\nif b < 1:\n    print('b small')\nelif c <= 7:\n    print('c is seven or less')\n    if c >= 3:\n        print('and at least three')\n        dummy = 'set'\n    else:\n        print('inner default')\nelse:\n    print('outer default')\nprint(dummy)",
+  "options": [
+   "c is seven or less / and at least three / set",
+   "c is seven or less / set",
+   "c is seven or less / and at least three / inner default / set",
+   "outer default / "
+  ],
+  "answer": 0,
+  "expect": "c is seven or less\nand at least three\nset\n",
+  "explanation": "The outer elif matches, so its block runs. Inside it, c >= 3 is also true, so that inner branch runs and sets dummy. The inner else belongs to the inner if and is skipped, and the outer else is skipped too.",
+  "wrongExplanations": [
+   "",
+   "The inner if also matched, so its message is printed as well.",
+   "The inner else only runs when the inner if is false, and here it is true.",
+   "The outer else is only reached when every earlier test fails."
+  ]
+ },
+ {
+  "id": "ifelse-10",
+  "area": "Conditions",
+  "topic": "ifelse",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You have five names, each with a different reply. What does the course suggest instead of five elif branches?",
+  "options": [
+   "A dictionary, looked up by name",
+   "A longer if statement",
+   "A list of all the replies",
+   "A set of names"
+  ],
+  "answer": 0,
+  "explanation": "Put the names as keys and the replies as values, then look the name up directly. Use in, or .get() with a default, so a missing name does not cause a KeyError.",
+  "wrongExplanations": [
+   "",
+   "That is the thing being replaced; it gets longer and harder to maintain with every new name.",
+   "A list has no way of tying each reply to the right name.",
+   "A set records which names exist but cannot store a reply against them."
+  ]
+ },
+ {
+  "id": "tt-01",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "What is a truth table for?",
+  "options": [
+   "Listing every combination of values so you can check a condition behaves correctly",
+   "Making code run faster",
+   "Storing data in a dictionary",
+   "Counting how many times a loop runs"
+  ],
+  "answer": 0,
+  "explanation": "A truth table breaks a complicated condition into its separate clauses and lists every combination of values, so you can see exactly when the whole thing is true. It also tells you which cases to test.",
+  "wrongExplanations": [
+   "",
+   "It is a thinking tool on paper; it has no effect on the code at all.",
+   "It is about conditions, not about storing values.",
+   "That would be a counter inside the loop."
+  ]
+ },
+ {
+  "id": "tt-02",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "logic",
+  "difficulty": 2,
+  "question": "How many rows does a truth table need for two variables that are each either True or False?",
+  "options": [
+   "4",
+   "2",
+   "8",
+   "16"
+  ],
+  "answer": 0,
+  "explanation": "Each variable has two possible values, so two variables give 2 times 2, which is 4 combinations. Three variables would give 8.",
+  "wrongExplanations": [
+   "",
+   "Two rows would only cover one variable.",
+   "8 is the answer for three variables.",
+   "16 is the answer for four variables."
+  ]
+ },
+ {
+  "id": "tt-03",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "Var_1 is True and Var_2 is False. What does this print?",
+  "code": "Var_1 = True\nVar_2 = False\nprint(Var_1 and Var_2 or (Var_1 and not Var_2))",
+  "options": [
+   "True",
+   "False",
+   "It is an error",
+   "None"
+  ],
+  "answer": 0,
+  "expect": "True\n",
+  "explanation": "The first clause, Var_1 and Var_2, is False. The bracketed clause is True and not False, which is True. False or True gives True.",
+  "wrongExplanations": [
+   "",
+   "or only needs one side to be true, and the bracketed clause is true.",
+   "Both names are defined on the lines above.",
+   "A boolean expression gives True or False."
+  ]
+ },
+ {
+  "id": "tt-04",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "logic",
+  "difficulty": 3,
+  "question": "For the condition  age > 24 , which interval of ages makes it True?",
+  "options": [
+   "From 25 upwards, written (24, +infinity)",
+   "From 24 upwards, written [24, +infinity)",
+   "Up to and including 24",
+   "Only exactly 24"
+  ],
+  "answer": 0,
+  "explanation": "A plain > does not include the number itself, so at age 24 the condition is False. The boundary therefore sits just above 24: the True interval starts after 24, not at it.",
+  "wrongExplanations": [
+   "",
+   "This includes 24 itself, but 24 > 24 is False. Square brackets mean the endpoint is included, which is wrong here.",
+   "That is where the condition is False.",
+   "Every age above 24 makes it True, not just one value."
+  ]
+ },
+ {
+  "id": "tt-05",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "A truth table splits ages into (18, 24) and [24, +infinity) and marks  age > 24  as True for the second one. Which age is handled wrongly?",
+  "options": [
+   "24, because 24 > 24 is False",
+   "18, because it sits on a boundary",
+   "25, because it is in neither interval",
+   "None; the table is correct"
+  ],
+  "answer": 0,
+  "expect": "False\n",
+  "code": "age = 24\nprint(age > 24)",
+  "explanation": "The square bracket puts 24 in the interval marked True, but 24 > 24 is False. The split should be (18, 24] and (24, +infinity), so that 24 sits with the values that make the condition false.",
+  "wrongExplanations": [
+   "",
+   "18 is excluded from the first interval by the round bracket, which matches 18 > 18 being False.",
+   "25 is inside the second interval and is handled correctly.",
+   "There is a real mistake here, and it is exactly on the boundary value."
+  ]
+ },
+ {
+  "id": "tt-06",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "A post code has exactly 3 characters. What does this print?",
+  "code": "post_code = 'AB1'\nprint(len(post_code) > 3)",
+  "options": [
+   "False",
+   "True",
+   "3",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "False\n",
+  "explanation": "len('AB1') is 3, and 3 > 3 is False. A table that marks this as True for an interval starting at 3 has the boundary in the wrong place: it should be (3, +infinity).",
+  "wrongExplanations": [
+   "",
+   "A plain > never includes the number itself. >= would be True here.",
+   "len() gives 3, but the comparison turns that into True or False.",
+   "The line is valid; strings have a length."
+  ]
+ },
+ {
+  "id": "tt-07",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "In a truth table, why does an empty string count as False in a clause that is just  post_code ?",
+  "options": [
+   "An empty string counts as false on its own; a string with anything in it counts as true",
+   "Strings are always false",
+   "Python converts strings to numbers first",
+   "It is a mistake; strings cannot be used as conditions"
+  ],
+  "answer": 0,
+  "explanation": "Python treats an empty string, an empty list and the number 0 as false, and anything with something in it as true. That is why a bare variable can be used as a clause.",
+  "wrongExplanations": [
+   "",
+   "A non-empty string counts as true.",
+   "No conversion happens; Python has a rule about what counts as true for each type.",
+   "Any value can be used as a condition; it just has to be clear what counts as true."
+  ]
+ },
+ {
+  "id": "tt-08",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "logic",
+  "difficulty": 3,
+  "question": "How does Python read  A or B and C  when the brackets are left out?",
+  "options": [
+   "A or (B and C)",
+   "(A or B) and C",
+   "Strictly left to right, so A or B first",
+   "It is ambiguous and Python raises an error"
+  ],
+  "answer": 0,
+  "explanation": "and binds more tightly than or, so B and C is worked out first and the result is then combined with A using or.",
+  "wrongExplanations": [
+   "",
+   "That would need brackets written in, because or is the looser of the two.",
+   "Precedence decides before left-to-right order does.",
+   "Python has clear rules here, so there is nothing ambiguous about it."
+  ]
+ },
+ {
+  "id": "tt-09",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "When building a truth table for  16 < age <= 18  and  len(post_code) > 3 , how do you decide where the age intervals start and stop?",
+  "options": [
+   "Look at the clauses with age in them and take the boundary numbers from those",
+   "Split the ages into ten equal bands",
+   "Use whatever intervals the data happens to contain",
+   "Use one row per possible age"
+  ],
+  "answer": 0,
+  "explanation": "The boundaries come from the conditions themselves: 16, 18 and 24 appear in the clauses, so those are the places where the answers change. Everything between two boundaries behaves the same way.",
+  "wrongExplanations": [
+   "",
+   "Equal bands would not line up with where the condition's answer actually changes.",
+   "The table is about the condition, not about a particular set of data.",
+   "Every age would mean a hopelessly long table, and all ages between two boundaries behave alike anyway."
+  ]
+ },
+ {
+  "id": "tt-10",
+  "area": "Conditions",
+  "topic": "truthtables",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "age is 30 and post_code is 'AB12'. What does this print?",
+  "code": "age = 30\npost_code = 'AB12'\nprint((16 < age <= 18 and post_code) or age > 24 and len(post_code) > 3)",
+  "options": [
+   "True",
+   "False",
+   "AB12",
+   "It is an error"
+  ],
+  "answer": 0,
+  "expect": "True\n",
+  "explanation": "The first bracket is False, because 30 is not between 16 and 18. On the right, age > 24 is True and len('AB12') > 3 is True, and and binds tighter than or, so that side is True. False or True is True.",
+  "wrongExplanations": [
+   "",
+   "The right-hand side is true, and or only needs one side.",
+   "The whole expression is a comparison, so the result is True or False.",
+   "Everything here is valid Python."
+  ]
+ },
+ {
+  "id": "for-01",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "for name, dept in zip(names, depts):\n    if dept == 'IT':\n        break\n    print(name)",
+  "options": [
+   "Aisha / Ben / Carla",
+   "Dan / Finn",
+   "Aisha / Ben / Carla / Dan",
+   "(nothing is printed)"
+  ],
+  "answer": 0,
+  "expect": "Aisha\nBen\nCarla\n",
+  "explanation": "zip pairs each name with its department. The first three are not in IT, so they are printed. Dan is in IT, so break stops the loop straight away, before his print line runs.",
+  "wrongExplanations": [
+   "",
+   "Those are the IT people, but break stops the loop rather than selecting them.",
+   "Dan triggers the break before his name is printed.",
+   "The first three names are printed before the loop reaches Dan."
+  ]
+ },
+ {
+  "id": "for-02",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "for i in range(3):\n    print(i)",
+  "options": [
+   "0 / 1 / 2",
+   "1 / 2 / 3",
+   "0 / 1 / 2 / 3",
+   "3"
+  ],
+  "answer": 0,
+  "expect": "0\n1\n2\n",
+  "explanation": "range(3) gives three numbers starting at 0, so you get 0, 1 and 2. The number you pass in is how many you want, not the last one.",
+  "wrongExplanations": [
+   "",
+   "range always starts at 0 unless you tell it otherwise.",
+   "It stops before 3, so 3 itself is never produced.",
+   "The loop runs three times, printing each number."
+  ]
+ },
+ {
+  "id": "for-03",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "for i in range(10, 0, -2):\n    print(i)",
+  "options": [
+   "10 / 8 / 6 / 4 / 2",
+   "10 / 8 / 6 / 4 / 2 / 0",
+   "0 / 2 / 4 / 6 / 8",
+   "(nothing is printed)"
+  ],
+  "answer": 0,
+  "expect": "10\n8\n6\n4\n2\n",
+  "explanation": "With three arguments, range takes a start, a stop and a step. Counting down from 10 in twos, it stops before reaching 0, so the last value is 2.",
+  "wrongExplanations": [
+   "",
+   "The stop value is never included, so 0 does not appear.",
+   "The step is negative, so it counts down rather than up.",
+   "With a negative step and a start above the stop, it does produce values."
+  ]
+ },
+ {
+  "id": "for-04",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "for i in range(6):\n    if i in [1, 3]:\n        continue\n    print(i)",
+  "options": [
+   "0 / 2 / 4 / 5",
+   "0 / 1 / 2 / 3 / 4 / 5",
+   "1 / 3",
+   "0 / 2 / 4"
+  ],
+  "answer": 0,
+  "expect": "0\n2\n4\n5\n",
+  "explanation": "continue skips the rest of the loop body and moves straight to the next number, so 1 and 3 are never printed. Unlike break, the loop carries on afterwards.",
+  "wrongExplanations": [
+   "",
+   "continue really does skip the print for 1 and 3.",
+   "continue skips those two; it does not select them.",
+   "5 is printed too: only 1 and 3 are skipped."
+  ]
+ },
+ {
+  "id": "for-05",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "This prints the same name six times. What is wrong?",
+  "code": "for person in names:\n    print(names[0])",
+  "options": [
+   "The loop variable person is never used inside the loop",
+   "names should be in quotes",
+   "The loop needs a range()",
+   "print should not be indented"
+  ],
+  "answer": 0,
+  "expect": "Aisha\nAisha\nAisha\nAisha\nAisha\nAisha\n",
+  "explanation": "The loop goes round once per person, but the body always asks for names[0], so it prints Aisha every time. The body should use the loop variable: print(person).",
+  "wrongExplanations": [
+   "",
+   "Quotes would make it the word 'names' rather than the list.",
+   "Looping straight over a list is the normal way to do this; range is for when you need position numbers.",
+   "The print belongs inside the loop, so the indentation is right."
+  ]
+ },
+ {
+  "id": "for-06",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "This should print all six names. Why does it print only one?",
+  "code": "for person in names:\n    pass\nprint(person)",
+  "options": [
+   "The print is not indented, so it runs once after the loop has finished",
+   "names only holds one value",
+   "pass stops the loop",
+   "A for loop can only print once"
+  ],
+  "answer": 0,
+  "expect": "Finn\n",
+  "explanation": "Only indented lines are part of the loop body. print sits outside it, so it runs once at the end, showing whatever the loop variable was left holding, which is the last name.",
+  "wrongExplanations": [
+   "",
+   "names holds six names; the loop really does go round six times.",
+   "pass means 'do nothing here'; it does not end the loop.",
+   "A print inside a loop runs on every pass. The problem is that this one is outside."
+  ]
+ },
+ {
+  "id": "for-07",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Which line gives you both the position number and the name on each pass?",
+  "setup": "short = ['Aisha', 'Ben']",
+  "options": [
+   "print([f'{i} {n}' for i, n in enumerate(short)])",
+   "print([f'{i} {n}' for i, n in zip(short)])",
+   "print([f'{i} {n}' for i, n in range(short)])",
+   "print([f'{i} {n}' for i, n in short.items()])"
+  ],
+  "answer": 0,
+  "expect": "['0 Aisha', '1 Ben']\n",
+  "explanation": "enumerate hands back the position and the item together on every pass, which is exactly what is wanted here.",
+  "wrongExplanations": [
+   "",
+   "zip with only one list gives back single items, not pairs, so there is nothing to unpack into two names.",
+   "range needs a number, not a list, and it gives one number at a time rather than a pair.",
+   ".items() belongs to dictionaries; a list does not have it."
+  ]
+ },
+ {
+  "id": "for-08",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "Why does this fail?",
+  "code": "for name, dept in range(6):\n    print(name, dept)",
+  "options": [
+   "range gives one number at a time, so there is nothing to split into two variables",
+   "range cannot be used in a for loop",
+   "6 should be in quotes",
+   "name and dept are reserved words"
+  ],
+  "answer": 0,
+  "expectError": "TypeError",
+  "explanation": "Writing two names after for only works when each pass hands back a pair, as zip, enumerate and .items() do. range gives a single number, so Python cannot unpack it and raises a TypeError.",
+  "wrongExplanations": [
+   "",
+   "range is one of the most common things to loop over.",
+   "range needs a number, and quotes would make it text.",
+   "Neither is a reserved word; they are ordinary names."
+  ]
+ },
+ {
+  "id": "for-09",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "for n in range(2, 6):\n    for x in range(2, n):\n        if n % x == 0:\n            break\n    else:\n        print(n, 'is prime')",
+  "options": [
+   "2 is prime / 3 is prime / 5 is prime",
+   "2 is prime / 3 is prime / 4 is prime / 5 is prime",
+   "3 is prime / 5 is prime",
+   "(nothing is printed)"
+  ],
+  "answer": 0,
+  "expect": "2 is prime\n3 is prime\n5 is prime\n",
+  "explanation": "A for loop can have an else, which runs only when the loop finishes without hitting break. For 4, x reaches 2 and 4 % 2 is 0, so break fires and the else is skipped. For 2 the inner range is empty, so the else runs.",
+  "wrongExplanations": [
+   "",
+   "4 divides by 2, so its inner loop breaks and the else is skipped.",
+   "2 counts too: range(2, 2) is empty, so the inner loop finishes without breaking.",
+   "The else after a for loop does run, whenever no break happened."
+  ]
+ },
+ {
+  "id": "for-10",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "concept",
+  "difficulty": 3,
+  "question": "When does the else after a for loop run?",
+  "options": [
+   "When the loop finished normally, without hitting break",
+   "When the loop body never ran",
+   "Always, after the loop",
+   "Only when the loop raised an error"
+  ],
+  "answer": 0,
+  "explanation": "Think of it as a 'no break happened' clause. It is useful for searching: if the loop never found what it was after, the else says so. It lines up with the for, not with any if inside the loop.",
+  "wrongExplanations": [
+   "",
+   "It still runs when the sequence was empty, because no break happened then either.",
+   "A break skips it, which is the whole point of it.",
+   "Errors stop the loop altogether; the else has nothing to do with them."
+  ]
+ },
+ {
+  "id": "for-11",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "The else was meant to line up with the for. What does this print instead?",
+  "code": "for n in [4, 9]:\n    if n % 2 == 0:\n        print(n, 'is even')\n    else:\n        print(n, 'is odd')",
+  "options": [
+   "4 is even / 9 is odd",
+   "4 is even",
+   "9 is odd",
+   "(nothing is printed)"
+  ],
+  "answer": 0,
+  "expect": "4 is even\n9 is odd\n",
+  "explanation": "Indented under the if, the else belongs to the if and runs on every pass where the test is false. Lined up with the for instead, it would run once at the end. Indentation alone decides which one you get.",
+  "wrongExplanations": [
+   "",
+   "The loop runs for both numbers, so both lines are printed.",
+   "4 is handled by the if branch on the first pass.",
+   "Both branches print something, so the loop is far from silent."
+  ]
+ },
+ {
+  "id": "for-12",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "for ind, nam in enumerate(names):\n    if ind % 3:\n        continue\n    print(nam)",
+  "options": [
+   "Aisha / Dan",
+   "Aisha / Ben / Carla",
+   "Ben / Carla / Ella / Finn",
+   "Aisha / Dan / Finn"
+  ],
+  "answer": 0,
+  "expect": "Aisha\nDan\n",
+  "explanation": "ind % 3 is the remainder after dividing by 3. It is 0 for positions 0 and 3, and 0 counts as false, so continue is skipped and those names print. Every other position has a remainder of 1 or 2, which counts as true.",
+  "wrongExplanations": [
+   "",
+   "That would be positions 0, 1 and 2; the remainder test picks every third one instead.",
+   "Those are the positions that are skipped, not the ones kept.",
+   "Finn is at position 5, and 5 % 3 is 2, so he is skipped."
+  ]
+ },
+ {
+  "id": "for-13",
+  "area": "Loops",
+  "topic": "forloops",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "You want to loop over two matching lists at once, names and depts. Which tool fits?",
+  "options": [
+   "zip(names, depts)",
+   "range(names)",
+   "enumerate(names)",
+   "names.items()"
+  ],
+  "answer": 0,
+  "explanation": "zip locks two or more sequences together and hands back one item from each on every pass, stopping when the shortest runs out.",
+  "wrongExplanations": [
+   "",
+   "range needs a number, not a list. range(len(names)) would work but gives positions, not the items themselves.",
+   "enumerate gives you positions alongside one list, so you would still have to look up the other by position.",
+   ".items() belongs to dictionaries, not lists."
+  ]
+ },
+ {
+  "id": "while-01",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "When should you reach for a while loop rather than a for loop?",
+  "options": [
+   "When you do not know in advance how many times it needs to go round",
+   "When you have a list to go through",
+   "When you need the position of each item",
+   "When you want it to run exactly ten times"
+  ],
+  "answer": 0,
+  "explanation": "A while loop keeps going as long as its condition stays true. You use it when you know what has to happen to stop, but not how many passes that will take.",
+  "wrongExplanations": [
+   "",
+   "A for loop is the natural fit for going through a list.",
+   "enumerate in a for loop handles that neatly.",
+   "range in a for loop is simpler when you know the number."
+  ]
+ },
+ {
+  "id": "while-02",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "i = 0\nwhile i < 3:\n    print(i)\n    i += 1",
+  "options": [
+   "0 / 1 / 2",
+   "0 / 1 / 2 / 3",
+   "1 / 2 / 3",
+   "It runs forever"
+  ],
+  "answer": 0,
+  "expect": "0\n1\n2\n",
+  "explanation": "The condition is checked before each pass. When i reaches 3 the condition is false, so the loop stops without printing 3. i += 1 is shorthand for i = i + 1.",
+  "wrongExplanations": [
+   "",
+   "The check happens before the body runs, so 3 is never printed.",
+   "i starts at 0 and is printed before it is increased.",
+   "i does change on every pass, so the loop does end."
+  ]
+ },
+ {
+  "id": "while-03",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "Why does this never stop?",
+  "code": "i = 0\nwhile i < 3:\n    print('still going')",
+  "options": [
+   "i is never changed inside the loop, so the condition stays true forever",
+   "while loops always run forever",
+   "The condition should use <=",
+   "print cannot be used in a while loop"
+  ],
+  "answer": 0,
+  "explanation": "Unlike a for loop, a while loop has nothing moving it along. You have to change the variable in the condition yourself, or it will stay true for ever.",
+  "wrongExplanations": [
+   "",
+   "They stop as soon as the condition becomes false; this one simply never does.",
+   "Changing to <= would just make it run forever from a different starting point.",
+   "print is fine; the missing line is i += 1."
+  ]
+ },
+ {
+  "id": "while-04",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "i = 0\nwhile True:\n    print(i)\n    if i == 2:\n        break\n    i += 1",
+  "options": [
+   "0 / 1 / 2",
+   "0 / 1",
+   "It runs forever",
+   "(nothing is printed)"
+  ],
+  "answer": 0,
+  "expect": "0\n1\n2\n",
+  "explanation": "while True never ends on its own, so a break inside is what stops it. The print comes before the check, so 2 is printed and then the loop breaks.",
+  "wrongExplanations": [
+   "",
+   "The break happens after the print, so 2 does appear.",
+   "The break gets it out; while True is only infinite if nothing breaks.",
+   "The body runs at least once, because True is true straight away."
+  ]
+ },
+ {
+  "id": "while-05",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "The person types 7, then 42. What does this print?",
+  "code": "attempts = 0\nwhile attempts < 3:\n    val = input()\n    if val.isdigit() and int(val) == 42:\n        print('Correct')\n        break\n    print('Nope')\n    attempts += 1\nelse:\n    print('No more attempts')",
+  "options": [
+   "Nope / Correct",
+   "Nope / Nope / Correct",
+   "Correct",
+   "Nope / Correct / No more attempts"
+  ],
+  "answer": 0,
+  "expect": "Nope\nCorrect\n",
+  "stdin": "7\n42\n",
+  "explanation": "7 is not 42, so 'Nope' prints and attempts becomes 1. The next pass reads 42, prints 'Correct' and breaks. The else after a while only runs when the loop ends because its condition went false, and a break skips it.",
+  "wrongExplanations": [
+   "",
+   "Only two values are typed, and the second one is right.",
+   "The first value, 7, is wrong, so 'Nope' prints first.",
+   "The break skips the else, so 'No more attempts' is not printed."
+  ]
+ },
+ {
+  "id": "while-06",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "concept",
+  "difficulty": 3,
+  "question": "When does the else after a while loop run?",
+  "options": [
+   "When the loop ended because its condition became false, not because of a break",
+   "Always, after the loop",
+   "Only when the loop never ran",
+   "Only when a break happened"
+  ],
+  "answer": 0,
+  "explanation": "It is the same idea as the else on a for loop: it runs when the loop finished naturally. A break jumps out and skips it, which is how you tell 'ran out of attempts' from 'got it right'.",
+  "wrongExplanations": [
+   "",
+   "A break skips it entirely.",
+   "It runs then too, because the condition was false from the start, which is a natural end.",
+   "It is the opposite: a break is exactly what stops it running."
+  ]
+ },
+ {
+  "id": "while-07",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "tea = 87\nwhile tea > 84:\n    print(tea)\n    tea -= 1\nprint(tea, 'is cool enough')",
+  "options": [
+   "87 / 86 / 85 / 84 is cool enough",
+   "87 / 86 / 85 / 84 / 84 is cool enough",
+   "86 / 85 / 84 / 84 is cool enough",
+   "87 / 86 / 85 / 85 is cool enough"
+  ],
+  "answer": 0,
+  "expect": "87\n86\n85\n84 is cool enough\n",
+  "explanation": "The loop prints while the temperature is above 84, so it prints 87, 86 and 85. When tea reaches 84 the condition is false, the loop ends, and the final line prints outside it.",
+  "wrongExplanations": [
+   "",
+   "84 is not printed inside the loop, because 84 > 84 is false.",
+   "The first pass prints 87, before anything is taken away.",
+   "The last value inside the loop is 85, and then tea becomes 84."
+  ]
+ },
+ {
+  "id": "while-08",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "The person types 'seven'. Why does this stop with an error?",
+  "code": "val = input()\nif int(val) > 10:\n    print('big')\nelse:\n    print('small')",
+  "options": [
+   "int() is used before checking the text is actually digits",
+   "input() can only take numbers",
+   "The if needs a colon",
+   "'seven' should be in quotes"
+  ],
+  "answer": 0,
+  "expectError": "ValueError",
+  "stdin": "seven\n",
+  "explanation": "int('seven') cannot work, so Python raises a ValueError. Check first with val.isdigit(), and only convert once you know it is safe.",
+  "wrongExplanations": [
+   "",
+   "input() happily accepts any text; it is int() that objects.",
+   "The colon is there on the if line; the error comes from int() further along.",
+   "It is already text, because input() always hands back a string."
+  ]
+ },
+ {
+  "id": "while-09",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "Which line safely checks that what the person typed is a whole number before converting it? (They typed 'abc'.)",
+  "setup": "val = 'abc'",
+  "options": [
+   "print(val.isdigit())",
+   "print(int(val))",
+   "print(val.isalpha())",
+   "print(val.isnumber())"
+  ],
+  "answer": 0,
+  "expect": "False\n",
+  "explanation": ".isdigit() asks whether every character is a digit, and gives back True or False without ever failing. That makes it safe to use before int().",
+  "wrongExplanations": [
+   "",
+   "int('abc') raises a ValueError, which is exactly what you were trying to avoid.",
+   ".isalpha() asks whether the text is all letters, which is the opposite question. For 'abc' it says True, which would send you straight into int() and the error you were avoiding.",
+   "There is no .isnumber() method on a string; the one that exists is .isdigit()."
+  ]
+ },
+ {
+  "id": "while-10",
+  "area": "Loops",
+  "topic": "whileloops",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "n = 2\nwhile n <= 20:\n    if n % 10 == 6:\n        n = n * 2\n        continue\n    print(n)\n    n = n * 2",
+  "options": [
+   "2 / 4 / 8",
+   "2 / 4 / 8 / 16",
+   "2 / 4 / 8 / 16 / 32",
+   "2 / 4 / 8 / 32"
+  ],
+  "answer": 0,
+  "expect": "2\n4\n8\n",
+  "explanation": "The series doubles: 2, 4, 8, 16, 32. 16 ends in a 6, so continue skips its print, though n is doubled first so the loop still moves on. The next value, 32, is over 20, so the loop ends.",
+  "wrongExplanations": [
+   "",
+   "16 ends in a 6, so the continue skips its print line.",
+   "16 is skipped, and 32 is never printed because the loop ends before it.",
+   "32 is over the limit of 20, so the loop stops without printing it."
+  ]
+ },
+ {
+  "id": "comp-01",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "concept",
+  "difficulty": 1,
+  "question": "What is a comprehension, in one sentence?",
+  "options": [
+   "A for loop written on one line that builds a whole collection at once",
+   "A way of making code run without a loop",
+   "A kind of function you define yourself",
+   "A comment explaining what the code does"
+  ],
+  "answer": 0,
+  "explanation": "It is still a loop; it has just been folded onto one line, with the thing you want to collect moved to the front. Instead of making an empty list and appending one item at a time, you get the finished collection back.",
+  "wrongExplanations": [
+   "",
+   "The looping still happens, line by line, exactly as before.",
+   "Defining functions is a separate idea; a comprehension builds a collection.",
+   "It is working code, not a comment."
+  ]
+ },
+ {
+  "id": "comp-02",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 1,
+  "question": "What does this print?",
+  "code": "print([i * i for i in range(5)])",
+  "options": [
+   "[0, 1, 4, 9, 16]",
+   "[1, 4, 9, 16, 25]",
+   "[0, 1, 2, 3, 4]",
+   "[0, 2, 4, 6, 8]"
+  ],
+  "answer": 0,
+  "expect": "[0, 1, 4, 9, 16]\n",
+  "explanation": "range(5) gives 0 to 4, and each one is multiplied by itself. The part before the for is what gets collected.",
+  "wrongExplanations": [
+   "",
+   "That would be range(1, 6); range(5) starts at 0.",
+   "That would be [i for i in range(5)], with no multiplying.",
+   "That is i * 2, not i * i."
+  ]
+ },
+ {
+  "id": "comp-03",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print([n for n in years if n > 3])",
+  "options": [
+   "[6, 9, 4]",
+   "[6, 2, 9, 1, 4, 3]",
+   "[2, 1, 3]",
+   "[6, 9, 4, 3]"
+  ],
+  "answer": 0,
+  "expect": "[6, 9, 4]\n",
+  "explanation": "An if at the end filters: only the values that pass the test are collected. years is [6, 2, 9, 1, 4, 3], and 6, 9 and 4 are the ones above 3.",
+  "wrongExplanations": [
+   "",
+   "The if removes some of them, so not everything is kept.",
+   "Those are the values that fail the test, not the ones that pass.",
+   "3 is not greater than 3; a plain > never includes the number itself."
+  ]
+ },
+ {
+  "id": "comp-04",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(['odd' if i % 2 else 'even' for i in range(4)])",
+  "options": [
+   "['even', 'odd', 'even', 'odd']",
+   "['odd', 'even', 'odd', 'even']",
+   "['even', 'even', 'odd', 'odd']",
+   "[0, 1, 0, 1]"
+  ],
+  "answer": 0,
+  "expect": "['even', 'odd', 'even', 'odd']\n",
+  "explanation": "i % 2 is 0 for even numbers, and 0 counts as false, so those give 'even'. Starting at 0, the pattern alternates from 'even'.",
+  "wrongExplanations": [
+   "",
+   "0 is the first number and it is even, so the list starts with 'even'.",
+   "The numbers alternate one by one, not in pairs.",
+   "The if/else at the front replaces each number with one of the two words."
+  ]
+ },
+ {
+  "id": "comp-05",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "logic",
+  "difficulty": 3,
+  "question": "Where does the if go when you want to leave some items out altogether, rather than replace them?",
+  "options": [
+   "At the end, after the for",
+   "At the front, before the for",
+   "It does not matter",
+   "An if cannot be used in a comprehension"
+  ],
+  "answer": 0,
+  "explanation": "An if at the end filters: items that fail the test are simply not collected. An if/else at the front chooses between two values for every item, so nothing is dropped.",
+  "wrongExplanations": [
+   "",
+   "At the front it must be a full if/else, and it replaces values rather than removing them.",
+   "The position changes the meaning completely, so it matters a great deal.",
+   "Both forms are allowed and are used often."
+  ]
+ },
+ {
+  "id": "comp-06",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(len({ch for ch in 'mississippi'}))",
+  "options": [
+   "4",
+   "11",
+   "1",
+   "8"
+  ],
+  "answer": 0,
+  "expect": "4\n",
+  "explanation": "Curly brackets make a set comprehension, so repeats are dropped. The word has eleven letters but only four different ones: m, i, s and p.",
+  "wrongExplanations": [
+   "",
+   "That is the length of the word; the set keeps each letter once.",
+   "Four different letters are kept, not one.",
+   "Eight would be the answer if only some repeats were removed; a set removes all of them."
+  ]
+ },
+ {
+  "id": "comp-07",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print([nam.split()[0] for nam in full_names])",
+  "options": [
+   "['Aisha', 'Ben', 'Carla', 'Dan', 'Ella', 'Finn']",
+   "['Khan', 'Morris', 'Diaz', 'Okafor', 'Novak', 'Walsh']",
+   "['Aisha Khan', 'Ben Morris', 'Carla Diaz', 'Dan Okafor', 'Ella Novak', 'Finn Walsh']",
+   "('Aisha', 'Ben', 'Carla', 'Dan', 'Ella', 'Finn')"
+  ],
+  "answer": 0,
+  "expect": "['Aisha', 'Ben', 'Carla', 'Dan', 'Ella', 'Finn']\n",
+  "explanation": ".split() with no argument cuts a string at the spaces and hands back a list of the pieces, so [0] takes the first name. Note that it is a list that comes back, not a tuple, whatever some notes say.",
+  "wrongExplanations": [
+   "",
+   "That would be [1], the second piece.",
+   "The comprehension takes a piece out of each name rather than keeping it whole.",
+   "A list comprehension builds a list; the square brackets around it decide that."
+  ]
+ },
+ {
+  "id": "comp-08",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "multi = [[1, 2], [3, 4], [5]]\nprint([inner for outer in multi for inner in outer])",
+  "options": [
+   "[1, 2, 3, 4, 5]",
+   "[[1, 2], [3, 4], [5]]",
+   "[1, 3, 5]",
+   "[5, 4, 3, 2, 1]"
+  ],
+  "answer": 0,
+  "expect": "[1, 2, 3, 4, 5]\n",
+  "explanation": "This is flattening. Read the two for parts left to right, exactly like two nested loops: take each inner list out of multi, then take each item out of that. The thing collected, inner, is written first.",
+  "wrongExplanations": [
+   "",
+   "Flattening removes the nesting, leaving one flat list.",
+   "Every item is collected, not just the first of each.",
+   "The order is kept as it was; nothing is reversed."
+  ]
+ },
+ {
+  "id": "comp-09",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "bug",
+  "difficulty": 3,
+  "question": "Why does this give an error?",
+  "code": "multi = [[1, 2], [3, 4]]\nprint([inner for inner in outer for outer in multi])",
+  "options": [
+   "The two for parts are the wrong way round, so outer is used before it exists",
+   "multi should be a tuple",
+   "You cannot have two for parts in a comprehension",
+   "inner needs to be defined first"
+  ],
+  "answer": 0,
+  "expectError": "NameError",
+  "explanation": "The for parts run left to right, so the one that produces outer must come first. Written this way, Python reaches outer before anything has given it a value, so it raises a NameError.",
+  "wrongExplanations": [
+   "",
+   "The type of multi is not the problem; the order of the loops is.",
+   "Two for parts are allowed, and that is exactly how flattening works.",
+   "inner is created by the loop itself, so it does not need defining beforehand."
+  ]
+ },
+ {
+  "id": "comp-10",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "choose",
+  "difficulty": 3,
+  "question": "Which line builds a dictionary with each name as the key and its length as the value?",
+  "setup": "short = ['Aisha', 'Ben']",
+  "options": [
+   "print(dict([(n, len(n)) for n in short]))",
+   "print([(n, len(n)) for n in short])",
+   "print({(n, len(n)) for n in short})",
+   "print(dict([(len(n), n) for n in short]))"
+  ],
+  "answer": 0,
+  "explanation": "The comprehension builds a list of key-and-value pairs, and dict() turns that list of pairs into a dictionary. This is the pattern the course uses, alongside dict(zip(keys, values)).",
+  "expect": "{'Aisha': 5, 'Ben': 3}\n",
+  "wrongExplanations": [
+   "",
+   "Without dict() round it, you are left with a list of tuples rather than a dictionary.",
+   "Curly brackets with pairs inside make a set of tuples, not a dictionary.",
+   "This builds each pair the wrong way round, so the lengths become the keys: {5: 'Aisha', 3: 'Ben'}."
+  ]
+ },
+ {
+  "id": "comp-11",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 2,
+  "question": "What does this print?",
+  "code": "print(dict(zip(['a', 'b', 'c'], range(3))))",
+  "options": [
+   "{'a': 0, 'b': 1, 'c': 2}",
+   "{'a': 1, 'b': 2, 'c': 3}",
+   "[('a', 0), ('b', 1), ('c', 2)]",
+   "{0: 'a', 1: 'b', 2: 'c'}"
+  ],
+  "answer": 0,
+  "expect": "{'a': 0, 'b': 1, 'c': 2}\n",
+  "explanation": "zip pairs the two sequences up, and dict() turns those pairs into keys and values. The first sequence becomes the keys. No comprehension is needed at all here, because zip already produces exactly the right shape.",
+  "wrongExplanations": [
+   "",
+   "range(3) starts at 0, not 1.",
+   "dict() turns the pairs into a dictionary; without it you would see the pairs.",
+   "The first sequence given to zip becomes the keys, so the letters are the keys."
+  ]
+ },
+ {
+  "id": "comp-12",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "bug",
+  "difficulty": 2,
+  "question": "This was meant to collect the names, but it collects something else. What does it print?",
+  "code": "print([dept for name in names])",
+  "options": [
+   "A NameError, because dept was never given a value",
+   "['Aisha', 'Ben', 'Carla', 'Dan', 'Ella', 'Finn']",
+   "['HR', 'Finance', 'HR', 'IT', 'Finance', 'IT']",
+   "An empty list"
+  ],
+  "answer": 0,
+  "expectError": "NameError",
+  "explanation": "The loop variable is name, but the thing being collected is dept, which does not exist. The part before the for has to use the loop variable, or something already defined.",
+  "wrongExplanations": [
+   "",
+   "That would need name, not dept, before the for.",
+   "depts is a list that exists, but dept on its own does not, and the comprehension never looks at it.",
+   "The comprehension would run six times if it could; it fails on the first."
+  ]
+ },
+ {
+  "id": "comp-13",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "structure",
+  "difficulty": 2,
+  "question": "Which bracket type do you use to build a set with a comprehension?",
+  "options": [
+   "Curly brackets, { }",
+   "Square brackets, [ ]",
+   "Round brackets, ( )",
+   "Angle brackets, < >"
+  ],
+  "answer": 0,
+  "explanation": "The brackets decide what you get: square makes a list, curly makes a set. It is the same loop inside either way.",
+  "wrongExplanations": [
+   "",
+   "Square brackets make a list, which keeps repeats and order.",
+   "Round brackets make something called a generator, which is a later topic.",
+   "Angle brackets are not used for this in Python."
+  ]
+ },
+ {
+  "id": "comp-14",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "predict",
+  "difficulty": 3,
+  "question": "What does this print?",
+  "code": "print([n for n in range(2, 12) if not any([n % x == 0 for x in range(2, n)])])",
+  "options": [
+   "[2, 3, 5, 7, 11]",
+   "[2, 3, 4, 5, 7, 11]",
+   "[3, 5, 7, 11]",
+   "[4, 6, 8, 9, 10]"
+  ],
+  "answer": 0,
+  "expect": "[2, 3, 5, 7, 11]\n",
+  "explanation": "The inner comprehension tests whether n divides exactly by anything between 2 and n. any() is True if at least one of those worked, so not any() keeps only the numbers nothing divided into: the primes.",
+  "wrongExplanations": [
+   "",
+   "4 divides by 2, so any() is True for it and it is filtered out.",
+   "2 is kept: range(2, 2) is empty, any([]) is False, so not any() is True.",
+   "Those are the numbers that were filtered out, not the ones kept."
+  ]
+ },
+ {
+  "id": "comp-15",
+  "area": "Comprehensions",
+  "topic": "comprehensions",
+  "angle": "concept",
+  "difficulty": 2,
+  "question": "Compared with building a list using a for loop and .append(), what does a comprehension change?",
+  "options": [
+   "Nothing about the result; it is the same loop written more compactly",
+   "It makes the result a set instead of a list",
+   "It skips the looping altogether",
+   "It can only ever produce numbers"
+  ],
+  "answer": 0,
+  "explanation": "A comprehension is a shorter way of writing the same thing. It still loops; it just hands back the finished list rather than making you start with an empty one and append.",
+  "wrongExplanations": [
+   "",
+   "Square brackets still give a list. It is curly brackets that give a set.",
+   "The looping still happens on every item.",
+   "It can collect anything at all: strings, tuples, whatever the loop produces."
+  ]
+ },
+ {
+  "id": "cond-11",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "choose",
+  "difficulty": 2,
+  "question": "dept holds 'IT'. Which line correctly checks whether the department is HR or IT?",
+  "setup": "dept = 'IT'",
+  "options": [
+   "print(dept == 'HR' or dept == 'IT')",
+   "print(dept == 'HR' or 'IT')",
+   "print(dept == ('HR' or 'IT'))",
+   "print(dept == 'HR' and dept == 'IT')"
+  ],
+  "answer": 0,
+  "expect": "True\n",
+  "explanation": "Each side of an or has to be a complete comparison. Writing dept == twice looks repetitive, but it is the only version that actually compares the department with both names.",
+  "wrongExplanations": [
+   "",
+   "This is the classic trap. Python reads it as (dept == 'HR') or ('IT'), and a non-empty string counts as true, so it prints IT rather than a True or False answer.",
+   "The bracket is worked out first: ('HR' or 'IT') is just 'HR', so this only ever compares with HR.",
+   "A department cannot be both at once, so and makes this False for everybody."
+  ]
+ },
+ {
+  "id": "cond-12",
+  "area": "Conditions",
+  "topic": "conditions",
+  "angle": "logic",
+  "difficulty": 3,
+  "question": "Which condition is true whenever b lies between a and c, whichever way round a and c happen to be? (Try it with a = 15, b = 12, c = 10.)",
+  "options": [
+   "a < b < c or c < b < a",
+   "a < b < c",
+   "a < b and b < c",
+   "b > a and b < c"
+  ],
+  "answer": 0,
+  "explanation": "A single chained comparison only covers one direction. With a = 15 and c = 10 the smaller value is on the right, so a < b < c is False even though 12 really is between them. Checking both directions with or covers either arrangement.",
+  "wrongExplanations": [
+   "",
+   "This only works when a is the smaller of the two. With a = 15, b = 12, c = 10 it is False, even though b is between them.",
+   "This is the same test written out longhand, so it has the same gap.",
+   "Also the same test again: it assumes a is below and c is above."
+  ]
+ },
+ {
+  "id": "pep8-11",
+  "area": "Foundations",
+  "topic": "pep8",
+  "angle": "logic",
+  "difficulty": 2,
+  "question": "This line runs perfectly well but breaks two PEP 8 rules. Which two?",
+  "code": "my_list=[1,2,3]",
+  "options": [
+   "No spaces around the = , and no space after each comma",
+   "The name is too short, and the list is too long",
+   "Square brackets should be round, and the numbers should be strings",
+   "It needs a comment, and it needs a semicolon"
+  ],
+  "answer": 0,
+  "explanation": "An assignment should read my_list = [1, 2, 3]: a space either side of the equals sign, and a space after each comma but not before. Both rules are about making the line easy to read at a glance.",
+  "wrongExplanations": [
+   "",
+   "my_list is a perfectly reasonable name and three items is a perfectly reasonable list.",
+   "Square brackets are correct for a list, and the numbers are meant to be numbers.",
+   "A comment is not required on every line, and Python does not use semicolons at the end of lines."
+  ]
+ }
+];
+/* === QUESTION BANK END === */
+
+const TOPICS = [
+  { id:"print",       name:"print & functions",   area:"Foundations" },
+  { id:"variables",   name:"variables",            area:"Foundations" },
+  { id:"types",       name:"data types",           area:"Foundations" },
+  { id:"pep8",        name:"PEP 8 style",          area:"Foundations" },
+  { id:"lists",       name:"lists",                area:"Data structures" },
+  { id:"tuples",      name:"tuples",               area:"Data structures" },
+  { id:"sets",        name:"sets",                 area:"Data structures" },
+  { id:"dicts",       name:"dictionaries",         area:"Data structures" },
+  { id:"choosing",    name:"choosing a structure", area:"Data structures" },
+  { id:"conditions",  name:"conditions",           area:"Conditions" },
+  { id:"ifelse",      name:"if / elif / else",     area:"Conditions" },
+  { id:"truthtables", name:"truth tables",         area:"Conditions" },
+  { id:"forloops",    name:"for loops",            area:"Loops" },
+  { id:"whileloops",  name:"while loops",          area:"Loops" },
+  { id:"comprehensions", name:"comprehensions",    area:"Comprehensions" }
+];
+const AREAS = [
+  { name:"Foundations",     key:"found" },
+  { name:"Data structures", key:"data"  },
+  { name:"Conditions",      key:"cond"  },
+  { name:"Loops",           key:"loop"  },
+  { name:"Comprehensions",  key:"comp"  }
+];
+
+(function(){
+"use strict";
+
+/* ---------------- storage (never allowed to break the app) ---------------- */
+const KEY = "pyquiz.v1";
+let memory = null;
+function blank(){ return { topics:{}, wrong:[] }; }
+function load(){
+  if(memory) return memory;
+  try {
+    const raw = window.localStorage.getItem(KEY);
+    if(!raw) return (memory = blank());
+    const d = JSON.parse(raw);
+    const base = blank();
+    if(d && typeof d === "object"){
+      if(d.topics && typeof d.topics === "object") base.topics = d.topics;
+      if(Array.isArray(d.wrong)) base.wrong = d.wrong;
+    }
+    return (memory = base);
+  } catch(e){ return (memory = blank()); }
+}
+function save(){
+  try { window.localStorage.setItem(KEY, JSON.stringify(memory)); }
+  catch(e){ /* storage blocked: carry on with this session only */ }
+}
+function topicStat(id){
+  const d = load();
+  if(!d.topics[id]) d.topics[id] = { seen:0, right:0, best:0 };
+  return d.topics[id];
+}
+
+/* ---------------- helpers ---------------- */
+const $ = id => document.getElementById(id);
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function areaKey(area){
+  const a = AREAS.find(x => x.name === area);
+  return a ? a.key : "found";
+}
+function topicById(id){ return TOPICS.find(t => t.id === id); }
+function topicName(id){ const t = topicById(id); return t ? t.name : id; }
+function shuffle(a){
+  const b = a.slice();
+  for(let i=b.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [b[i],b[j]] = [b[j],b[i]]; }
+  return b;
+}
+
+/* ---------------- a very small Python highlighter ----------------
+   Strings and comments are found first so that keywords inside them
+   are left alone. */
+const KEYWORDS = ("False None True and as assert break class continue def del elif else except " +
+  "finally for from global if import in is lambda nonlocal not or pass raise return try while with yield").split(" ");
+const BUILTINS = ("print len range type int str float bool list tuple set dict frozenset zip enumerate " +
+  "input any all sum min max sorted abs round id").split(" ");
+function highlight(code){
+  /* Strings and comments are taken out first, so keywords inside them are
+     left alone. Everything else is then walked through once, token by token.
+     One pass matters: an earlier version chained .replace() calls and the
+     later ones found the markup the earlier ones had just inserted, which
+     put raw class="..." text on the screen. */
+  function plain(text){
+    let out = "";
+    const re = /([A-Za-z_][A-Za-z0-9_]*)|(\d+\.?\d*)|([\s\S])/g;
+    let m;
+    while((m = re.exec(text)) !== null){
+      if(m[1]){
+        const word = m[1];
+        const follows = text.slice(re.lastIndex);
+        if(KEYWORDS.indexOf(word) >= 0) out += '<span class="kw">' + word + "</span>";
+        else if(BUILTINS.indexOf(word) >= 0 && /^\s*\(/.test(follows))
+          out += '<span class="fn">' + word + "</span>";
+        else out += word;
+      } else if(m[2]){
+        out += '<span class="num">' + m[2] + "</span>";
+      } else {
+        out += esc(m[3]);
+      }
+    }
+    return out;
+  }
+  let outHTML = "";
+  let rest = String(code);
+  const re = /('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|#[^\n]*)/;
+  let m;
+  while((m = re.exec(rest)) !== null){
+    outHTML += plain(rest.slice(0, m.index));
+    outHTML += '<span class="' + (m[0][0] === "#" ? "com" : "str") + '">' + esc(m[0]) + "</span>";
+    rest = rest.slice(m.index + m[0].length);
+  }
+  return outHTML + plain(rest);
+}
+
+/* ---------------- screens ---------------- */
+let screen = "home";
+function show(name){
+  screen = name;
+  ["home","setup","quiz","results"].forEach(s => $("screen-"+s).classList.toggle("hidden", s !== name));
+  $("homeBtn").classList.toggle("hidden", name === "home");
+  window.scrollTo(0,0);
+}
+
+function ring(pct, colour){
+  const r = 15, c = 2*Math.PI*r, done = c * (pct/100);
+  return '<svg class="ring" viewBox="0 0 40 40" aria-hidden="true">' +
+    '<circle cx="20" cy="20" r="'+r+'" fill="none" stroke="var(--chip)" stroke-width="4"/>' +
+    '<circle cx="20" cy="20" r="'+r+'" fill="none" stroke="'+colour+'" stroke-width="4" ' +
+      'stroke-linecap="round" stroke-dasharray="'+done.toFixed(1)+' '+c.toFixed(1)+'" ' +
+      'transform="rotate(-90 20 20)"/>' +
+    '<text x="20" y="24" text-anchor="middle">'+pct+'</text></svg>';
+}
+
+function renderHome(){
+  const d = load();
+  let html = '<div class="card plain"><h2>What would you like to do?</h2>' +
+    '<p class="muted small">Questions cover weeks 1 to 3. Pick a topic to practise just that, ' +
+    'or use "Quiz me" for a mix.</p>' +
+    '<div class="row" style="margin-top:14px">' +
+    '<button class="btn primary" id="quizMe">Quiz me</button>';
+  if(d.wrong.length) html += '<button class="btn" id="mistakes">Mistakes round (' + d.wrong.length + ')</button>';
+  html += '<button class="btn ghost" id="resetBtn">Reset progress</button></div>' +
+    '<div id="confirmSlot"></div></div>';
+
+  AREAS.forEach(area => {
+    const ts = TOPICS.filter(t => t.area === area.name);
+    if(!ts.length) return;
+    const col = "var(--a-" + area.key + ")";
+    html += '<div class="areahead"><span class="areadot" style="background:'+col+'"></span>' +
+            '<h2 style="color:'+col+'">' + esc(area.name) + '</h2></div><div class="topicgrid">';
+    ts.forEach(t => {
+      const st = d.topics[t.id] || { seen:0, right:0, best:0 };
+      const total = QUESTIONS.filter(q => q.topic === t.id).length;
+      const sub = st.seen ? ("best " + st.best + "%  &middot;  " + st.seen + " answered") : (total + " questions");
+      html += '<button class="topiccard" data-topic="'+t.id+'">' +
+              '<span class="tname"><b>' + esc(t.name) + '</b><span>' + sub + '</span></span>' +
+              ring(st.best || 0, col) + '</button>';
+    });
+    html += "</div>";
+  });
+  $("screen-home").innerHTML = html;
+
+  $("quizMe").onclick = () => renderSetup(null);
+  const mb = $("mistakes"); if(mb) mb.onclick = startMistakes;
+  $("resetBtn").onclick = askReset;
+  document.querySelectorAll(".topiccard").forEach(b => {
+    b.onclick = () => renderSetup([b.getAttribute("data-topic")]);
+  });
+}
+function askReset(){
+  $("confirmSlot").innerHTML =
+    '<div class="confirm"><p style="margin:0 0 10px"><b>Delete all saved progress?</b> ' +
+    'Scores and your saved mistakes will be cleared from this browser. This cannot be undone.</p>' +
+    '<div class="row"><button class="btn danger" id="yesReset">Yes, reset everything</button>' +
+    '<button class="btn ghost" id="noReset">Cancel</button></div></div>';
+  $("yesReset").onclick = () => {
+    memory = blank(); save();
+    renderHome();
+  };
+  $("noReset").onclick = () => { $("confirmSlot").innerHTML = ""; };
+}
+
+/* ---------------- set up ---------------- */
+let setupState = { topics:[], count:10, diff:"any" };
+function renderSetup(preselect){
+  setupState = { topics: preselect ? preselect.slice() : [], count:10, diff:"any" };
+  let html = '<div class="card"><h2>Set up your quiz</h2>';
+  html += '<span class="fieldlab">Topics</span><div class="optrow" id="topicPills">' +
+          '<button class="pill" data-t="__all__" aria-pressed="false">All</button>';
+  TOPICS.forEach(t => {
+    html += '<button class="pill" data-t="'+t.id+'" aria-pressed="false">' + esc(t.name) + '</button>';
+  });
+  html += "</div>";
+  html += '<span class="fieldlab">How many questions</span><div class="optrow" id="countPills">' +
+          ["5","10","20","All"].map(n =>
+            '<button class="pill" data-n="'+n+'" aria-pressed="'+(n==="10")+'">'+n+'</button>').join("") + "</div>";
+  html += '<span class="fieldlab">Difficulty</span><div class="optrow" id="diffPills">' +
+          [["any","Any"],["1","Easy"],["2","Medium"],["3","Harder"]].map(d =>
+            '<button class="pill" data-d="'+d[0]+'" aria-pressed="'+(d[0]==="any")+'">'+d[1]+'</button>').join("") + "</div>";
+  html += '<p class="hintline muted small" id="poolNote" style="margin-top:18px"></p>';
+  html += '<div class="row"><button class="btn primary" id="startQuiz">Start</button>' +
+          '<button class="btn ghost" id="backHome">Back</button></div></div>';
+  $("screen-setup").innerHTML = html;
+
+  function paint(){
+    document.querySelectorAll("#topicPills .pill").forEach(p => {
+      const t = p.getAttribute("data-t");
+      const on = t === "__all__" ? setupState.topics.length === 0 : setupState.topics.indexOf(t) >= 0;
+      p.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    const n = pool().length;
+    $("poolNote").textContent = n + (n === 1 ? " question matches." : " questions match.");
+    $("startQuiz").disabled = n === 0;
+  }
+  document.querySelectorAll("#topicPills .pill").forEach(p => {
+    p.onclick = () => {
+      const t = p.getAttribute("data-t");
+      if(t === "__all__") setupState.topics = [];
+      else {
+        const i = setupState.topics.indexOf(t);
+        if(i >= 0) setupState.topics.splice(i,1); else setupState.topics.push(t);
+      }
+      paint();
+    };
+  });
+  document.querySelectorAll("#countPills .pill").forEach(p => {
+    p.onclick = () => {
+      setupState.count = p.getAttribute("data-n") === "All" ? "all" : parseInt(p.getAttribute("data-n"),10);
+      document.querySelectorAll("#countPills .pill").forEach(x => x.setAttribute("aria-pressed","false"));
+      p.setAttribute("aria-pressed","true");
+      paint();
+    };
+  });
+  document.querySelectorAll("#diffPills .pill").forEach(p => {
+    p.onclick = () => {
+      setupState.diff = p.getAttribute("data-d");
+      document.querySelectorAll("#diffPills .pill").forEach(x => x.setAttribute("aria-pressed","false"));
+      p.setAttribute("aria-pressed","true");
+      paint();
+    };
+  });
+  $("startQuiz").onclick = () => startQuiz(pool());
+  $("backHome").onclick = () => { renderHome(); show("home"); };
+  paint();
+  show("setup");
+}
+function pool(){
+  return QUESTIONS.filter(q =>
+    (setupState.topics.length === 0 || setupState.topics.indexOf(q.topic) >= 0) &&
+    (setupState.diff === "any" || String(q.difficulty) === setupState.diff));
+}
+
+/* ---------------- the quiz ---------------- */
+let quiz = null;
+function startQuiz(list, label){
+  const picked = shuffle(list);
+  const n = (setupState.count === "all" || !setupState.count) ? picked.length
+            : Math.min(setupState.count, picked.length);
+  quiz = {
+    items: picked.slice(0, n).map(q => ({ q:q, order:shuffle([0,1,2,3]) })),
+    i:0, answers:[], label: label || null
+  };
+  renderQuestion();
+  show("quiz");
+}
+function startMistakes(){
+  const d = load();
+  const list = QUESTIONS.filter(q => d.wrong.indexOf(q.id) >= 0);
+  if(!list.length) return;
+  setupState = { topics:[], count:"all", diff:"any" };
+  startQuiz(list, "Mistakes round");
+}
+function renderQuestion(){
+  const it = quiz.items[quiz.i], q = it.q;
+  const t = topicById(q.topic), key = areaKey(q.area);
+  let html = '<div class="card fade"><div class="qtop">' +
+    '<span class="badge" style="background:var(--a-'+key+'-bg);color:var(--a-'+key+')">' +
+      esc(t ? t.name : q.topic) + '</span>' +
+    '<span class="spacer"></span>' +
+    '<span class="small muted">' + (quiz.label ? esc(quiz.label) + " &middot; " : "") +
+      "Question " + (quiz.i+1) + " of " + quiz.items.length + "</span></div>";
+  html += '<div class="pbar"><i style="width:' + (quiz.i/quiz.items.length*100) + '%"></i></div>';
+  html += '<p class="qtext">' + esc(q.question) + "</p>";
+  if(q.code) html += '<pre class="code">' + highlight(q.code) + "</pre>";
+  html += '<div class="answers" id="answers">';
+  it.order.forEach((orig, slot) => {
+    const text = q.options[orig];
+    const prose = /[a-z]{4,}\s[a-z]{4,}/.test(text) && !/[=\[\](){}]/.test(text);
+    html += '<button class="ans' + (prose ? " prose" : "") + '" data-orig="'+orig+'" data-slot="'+slot+'">' +
+            '<span class="key">' + "ABCD"[slot] + '</span><span class="atext">' + esc(text) + "</span></button>";
+  });
+  html += "</div><div id=\"fbSlot\"></div></div>";
+  $("screen-quiz").innerHTML = html;
+  document.querySelectorAll("#answers .ans").forEach(b => {
+    b.onclick = () => answer(parseInt(b.getAttribute("data-orig"),10));
+  });
+}
+function answer(orig){
+  const it = quiz.items[quiz.i], q = it.q;
+  if(it.given !== undefined) return;
+  it.given = orig;
+  const right = orig === q.answer;
+  quiz.answers.push({ id:q.id, topic:q.topic, right:right });
+
+  const st = topicStat(q.topic);
+  st.seen++; if(right) st.right++;
+  const d = load();
+  const at = d.wrong.indexOf(q.id);
+  if(right){ if(at >= 0) d.wrong.splice(at,1); }
+  else if(at < 0) d.wrong.push(q.id);
+  save();
+
+  document.querySelectorAll("#answers .ans").forEach(b => {
+    const o = parseInt(b.getAttribute("data-orig"),10);
+    b.disabled = true;
+    if(o === q.answer) b.classList.add("right");
+    else if(o === orig) b.classList.add("wrong");
+  });
+  let html = '<div class="fb ' + (right ? "ok" : "no") + '"><p class="fbhead">' +
+             (right ? "Correct" : "Not quite") + "</p>";
+  if(!right){
+    const w = (q.wrongExplanations || [])[orig];
+    if(w) html += "<p>" + esc(w) + "</p>";
+  }
+  html += "<p>" + esc(q.explanation) + "</p></div>";
+  const last = quiz.i + 1 >= quiz.items.length;
+  html += '<div class="row" style="margin-top:16px"><button class="btn primary" id="nextBtn">' +
+          (last ? "See results" : "Next") + "</button></div>";
+  $("fbSlot").innerHTML = html;
+  $("nextBtn").focus();
+  $("nextBtn").onclick = next;
+}
+function next(){
+  if(quiz.i + 1 >= quiz.items.length) return renderResults();
+  quiz.i++;
+  renderQuestion();
+}
+
+/* ---------------- results ---------------- */
+function renderResults(){
+  const total = quiz.answers.length;
+  const right = quiz.answers.filter(a => a.right).length;
+  const pct = total ? Math.round(right/total*100) : 0;
+  const byTopic = {};
+  quiz.answers.forEach(a => {
+    if(!byTopic[a.topic]) byTopic[a.topic] = { n:0, c:0 };
+    byTopic[a.topic].n++; if(a.right) byTopic[a.topic].c++;
+  });
+  Object.keys(byTopic).forEach(t => {
+    const st = topicStat(t);
+    const p = Math.round(byTopic[t].c / byTopic[t].n * 100);
+    if(p > (st.best||0)) st.best = p;
+  });
+  save();
+
+  let msg;
+  if(pct === 100) msg = "Every one right. Worth trying a harder difficulty next.";
+  else if(pct >= 80) msg = "Strong. The few you missed are the ones worth re-reading.";
+  else if(pct >= 60) msg = "A good base. The explanations below are where the value is.";
+  else if(pct >= 40) msg = "Plenty to build on. Try the mistakes round in a day or two.";
+  else msg = "Early days, and that is exactly what this is for. Read the explanations, then try again.";
+
+  let html = '<div class="card"><h2>Results</h2>' +
+    '<div class="scoreline"><span class="big">' + right + "/" + total + '</span>' +
+    '<span class="muted">' + pct + "%</span></div><p class=\"muted\">" + msg + "</p>";
+  html += '<h3 style="margin-top:22px">By topic</h3><div>';
+  Object.keys(byTopic).forEach(t => {
+    const o = byTopic[t], p = Math.round(o.c/o.n*100);
+    const tt = topicById(t), col = "var(--a-" + areaKey(tt ? tt.area : "") + ")";
+    html += '<div class="trow"><div><div style="font-weight:600">' + esc(topicName(t)) + "</div>" +
+            '<div class="tbar"><i style="width:'+p+'%;background:'+col+'"></i></div></div>' +
+            '<div class="tv">' + o.c + "/" + o.n + "</div></div>";
+  });
+  html += "</div>";
+
+  const missed = quiz.items.filter(it => it.given !== undefined && it.given !== it.q.answer);
+  if(missed.length){
+    html += '<h3 style="margin-top:24px">What to look at again</h3>';
+    missed.forEach(it => {
+      const q = it.q;
+      html += '<div class="wrongitem"><p class="wq">' + esc(q.question) + "</p>";
+      if(q.code) html += '<pre class="code">' + highlight(q.code) + "</pre>";
+      html += '<p class="small" style="margin:0 0 6px"><b>Answer:</b> <code>' + esc(q.options[q.answer]) + "</code></p>";
+      html += '<p class="small muted" style="margin:0">' + esc(q.explanation) + "</p></div>";
+    });
+  }
+  html += '<div class="row" style="margin-top:22px">';
+  if(missed.length) html += '<button class="btn primary" id="retryBtn">Retry these mistakes</button>';
+  html += '<button class="btn" id="newBtn">New quiz</button>' +
+          '<button class="btn ghost" id="homeBtn2">Home</button></div></div>';
+  $("screen-results").innerHTML = html;
+  const rb = $("retryBtn");
+  if(rb) rb.onclick = () => {
+    setupState = { topics:[], count:"all", diff:"any" };
+    startQuiz(missed.map(it => it.q), "Mistakes round");
+  };
+  $("newBtn").onclick = () => renderSetup(null);
+  $("homeBtn2").onclick = () => { renderHome(); show("home"); };
+  show("results");
+}
+
+/* ---------------- keyboard ---------------- */
+document.addEventListener("keydown", e => {
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  if(e.key === "Escape"){ renderHome(); show("home"); return; }
+  if(screen !== "quiz") return;
+  const it = quiz && quiz.items[quiz.i];
+  if(!it) return;
+  if(e.key === "Enter"){
+    const nb = $("nextBtn");
+    if(nb){ e.preventDefault(); next(); }
+    return;
+  }
+  let slot = -1;
+  if(/^[1-4]$/.test(e.key)) slot = parseInt(e.key,10) - 1;
+  else if(/^[a-dA-D]$/.test(e.key)) slot = "abcd".indexOf(e.key.toLowerCase());
+  if(slot >= 0 && it.given === undefined){
+    e.preventDefault();
+    answer(it.order[slot]);
+  }
+});
+
+$("homeBtn").onclick = () => { renderHome(); show("home"); };
+renderHome();
+show("home");
+})();
+</script>
+</body>
+</html>
